@@ -1,0 +1,2499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AP Chemistry 学习工具</title>
+<meta name="description" content="AP Chemistry 中文可视化学习工具：9 个单元完整课程地图、470+ 道真题练习（含配图题）、错题本与生词本。手机、平板、桌面均可使用。">
+<meta name="theme-color" content="#2b6de9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AP Chemistry">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta property="og:title" content="AP Chemistry 学习工具">
+<meta property="og:description" content="9 个单元 · 470+ 题 · 配图题 · 错题本 · 生词本">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="assets/style.css">
+<noscript><style>
+/* ================= 无 JavaScript 兜底 v2 =================
+   场景：iOS「文件」App 快速查看 / 微信文件预览 / 金山文档 / 网盘预览
+   这些阅读器禁用脚本，页面能显示但所有交互失效。本样式表只在
+   「脚本不可用」时生效，用纯 CSS 恢复可用的导航与阅读体验。 */
+
+/* —— 顶部提示卡：改为文档流，不遮挡 —— */
+.nojs{position:static !important;left:auto !important;top:auto !important;
+  transform:none !important;width:auto !important;max-width:none !important;
+  margin:0 0 14px !important;display:block !important}
+.topbar .btn{display:none !important}
+
+/* —— 首页：四张卡片全部保留（都是可点的锚点链接）—— */
+#home .mod-card{display:block !important;cursor:pointer}
+
+/* —— 模块切换：纯 CSS radio（点击后单独进入一个模块，像桌面端）—— */
+#mod-learn,#mod-bank,#mod-wrong,#mod-vocab{display:none !important}
+#nm-home:checked ~ #home{display:block !important}
+#nm-learn:checked ~ #mod-learn{display:block !important}
+#nm-bank:checked ~ #mod-bank{display:block !important}
+#nm-wrong:checked ~ #mod-wrong{display:block !important}
+#nm-vocab:checked ~ #mod-vocab{display:block !important}
+#nm-learn:checked ~ #home,
+#nm-bank:checked ~ #home,
+#nm-wrong:checked ~ #home,
+#nm-vocab:checked ~ #home{display:none !important}
+#mod-learn #learnContent{display:block !important}
+#mod-learn #learnDirectory{display:none !important}
+#mod-learn .ls-head{display:none !important}
+#mod-learn .tabs{display:flex !important;flex-wrap:wrap !important;overflow-x:visible !important;
+  margin-bottom:14px !important}
+#mod-learn .unit-panel{display:none !important}
+#mod-learn .pane{display:none !important}
+#mod-learn .pane:target{display:block !important;border-top:1px solid var(--line);
+  margin-top:8px;padding-top:18px;animation:none !important}
+
+/* —— 单元选择器：默认隐藏，仅在无脚本时显示 —— */
+.nojs-picker{display:block !important}
+.nojs-radio{position:absolute !important;width:1px;height:1px;opacity:0;pointer-events:none;margin:0}
+.nojs-units{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));
+  gap:10px;margin:0 0 20px}
+.nojs-units label{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;
+  background:var(--card);color:var(--ink);font-size:13.5px;line-height:1.5;cursor:pointer}
+.nojs-units label b{display:block;font-size:11.5px;letter-spacing:.4px;color:#2b5cb8;margin-bottom:3px}
+.nojs-lead{font-size:13px;color:var(--muted);margin:10px 0 12px}
+#nu1:checked ~ #learnContent #unit-u1,
+#nu2:checked ~ #learnContent #unit-u2,
+#nu3:checked ~ #learnContent #unit-u3,
+#nu4:checked ~ #learnContent #unit-u4,
+#nu5:checked ~ #learnContent #unit-u5,
+#nu6:checked ~ #learnContent #unit-u6,
+#nu7:checked ~ #learnContent #unit-u7,
+#nu8:checked ~ #learnContent #unit-u8,
+#nu9:checked ~ #learnContent #unit-u9{display:block !important}
+#nu1:checked ~ .nojs-picker label[for="nu1"],
+#nu2:checked ~ .nojs-picker label[for="nu2"],
+#nu3:checked ~ .nojs-picker label[for="nu3"],
+#nu4:checked ~ .nojs-picker label[for="nu4"],
+#nu5:checked ~ .nojs-picker label[for="nu5"],
+#nu6:checked ~ .nojs-picker label[for="nu6"],
+#nu7:checked ~ .nojs-picker label[for="nu7"],
+#nu8:checked ~ .nojs-picker label[for="nu8"],
+#nu9:checked ~ .nojs-picker label[for="nu9"]{border-color:#2b6de9;background:#e7efff;box-shadow:0 6px 18px rgba(43,109,233,.14)}
+
+/* —— 需要脚本的模块：点开显示说明，而不是空白 —— */
+.nojs-need{display:block;padding:18px 20px;border:1px dashed var(--line);border-radius:12px;
+  background:#f7faff;color:var(--muted);font-size:13.5px;line-height:1.85;margin:10px 0}
+.nojs-need b{display:block;font-size:15px;color:var(--ink);margin-bottom:6px}
+
+/* —— 脚本填充的空容器一律不显示 —— */
+.bgn:empty,.practice:empty,.fig:empty{display:none !important}
+.sliders{display:none !important}
+
+/* —— 顶部导航条 —— */
+.nojs-nav{display:flex !important;flex-wrap:wrap;gap:8px;margin-top:14px}
+.nojs-nav a,.nojs-nav label{display:inline-block;padding:8px 13px;border:1px solid #cddaf0;border-radius:9px;
+  color:#2b5cb8;text-decoration:none;font-size:13px;background:#f7faff;cursor:pointer}
+
+/* —— 深色模式 —— */
+[data-theme="dark"] .nojs-need{background:#171d29;color:var(--muted)}
+[data-theme="dark"] .nojs-need b{color:var(--ink)}
+[data-theme="dark"] .nojs-nav a,[data-theme="dark"] .nojs-nav label,[data-theme="dark"] .nojs-units label{
+  background:var(--card);border-color:var(--line);color:var(--ink)}
+[data-theme="dark"] .nojs-nav a,[data-theme="dark"] .nojs-nav label{color:#8fb4f0;background:#1e2735;border-color:#2c3a52}
+[data-theme="dark"] .nojs-units label b{color:#8fb4f0}
+[data-theme="dark"] #nu1:checked ~ .nojs-picker label[for="nu1"],
+[data-theme="dark"] #nu2:checked ~ .nojs-picker label[for="nu2"],
+[data-theme="dark"] #nu3:checked ~ .nojs-picker label[for="nu3"],
+[data-theme="dark"] #nu4:checked ~ .nojs-picker label[for="nu4"],
+[data-theme="dark"] #nu5:checked ~ .nojs-picker label[for="nu5"],
+[data-theme="dark"] #nu6:checked ~ .nojs-picker label[for="nu6"],
+[data-theme="dark"] #nu7:checked ~ .nojs-picker label[for="nu7"],
+[data-theme="dark"] #nu8:checked ~ .nojs-picker label[for="nu8"],
+[data-theme="dark"] #nu9:checked ~ .nojs-picker label[for="nu9"]{
+  border-color:#4d7fe0;background:#1b2740}
+</style></noscript>
+</head>
+<body>
+<script>
+try{var _t=localStorage.getItem("apchem.theme");if(_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
+try{var _fs=localStorage.getItem("apchem.fontScale");if(_fs&&_fs!=="1"){document.body.style.zoom=_fs}}catch(e){}
+try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentElement.style.setProperty("--wm-size",_wm+"px")}}catch(e){}
+</script>
+<noscript>
+  <div class="nojs">
+    <b>当前阅读器没有运行 JavaScript —— 已切换为「无脚本阅读模式」</b>
+    <p>你现在处于<b>预览模式</b>：iOS「文件」App 的快速查看、微信「文件预览」「金山文档」「网盘预览」等阅读器出于安全考虑会<b>禁用脚本</b>。因此动图、选择元素、做题这些交互都无法运行——<b>这不是文件损坏</b>。</p>
+    <p>本模式下仍可正常阅读全部 9 个单元：点下面的「学习」，再在上方选择 Unit 1 – Unit 9。</p>
+    <p class="nojs-nav">
+      <label for="nm-home">⌂ 首页</label>
+      <label for="nm-learn">≡ 学习（U1–U9）</label>
+      <label for="nm-bank">∑ 题库</label>
+      <label for="nm-wrong">✗ 错题本</label>
+      <label for="nm-vocab">Aa 生词本</label>
+    </p>
+    <p><b>想要完整的交互（动图、做题、错题本、生词本）？</b>请在真正的浏览器中打开本文件（iPhone 用 Safari），或把它发布成在线链接后用 Safari／微信打开。</p>
+  </div>
+</noscript>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand"><span class="logo">AP</span> AP Chemistry 学习工具</div>
+    <span class="crumb" id="crumb">首页</span>
+    <span class="spacer"></span>
+    <button class="btn" id="btnGap">查缺补漏</button>
+    <button class="btn" id="btnPdf">大纲</button>
+    <button class="btn" id="btnTrans">翻译</button><button class="btn" id="btnReload" title="重新载入页面">刷新</button>
+    <button class="btn back" id="btnBack">← 返回首页</button>
+    <button class="btn acct-entry" id="btnUser" title="登录 / 注册 / 个人中心">登录 / 注册</button>
+  </div>
+
+  <!-- ============ 首页：模块选择 ============ -->
+  <!-- 无脚本模块选择器（脚本可用时完全隐藏，不影响正常界面） -->
+  <input type="radio" name="nojsmod" id="nm-home" class="nojs-radio" checked>
+  <input type="radio" name="nojsmod" id="nm-learn" class="nojs-radio">
+  <input type="radio" name="nojsmod" id="nm-bank" class="nojs-radio">
+  <input type="radio" name="nojsmod" id="nm-wrong" class="nojs-radio">
+  <input type="radio" name="nojsmod" id="nm-vocab" class="nojs-radio">
+  <div id="home">
+    <div class="home-head">
+      <h1>AP Chemistry</h1>
+    </div>
+    <div class="modules">
+      <label class="mod-card learn" data-mod="learn" for="nm-learn">
+        <span class="go">进入 →</span>
+        <div class="ic">≡</div>
+        <h2>学习</h2>
+        <p class="desc">Course Map —— 全部 9 个单元的内容地图，按 AP 官方小节归类，一键进入学习页或练习。</p>
+        <div class="chips">
+          <span class="chip">9 个单元</span><span class="chip">按小节归类</span><span class="chip">一键练习</span>
+        </div>
+      </label>
+      <label class="mod-card bank" data-mod="bank" for="nm-bank">
+        <span class="go">进入 →</span>
+        <div class="ic">∑</div>
+        <h2>题库</h2>
+        <p class="desc">Question Bank —— 所有 PDF 题目按小节归好档。先选范围（如 U2.7 分子几何），再选题量，随时开练。</p>
+        <div class="chips">
+          <span class="chip">按范围选</span><span class="chip">自选题量</span><span class="chip">中英双语解析</span>
+        </div>
+      </label>
+      <label class="mod-card wrong" data-mod="wrong" for="nm-wrong">
+        <span class="go">进入 →</span>
+        <div class="ic">✗</div>
+        <h2>错题本</h2>
+        <p class="desc">Review Book —— 只收录做错的题，分「待订正 / 已订正」两部分，一键重做全部待订正。</p>
+        <div class="chips">
+          <span class="chip">自动记录</span><span class="chip">三态分类</span><span class="chip">一键订正</span>
+        </div>
+      </label>
+      <label class="mod-card vocab" data-mod="vocab" for="nm-vocab">
+        <span class="go">进入 →</span>
+        <div class="ic">Aa</div>
+        <h2>生词本</h2>
+        <p class="desc">Vocabulary Book —— 用「翻译」查过的单词会自动收录，集中查看中文释义与知识点，还能进入背诵模式自测。</p>
+        <div class="chips">
+          <span class="chip">单词列表</span><span class="chip">背诵模式</span><span class="chip">自动收录</span>
+        </div>
+      </label>
+    </div>
+        <button class="theme-toggle" id="btnSettings" aria-label="设置" aria-haspopup="dialog">
+        <span class="tt-icon">&#9881;</span><span class="tt-text">设置</span>
+      </button>
+</div>
+
+  <!-- ============ 学习 · 目录 ============ -->
+  <div class="module learn" id="mod-learn">
+    <div class="module-head" id="learnHead"><h2>学习 · Course Map</h2><p>AP Chemistry 全部 9 个单元。点击任意卡片进入该单元的教学空间。</p></div>
+    <div id="learnDirectory"></div>
+<!-- 无脚本兜底：纯 CSS 单元选择器（脚本可用时整块隐藏、不参与任何逻辑） -->
+    <input type="radio" name="nojsunit" id="nu1" class="nojs-radio" checked>
+    <input type="radio" name="nojsunit" id="nu2" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu3" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu4" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu5" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu6" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu7" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu8" class="nojs-radio">
+    <input type="radio" name="nojsunit" id="nu9" class="nojs-radio">
+    <div class="nojs-picker">
+      <p class="nojs-lead">选择要学习的单元 —— 该单元的内容会整章展开，可连续滚动阅读：</p>
+      <div class="nojs-units">
+      <label for="nu1"><b>Unit 1</b>原子结构与性质</label>
+      <label for="nu2"><b>Unit 2</b>分子与离子化合物</label>
+      <label for="nu3"><b>Unit 3</b>分子间作用力与性质</label>
+      <label for="nu4"><b>Unit 4</b>化学反应</label>
+      <label for="nu5"><b>Unit 5</b>化学动力学</label>
+      <label for="nu6"><b>Unit 6</b>热力学</label>
+      <label for="nu7"><b>Unit 7</b>化学平衡</label>
+      <label for="nu8"><b>Unit 8</b>酸和碱</label>
+      <label for="nu9"><b>Unit 9</b>热力学应用与电化学</label>
+      </div>
+    </div>
+    <div class="learn-content" id="learnContent">
+      <div class="ls-head">
+        <button class="btn ls-back" id="backDir">← 返回单元列表</button>
+        <div class="ls-title"><b id="lsTitle">—</b><span id="lsMeta"></span></div>
+      </div>
+    <div class="unit-panel active" id="unit-u1">
+<nav class="tabs" data-tabs>
+      <a class="tab on" href="#u1e-mole" data-pane="u1e-mole">摩尔与摩尔质量</a>
+      <a class="tab" href="#u1e-massspec" data-pane="u1e-massspec">质谱与同位素</a>
+      <a class="tab" href="#u1e-comp" data-pane="u1e-comp">元素组成与化学式</a>
+      <a class="tab" href="#u1e-mix" data-pane="u1e-mix">混合物与限量反应</a>
+      <a class="tab" href="#u1-atomic" data-pane="u1-atomic">原子结构</a>
+      <a class="tab" href="#u1-config" data-pane="u1-config">电子排布</a>
+      <a class="tab" href="#u1-quantum" data-pane="u1-quantum">量子数</a>
+      <a class="tab" href="#u1-pes" data-pane="u1-pes">PES 能谱</a>
+      <a class="tab" href="#u1-trends" data-pane="u1-trends">周期趋势</a>
+      <a class="tab" href="#u1e-ionic" data-pane="u1e-ionic">价电子与离子化合物</a>
+    </nav>
+
+<section class="pane on" id="u1e-mole">
+      <div class="bgn" data-bgn="u1e-mole"></div>
+      <div class="card">
+        <h3>核心：从「克」走到「个数」的桥梁</h3>
+        <p class="lead">化学家用摩尔把宏观的质量和微观的粒子数连起来。三个量之间的换算只有两条路，都要经过摩尔这个中转站。</p>
+        <div class="fx">
+          <div class="fx-row"><b>n = m / M</b><span>物质的量(mol) = 质量(g) ÷ 摩尔质量(g/mol)</span></div>
+          <div class="fx-row"><b>N = n × N<sub>A</sub></b><span>粒子数 = 物质的量 × 6.022×10²³</span></div>
+          <div class="fx-row"><b>ρ = m / V</b><span>密度 = 质量 ÷ 体积（常用于溶液的浓度换算）</span></div>
+        </div>
+        <div class="hint"><b>换算地图：</b>质量 —(÷ M)→ 摩尔 —(× N<sub>A</sub>)→ 粒子数；反向就是 × M 和 ÷ N<sub>A</sub>。<br>
+          摩尔质量在数值上等于元素的平均原子质量：1 mol C = 12.0 g，1 mol Mg = 24.3 g，1 mol Cu = 63.5 g。</div>
+        <div class="readout" style="margin-top:14px">
+          <b>例题（PPT Unit 1.1 第 3 题）：88 g 金里含有多少个原子？</b><br>
+          ① n = 88 ÷ 197 = 0.447 mol（Au 摩尔质量 197 g/mol）<br>
+          ② N = 0.447 × 6.022×10²³ ≈ <b>2.7 × 10²³ 个原子</b><br><br>
+          <b>例题（PPT 第 5 题）：Na₂Cr₂O₇ 的摩尔质量是多少？</b><br>
+          2×22.99（Na）+ 2×52.00（Cr）+ 7×16.00（O）= <b>262 g/mol</b>
+        </div>
+      </div>
+      <div class="practice" data-practice="u1e-mole"></div>
+    </section>
+
+<section class="pane" id="u1e-massspec">
+      <div class="bgn" data-bgn="u1e-massspec"></div>
+      <div class="card">
+        <h3>怎么读一张质谱图</h3>
+        <p class="lead">质谱仪把原子电离后按质量分开：横轴是质荷比，纵轴是相对丰度。它是「同种元素存在不同质量原子」最直接的证据。</p>
+        <div class="fx">
+          <div class="fx-row"><b>峰的位置</b><span>= 该同位素的质量（质荷比 m/z）</span></div>
+          <div class="fx-row"><b>峰的高度</b><span>= 该同位素的相对丰度（%）</span></div>
+          <div class="fx-row"><b>平均原子质量 = Σ(同位素质量 × 丰度)</b><span>每个同位素都要按自己的丰度加权</span></div>
+        </div>
+        <div class="hint">⚠ 最容易混的地方：<b>质谱的横轴是质量，PES 的横轴是电子的结合能</b>。两个图都叫「谱」，但测的东西完全不同。</div>
+        <div class="readout" style="margin-top:14px">
+          <b>例题：铜有两种天然同位素 ⁶³Cu（69.15%）和 ⁶⁵Cu（30.85%），平均原子质量是多少？</b><br>
+          63 × 0.6915 + 65 × 0.3085 = 43.56 + 20.05 = <b>63.61 ≈ 63.5</b><br><br>
+          <b>快速自检：</b>平均值一定<b>落在两个同位素质量之间</b>，而且更靠近丰度大的那一个。63.5 明显更接近 63，说明 ⁶³Cu 更丰富。如果你算出 64.5，就是把丰度用反了。<br><br>
+          <b>¹²C 基准：</b>¹²C 的质量被定义为恰好 12 u，其他原子的质量都是相对它给出的。天然碳约含 98.89% 的 ¹²C 与 1.11% 的 ¹³C，所以碳的原子量是 12.01 而不是整数 12。
+        </div>
+      </div>
+      <div class="practice" data-practice="u1e-massspec"></div>
+    </section>
+
+<section class="pane" id="u1e-comp">
+      <div class="bgn" data-bgn="u1e-comp"></div>
+      <div class="card">
+        <h3>从质量百分比推到化学式：四步走</h3>
+        <p class="lead">这是 Unit 1 计算题的绝对主角。把下面四步练成肌肉记忆，绝大多数题都能顺下来。</p>
+        <ol class="steps4">
+          <li><b>假设取 100 g 样品</b> —— 这样百分比就直接变成克数，不用再算一遍。</li>
+          <li><b>每种元素除以它的摩尔质量</b>，把「克」换成「摩尔」。</li>
+          <li><b>全部除以最小的那个摩尔数</b>，得到最简整数比 → 这就是<b>实验式（最简式）</b>。</li>
+          <li>如果题目给了摩尔质量：<b>倍数 = 摩尔质量 ÷ 实验式式量</b>，实验式乘上倍数 → <b>分子式</b>。</li>
+        </ol>
+        <div class="readout" style="margin-top:14px">
+          <b>例题（PPT Unit 1.3 Example 1）：含 47.08% C、6.59% H、46.33% Cl，摩尔质量 153 g/mol</b><br>
+          ① 取 100 g → C 47.08 g、H 6.59 g、Cl 46.33 g<br>
+          ② 除以摩尔质量：C 47.08/12.01 = 3.92；H 6.59/1.008 = 6.54；Cl 46.33/35.45 = 1.31<br>
+          ③ 全部除以最小值 1.31 → <b>3 : 5 : 1</b> → 实验式 <b>C₃H₅Cl</b>（式量 76.5）<br>
+          ④ 153 ÷ 76.5 = 2 → 分子式 <b>C₆H₁₀Cl₂</b>
+        </div>
+        <div class="hint"><b>另一类高频问法（用元素含量反推纯度）：</b>纯 CaCO₃ 中 Ca 占 40%，而样品只测出 30% 的 Ca，说明它不是纯的 →<br>
+           CaCO₃ 含量 = 30% ÷ 40% = <b>75%</b>。同理可判断「含 75% Cl 的食盐其实是掺了 LiCl（LiCl 的 Cl 含量更高）」。</div>
+      </div>
+      <div class="practice" data-practice="u1e-comp"></div>
+    </section>
+
+<section class="pane" id="u1e-mix">
+      <div class="bgn" data-bgn="u1e-mix"></div>
+      <div class="card">
+        <h3>限量反应物：谁先耗尽谁说了算</h3>
+        <p class="lead">只要反应物不止一种，就必须先判断谁是限量试剂（limiting reactant），否则算出来的产量一定是错的。</p>
+        <ol class="steps4">
+          <li><b>把所有反应物都换算成摩尔</b>（n = m/M）。</li>
+          <li><b>各自除以方程式里的系数</b>，得到「相对需求量」。</li>
+          <li><b>商最小的那个就是限量反应物</b>，产物的量完全由它决定，其余都是过量的。</li>
+          <li>用限量试剂的摩尔数 × 系数比算出产物摩尔数，再乘摩尔质量换成克。</li>
+        </ol>
+        <div class="readout" style="margin-top:14px">
+          <b>例题（PPT Unit 1.4 Example 1）：6 g H₂ 与 160 g O₂ 反应，2H₂ + O₂ → 2H₂O，最多生成多少水？</b><br>
+          ① n(H₂) = 6/2 = 3 mol；n(O₂) = 160/32 = 5 mol<br>
+          ② 除以系数：H₂ → 3 ÷ 2 = 1.5；O₂ → 5 ÷ 1 = 5<br>
+          ③ 1.5 &lt; 5 → <b>H₂ 是限量反应物</b>，O₂ 过量<br>
+          ④ 生成 H₂O = 3 mol × 18 g/mol = <b>54 g</b><br>
+          <span style="color:#b33b3b">常见错误：直接拿 5 mol O₂ 去算得到 180 g —— 这是把过量的那个当成限量了。</span>
+        </div>
+        <div class="fx" style="margin-top:14px">
+          <div class="fx-row"><b>产率 = 实际产量 ÷ 理论产量 × 100%</b><span>理论产量永远由限量试剂算出，与过量试剂无关</span></div>
+        </div>
+        <div class="hint"><b>混合物分析的套路：</b>让混合物里只有一种成分参与反应（或分别反应），用产物的量反推该成分的量，再除以样品总质量 → 质量分数。</div>
+      </div>
+      <div class="practice" data-practice="u1e-mix"></div>
+    </section>
+
+<section class="pane" id="u1-atomic">
+      <div class="bgn" data-bgn="u1-atomic"></div>
+      <div class="grid2">
+        <div class="card">
+          <h3>原子建造器</h3>
+          <p class="lead">拖动滑块增减质子、中子、电子，观察原子如何变成离子或同位素。</p>
+          <div class="fig" id="atomFig"></div>
+          <div class="sliders">
+            <label>质子（决定元素）<b id="pVal">8</b></label>
+            <input type="range" id="rP" min="1" max="18" value="8">
+            <label>中子（决定同位素）<b id="nVal">8</b></label>
+            <input type="range" id="rN" min="0" max="24" value="8">
+            <label>电子（决定电荷）<b id="eVal">8</b></label>
+            <input type="range" id="rE" min="0" max="18" value="8">
+          </div>
+        </div>
+        <div class="card">
+          <h3>读数</h3>
+          <p class="lead">亚原子粒子的角色与原子符号。</p>
+          <div class="readout" id="atomReadout"></div>
+          <div class="hint">质子数 = 原子序数 Z，决定是什么元素；质子 + 中子 = 质量数 A；电子数变化会形成带电的离子。</div>
+        </div>
+      </div>
+      <div class="practice" data-practice="u1-atomic"></div>
+    </section>
+
+<section class="pane" id="u1-config">
+      <div class="bgn" data-bgn="u1-config"></div>
+      <div class="card">
+        <h3>电子排布：Aufbau 填充</h3>
+        <p class="lead">选择元素，观察电子按能级由低到高填充（1s → 2s → 2p → 3s → 3p → 4s → 3d …）。</p>
+        <div class="row" style="margin-bottom:12px">
+          <select id="cfgEl"></select>
+          <span class="badge" id="cfgBadge"></span>
+        </div>
+        <div class="fig" id="cfgLevel"></div>
+        <div class="readout" id="cfgText"></div>
+        <div class="hint">洪特规则：同一能级（如 2p 三个轨道）先各自占一个电子、方向相同，再配对。</div>
+      </div>
+      <div class="card">
+        <h3>轨道图（Orbital Box）</h3>
+        <p class="lead">每个方格是一个轨道，↑↓ 表示自旋相反的两个电子。</p>
+        <div class="fig" id="cfgBox"></div>
+      </div>
+      <div class="practice" data-practice="u1-config"></div>
+    </section>
+
+<section class="pane" id="u1-quantum">
+      <div class="bgn" data-bgn="u1-quantum"></div>
+      <div class="card">
+        <h3>量子数探索器</h3>
+        <p class="lead">调节四个量子数，理解它们如何锁定一个电子的「地址」与轨道形状。</p>
+        <div class="grid2">
+          <div>
+            <div class="sliders">
+              <label>n（主量子数，能层）<b id="qN">2</b></label>
+              <input type="range" id="qnN" min="1" max="4" value="2">
+              <label>l（角量子数，形状）<b id="qL">1</b></label>
+              <input type="range" id="qnL" min="0" max="1" value="1">
+              <label>m<sub>l</sub>（磁量子数，方向）<b id="qMl">0</b></label>
+              <input type="range" id="qnMl" min="-1" max="1" value="0">
+            </div>
+            <div class="row" style="margin-top:10px">
+              <span style="font-size:13px">m<sub>s</sub>（自旋）：</span>
+              <div class="seg" id="msSeg">
+                <button class="on" data-ms="+1/2">+½</button>
+                <button data-ms="-1/2">−½</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="fig" id="orbShape"></div>
+            <div class="readout" id="quantumReadout"></div>
+          </div>
+        </div>
+      </div>
+      <div class="practice" data-practice="u1-quantum"></div>
+    </section>
+
+<section class="pane" id="u1-pes">
+      <div class="bgn" data-bgn="u1-pes"></div>
+      <div class="card">
+        <h3>PES 光电子能谱模拟器</h3>
+        <p class="lead">
+          X 轴为结合能（Binding Energy）。<b style="color:#d64545">注意 AP 的坑：结合能从左到右是递减的</b>
+          ——越靠左的峰，电子被原子核抓得越紧。
+        </p>
+        <div class="row" style="margin-bottom:12px">
+          <span style="font-size:13px;color:var(--muted)">选择元素：</span>
+          <select id="pesEl"></select>
+          <div class="seg" id="pesScaleSeg">
+            <button class="on" data-scale="spaced">等距排列</button>
+            <button data-scale="real">真实比例</button>
+          </div>
+        </div>
+        <div class="fig" style="display:block;padding:0">
+          <div id="pesChartBox" style="position:relative;height:330px"><canvas id="pesChart"></canvas></div>
+          <div id="pesFallback" style="display:none"></div>
+        </div>
+        <div class="hint" id="pesClickHint">点击任意峰值，查看它对应的电子亚层与电子数。</div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>选中峰的信息</h3>
+          <p class="lead">点击图表中的柱子即可查看。</p>
+          <div class="readout" id="pesInfo">—</div>
+        </div>
+        <div class="card">
+          <h3>怎么读这张图</h3>
+          <div class="readout" style="font-size:13px">
+            <b>峰的位置</b>由两个因素决定：<br>
+            ① <b>Z<sub>eff</sub>（有效核电荷）</b>：离核越近的电子被核吸引越强，结合能越大；<br>
+            ② <b>与原子核的距离</b>：主量子数 n 越小、穿透越深，结合能越大。<br><br>
+            所以 1s ≫ 2s &gt; 2p ≫ 3s：<b>1s 峰在最左（结合能最大）</b>，价电子峰在最右。<br><br>
+            <b>峰的高度</b> = 该亚层电子数；<b>所有峰高相加 = 电子总数 = Z</b>。<br>
+            把峰从左到右读一遍，就是该原子的电子排布式。
+          </div>
+        </div>
+      </div>
+      <div class="practice" data-practice="u1-pes"></div>
+    </section>
+
+<section class="pane" id="u1-trends">
+      <div class="bgn" data-bgn="u1-trends"></div>
+        <div class="card"><h3>周期趋势热力图</h3><p class="lead">同一张周期表，切换不同性质（半径 / 电离能 / 电负性），颜色呈现规律性的递变。</p><div id="animTrends"></div><div class="anim-detail"><b>详细讲解</b>　周期趋势可由「有效核电荷 + 电子层」两条主线推出。<ul><li><b>原子半径</b>：同周期从左到右<b>减小</b>；同族从上到下<b>增大</b>。</li><li><b>第一电离能</b>：同周期总体<b>增大</b>（越难失电子）；同族<b>减小</b>。</li><li><b>电负性</b>：同周期<b>增大</b>、同族<b>减小</b>，右上角（F、O）最强。</li></ul>把同一张周期表切换成不同性质来「上色」，就能一眼看出规律性递变——这正是周期律的精髓。</div></div>
+        <div class="card"><h3>库仑定律与有效核电荷</h3><p class="lead">核电荷越大，对外层电子的库仑吸引越强——这正是原子半径与电离能周期趋势的根源。</p><div id="animCoulomb"></div><div class="anim-detail"><b>详细讲解</b>　库仑定律 F ∝ q₁q₂ / r² 是理解原子与周期趋势的底层逻辑。<ul><li>核电荷（质子数）越大，对外层电子的<span class='hl'>有效核电荷</span>越大，吸引越强。</li><li>电子被拉得越近 → 半径越小；移走电子（电离）需要的能量越大。</li></ul>由此可得周期趋势：同周期从左到右半径减小、电离能/电负性增大；同主族从上到下半径增大、电离能减小。记住「电荷越大、距离越近 → 作用越强」这一条主线，很多趋势都能推出来。</div></div>
+      <div class="card">
+        <h3>元素周期趋势 · 热力图</h3>
+        <p class="lead">切换趋势，颜色越深数值越大；悬停查看具体值。</p>
+        <div class="row" style="margin-bottom:12px">
+          <div class="seg" id="trendSeg">
+            <button class="on" data-trend="radius">原子半径</button>
+            <button data-trend="ie">第一电离能</button>
+            <button data-trend="en">电负性</button>
+          </div>
+        </div>
+        <div class="fig" id="ptFig"></div>
+        <div class="readout" id="trendNote"></div>
+        <div class="legend"><span id="trendArrow"></span></div>
+      </div>
+      <div class="practice" data-practice="u1-trends"></div>
+    </section>
+
+<section class="pane" id="u1e-ionic">
+      <div class="bgn" data-bgn="u1e-ionic"></div>
+      <div class="card">
+        <h3>价电子决定离子电荷，离子电荷决定化学式</h3>
+        <p class="lead">主族元素的典型离子电荷，由它在周期表中的位置直接决定 —— 不用背，看族数就行。</p>
+        <div class="readout">
+          <b>1 族</b>（Na、K）失去 1 个电子 → <b>1+</b>　　<b>2 族</b>（Mg、Ca）→ <b>2+</b>　　<b>13 族</b>（Al）→ <b>3+</b><br>
+          <b>15 族</b>（N、P）得到 3 个电子 → <b>3−</b>　　<b>16 族</b>（O、S）→ <b>2−</b>　　<b>17 族</b>（F、Cl）→ <b>1−</b><br><br>
+          规律：<b>金属失电子变阳离子、非金属得电子变阴离子</b>，目标都是达到最近稀有气体的电子构型（八隅体）。
+        </div>
+        <div class="hint"><b>写化学式的交叉法：</b>把两种离子电荷的绝对值交叉写到对方右下角，再约到最简。<br>
+          Na⁺ + O²⁻ → Na₂O　|　Mg²⁺ + N³⁻ → Mg₃N₂　|　Al³⁺ + O²⁻ → Al₂O₃　|　Ca²⁺ + F⁻ → CaF₂</div>
+        <div class="readout" style="margin-top:14px">
+          <b>例题（PPT Unit 1.8）：写出下列组合的化学式</b><br>
+          Na + O → <b>Na₂O</b>　　Mg + N → <b>Mg₃N₂</b>　　K + P → <b>K₃P</b><br>
+          Al + O → <b>Al₂O₃</b>　　Ca + F → <b>CaF₂</b>　　Be + O → <b>BeO</b>
+        </div>
+        <div class="hint"><b>为什么同族能「类比」？</b>Mg 和 F 按 1 : 2 结合成 MgF₂，同族的 Ba 和 F 也是 1 : 2（BaF₂）—— 因为同族元素价电子数相同，所以形成化合物的<b>比例相同、化学性质相似</b>。这就是判断「与 Mg 化合比例相同的元素」这类题的依据。</div>
+      </div>
+      <div class="practice" data-practice="u1e-ionic"></div>
+    </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u2">
+<nav class="tabs" data-tabs>
+      <a class="tab on" href="#u2-bonding" data-pane="u2-bonding">化学键</a>
+      <a class="tab" href="#u2-geometry" data-pane="u2-geometry">分子几何</a>
+      <a class="tab" href="#u2-lewis" data-pane="u2-lewis">键角 &amp; 路易斯</a>
+      <a class="tab" href="#u2-imf" data-pane="u2-imf">分子间作用力</a>
+    </nav>
+
+<section class="pane on" id="u2-bonding">
+      <div class="bgn" data-bgn="u2-bonding"></div>
+      <div class="card">
+        <h3>三种化学键</h3>
+        <p class="lead">切换键型，观察粒子层面的电子如何「成键」。</p>
+        <div class="row" style="margin-bottom:10px">
+          <div class="seg" id="bondSeg">
+            <button class="on" data-bond="ionic">离子键</button>
+            <button data-bond="covalent">共价键</button>
+            <button data-bond="metallic">金属键</button>
+          </div>
+        </div>
+        <div class="fig" id="bondFig"></div>
+        <div class="readout" id="bondDesc"></div>
+      </div>
+      <div class="card">
+        <h3>电负性差 → 键型判定</h3>
+        <p class="lead">ΔEN = |EN₁ − EN₂| 越大，键越偏离子性。</p>
+        <div class="row" style="margin-bottom:10px">
+          <select id="elA"></select><span style="color:var(--muted)">vs</span><select id="elB"></select>
+          <span class="badge" id="bondBadge">—</span>
+        </div>
+        <div class="readout" id="bondCalc"></div>
+        <div class="legend">
+          <span><i style="background:#0f9d58"></i>ΔEN &lt; 0.5 非极性共价</span>
+          <span><i style="background:#e07b00"></i>0.5–1.7 极性共价</span>
+          <span><i style="background:#d64545"></i>&gt; 1.7 离子键</span>
+        </div>
+      </div>
+      <div class="practice" data-practice="u2-bonding"></div>
+    </section>
+
+<section class="pane" id="u2-geometry">
+      <div class="bgn" data-bgn="u2-geometry"></div>
+        <div class="card"><h3>杂化轨道形成</h3><p class="lead">一个 s 轨道与三个 p 轨道重新组合，形成四个能量相同、指向四面体顶点的 sp³ 杂化轨道。</p><div id="animHybrid"></div><div class="anim-detail"><b>详细讲解</b>　杂化轨道理论解释分子的几何构型。<ul><li>中心原子的 1 个 s 轨道与 3 个 p 轨道重新组合，形成 <b>4 个能量完全等价</b>的 <span class='hl'>sp³ 杂化轨道</span>。</li><li>它们尽量远离，指向<b>正四面体的四个顶点</b>，夹角 109.5°。</li></ul>由此 CH₄ 是正四面体、H₂O/NH₃ 是在四面体基础上因孤对而「压扁」。规律：电子域数 = 4 → sp³，3 → sp²（120°），2 → sp（180°）。</div></div>
+      <div class="card">
+        <h3>VSEPR 分子几何</h3>
+        <p class="lead">点击分子查看 3D 形状与键角（虚线键 = 指向纸面后方，楔形键 = 朝向你）。</p>
+        <div class="row" style="margin-bottom:12px" id="geoRow"></div>
+        <div class="fig" id="geoFig" style="perspective:700px"></div>
+        <div class="readout" id="geoDesc"></div>
+      </div>
+      <div class="card">
+        <h3>核心思路：孤对电子会「挤压」键角</h3>
+        <p class="lead">键角排序：四面体 109.5° &gt; 三角锥 107° &gt; 弯曲 104.5°，孤对电子越多，挤压越强。</p>
+        <div class="legend">
+          <span><i style="background:#7c3aed"></i>中心原子</span>
+          <span><i style="background:#0ea5e9"></i>配位原子</span>
+          <span><i style="background:#e07b00"></i>孤对电子</span>
+        </div>
+      </div>
+      <div class="practice" data-practice="u2-geometry"></div>
+    </section>
+
+<section class="pane" id="u2-lewis">
+      <div class="bgn" data-bgn="u2-lewis"></div>
+        <div class="card"><h3>路易斯结构分步绘制</h3><p class="lead">按「价电子 → 成键 → 补孤对」的顺序逐步画出一个分子的完整路易斯结构（以 H₂O 为例）。</p><div id="animLewis"></div><div id="lewisGallery"></div><div class="anim-detail"><b>详细讲解</b>　路易斯结构用「点」表示价电子，画法有固定三步：<ul><li>数总<span class='hl'>价电子</span>数（含电荷修正）；</li><li>把中心原子与外围原子用<b>共用电子对</b>（单/双/三键）连接；</li><li>剩余电子作为<b>孤对</b>补齐，使各原子尽量满足八隅体。</li></ul>孤对会「占据空间」并压缩键角（如 H₂O 的 104.5° < 109.5°）。它也是判断分子极性、几何构型与反应活性（孤对可作为电子对给体）的关键。下方可切换查看多个经典分子的路易斯结构。</div></div>
+        <div class="card"><h3>成键过程动画</h3><p class="lead">两个原子从远处靠近，势能沿曲线下降，直到最低点——那就是键长与键能。</p><div id="animBond"></div><div class="anim-detail"><b>详细讲解</b>　把两个原子从无穷远处慢慢靠近：<span class='hl'>吸引</span>（核与对方电子）使势能下降，<span class='hl'>排斥</span>（核与核、电子与电子）使势能上升。<ul><li><b>势能最低点</b>对应的核间距就是<b>键长</b>——此时体系最稳定，原子「愿意」保持这个距离。</li><li>最低点的<b>深度</b>就是<b>键能</b>：要拆开这个键必须输入这么多能量。深度越深，键越强、越难断裂。</li><li>再靠近时排斥急剧上升，势能陡增——这解释了为什么原子不会无限靠近、分子有固定大小。</li></ul>考试要点：读懂势能曲线、由最低点读键长与键能，是 AP 判断键强/键长、比较不同分子稳定性的基础。</div></div>
+      <div class="card">
+        <h3>键角与路易斯结构</h3>
+        <p class="lead">选择分子，看路易斯点式结构、键角，以及形式电荷的计算。</p>
+        <div class="row" style="margin-bottom:12px" id="lewisRow"></div>
+        <div class="fig" id="lewisFig"></div>
+        <div class="readout" id="lewisDesc"></div>
+      </div>
+      <div class="card">
+        <h3>形式电荷</h3>
+        <p class="lead">形式电荷 FC = 价电子数 − 孤对电子数 − ½ 成键电子数。</p>
+        <div class="readout" id="fcCalc"></div>
+        <div class="hint">最优路易斯结构：形式电荷尽量接近 0，负电荷落在电负性更大的原子上。</div>
+      </div>
+      <div class="practice" data-practice="u2-lewis"></div>
+    </section>
+
+<section class="pane" id="u2-imf">
+      <div class="bgn" data-bgn="u2-imf"></div>
+        <div class="card"><h3>伦敦色散力</h3><p class="lead">电子云的瞬时偏移产生瞬时偶极，又诱导邻近分子产生偶极，两者相互吸引。</p><div id="animDispersion"></div><div class="anim-detail"><b>详细讲解</b>　伦敦色散力是<b>所有分子</b>都具有的分子间作用力。<ul><li>电子时刻在运动，某一瞬间电子偏向一侧，就产生<span class='hl'>瞬时偶极</span>（δ⁺/δ⁻）。</li><li>这个瞬时偶极又<b>诱导</b>邻近分子产生同向偶极，两者相互吸引。</li></ul><b>规律</b>：分子越大（电子越多、越易被极化），色散力越强 → 沸点越高。这就是同族卤素/惰性气体从上到下沸点升高的原因（它们都没有偶极或氢键，只有色散力）。</div></div>
+      <div class="card">
+        <h3>三种分子间作用力（IMF）<span class="badge warn" style="margin-left:8px">Unit 3 前置</span></h3>
+        <p class="lead">分子之间的吸引力，比化学键弱得多，却决定了沸点、溶解性。</p>
+        <div class="row" style="margin-bottom:10px">
+          <div class="seg" id="imfSeg">
+            <button class="on" data-imf="ldf">伦敦色散力</button>
+            <button data-imf="dipole">偶极–偶极</button>
+            <button data-imf="hbond">氢键</button>
+          </div>
+        </div>
+        <div class="fig" id="imfFig"></div>
+        <div class="readout" id="imfDesc"></div>
+      </div>
+      <div class="card">
+        <h3>作用力强度谱</h3>
+        <div class="fig" id="imfBar"></div>
+        <div class="hint">化学键（共价 / 离子 / 金属）远强于分子间作用力；IMF 中：色散力 &lt; 偶极–偶极 &lt; 氢键。</div>
+      </div>
+      <div class="practice" data-practice="u2-imf"></div>
+    </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u3">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u3-imf" data-pane="u3-imf">3.1 分子间作用力</a>
+        <a class="tab" href="#u3-states" data-pane="u3-states">3.2–3.3 物质状态与固体</a>
+        <a class="tab" href="#u3-gas" data-pane="u3-gas">3.4–3.6 气体与分子动理论</a>
+        <a class="tab" href="#u3-solution" data-pane="u3-solution">3.7–3.10 溶液与溶解度</a>
+        <a class="tab" href="#u3-spectra" data-pane="u3-spectra">3.11–3.13 光谱与光电效应</a>
+      </nav>
+
+      <section class="pane on" id="u3-imf">
+        <div class="bgn" data-bgn="u3-imf"></div>
+        <div class="card">
+          <h3>三类分子间作用力 · 动态示意</h3>
+          <p class="lead">分子间作用力（IMF）是分子<strong>之间</strong>的吸引，强度只有化学键的约 1%，却决定了沸点、熔点与溶解性。下面三组小球现场演示它们是怎么“吸”在一起的。</p>
+          <div class="u3anim">
+            <div class="u3row">
+              <div>
+                <div class="u3row" style="gap:26px">
+                  <div class="mol"><span class="eb"></span></div>
+                  <div class="mol"><span class="eb" style="animation-delay:1.3s"></span></div>
+                </div>
+                <div class="cap">① 色散力：电子云瞬时偏移</div>
+              </div>
+              <div>
+                <div class="u3row" style="gap:16px">
+                  <div class="mol pol att"><span>δ−</span></div>
+                  <div class="mol pol att" style="animation-delay:-1.3s"><span>δ+</span></div>
+                </div>
+                <div class="cap">② 偶极–偶极：正负端相吸</div>
+              </div>
+              <div>
+                <div class="u3row" style="gap:4px">
+                  <div class="mol pol"><span>O</span></div>
+                  <span class="hlink"></span>
+                  <div class="mol"><span>H</span></div>
+                </div>
+                <div class="cap">③ 氢键：虚线持续“拉紧”</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>五种 IMF（由弱到强）</b><br>
+            ① 伦敦色散力（所有分子都有，分子越大、电子越多越强）<br>
+            ② 偶极–偶极力（极性分子之间，比色散力强）<br>
+            ③ 偶极–诱导偶极（极性与非极性分子之间，总是吸引）<br>
+            ④ 离子–偶极力（离子与极性分子之间，比偶极–偶极强）<br>
+            ⑤ 氢键（H 连在 N / O / F 上时，三者中最强）
+          </div>
+          <div class="hint"><b>极性与强度：</b>极性分子之间的作用力 = 偶极–偶极 <b>加上</b> 色散力，所以同尺寸下总比非极性分子之间强。</div>
+        </div>
+        <div class="card">
+          <h3>元素与化合物的实例</h3>
+          <p class="lead">同一个问题换个问法：给定物质，它主要靠哪种 IMF？</p>
+          <div class="fig">
+            <table class="dtable">
+              <tr><th>物质</th><th>分子极性</th><th>主要 IMF</th><th>沸点趋势</th></tr>
+              <tr><td>CH₄、CO₂、Ar</td><td>非极性</td><td>只有色散力</td><td>最低</td></tr>
+              <tr><td>HCl、HBr</td><td>极性</td><td>色散力 + 偶极–偶极</td><td>中</td></tr>
+              <tr><td>H₂O、HF、NH₃</td><td>极性 + N/O/F–H</td><td>再加氢键</td><td>最高</td></tr>
+              <tr><td>NaCl（离子固体）</td><td>—</td><td>离子–离子 / 离子–偶极</td><td>极高</td></tr>
+            </table>
+          </div>
+          <div class="hint"><b>考点：</b>HCl（−85 °C）与 LiCl（1360 °C）沸点差这么多，是因为 LiCl 是<b>离子化合物</b>，粒子间是离子键而非分子间作用力。</div>
+        </div>
+        <div class="practice" data-practice="u3-imf"></div>
+      </section>
+
+      <section class="pane" id="u3-states">
+        <div class="bgn" data-bgn="u3-states"></div>
+        <div class="card">
+          <h3>固 → 液 → 气：相变时分子在做什么</h3>
+          <p class="lead">相变改变的是<strong>分子之间</strong>的作用力，而不是分子内部的化学键——分子始终保持完整。</p>
+          <div class="u3anim">
+            <div class="phase">
+              <div class="ph">
+                <div class="pbox solid">
+                  <i style="left:26px;top:30px"></i><i style="left:40px;top:30px"></i><i style="left:54px;top:30px"></i>
+                  <i style="left:26px;top:44px"></i><i style="left:40px;top:44px"></i><i style="left:54px;top:44px"></i>
+                  <i style="left:40px;top:58px"></i>
+                </div>
+                <div class="cap">固体：只在原位振动</div>
+              </div>
+              <div class="ph">
+                <div class="pbox liquid">
+                  <i style="left:20px;top:26px;animation-delay:0s"></i><i style="left:52px;top:34px;animation-delay:.5s"></i>
+                  <i style="left:34px;top:56px;animation-delay:1s"></i><i style="left:66px;top:22px;animation-delay:1.4s"></i>
+                  <i style="left:78px;top:62px;animation-delay:.8s"></i><i style="left:28px;top:70px;animation-delay:1.8s"></i>
+                </div>
+                <div class="cap">液体：紧挨着滑动、碰撞</div>
+              </div>
+              <div class="ph">
+                <div class="pbox gas">
+                  <i style="left:8px;top:70px;animation-delay:0s"></i><i style="left:20px;top:44px;animation-delay:.3s"></i>
+                  <i style="left:14px;top:18px;animation-delay:.7s"></i><i style="left:36px;top:72px;animation-delay:1.1s"></i>
+                  <i style="left:44px;top:30px;animation-delay:1.5s"></i>
+                </div>
+                <div class="cap">气体：自由飞行、间隔很大</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>蒸发与蒸气压：</b>液体的蒸气压是<b>汽液平衡</b>时的蒸气压强。IMF 越强 → 分子越难逃逸 → 蒸气压越低、沸点越高。<br>
+            <b>排序示例：</b>25 °C 下蒸气压 Cl₂ &gt; Br₂ &gt; I₂（分子越大、色散力越强，越难逃逸）。
+          </div>
+        </div>
+        <div class="card">
+          <h3>四类固体的结构与性质</h3>
+          <p class="lead">离子固体 / 共价网络固体 / 分子固体 / 金属固体——抓住「粒子是什么、靠什么结合」，性质就能推出来。</p>
+          <div class="fig">
+            <table class="dtable">
+              <tr><th>类型</th><th>结构单元</th><th>结合方式</th><th>熔点</th><th>导电性</th><th>实例</th></tr>
+              <tr><td>离子固体</td><td>正负离子</td><td>离子键（强）</td><td>高</td><td>固态不导电，熔融/溶解后导电</td><td>NaCl</td></tr>
+              <tr><td>共价网络固体</td><td>原子</td><td>共价键（强）</td><td>很高</td><td>一般不导电（石墨例外）</td><td>金刚石、石墨、SiO₂</td></tr>
+              <tr><td>分子固体</td><td>分子</td><td>分子间作用力（弱）</td><td>低</td><td>不导电</td><td>冰、干冰、蔗糖</td></tr>
+              <tr><td>金属固体</td><td>正离子 + 电子海</td><td>金属键</td><td>变化大</td><td>良导体（固/液均可）</td><td>Cu、Fe、青铜</td></tr>
+            </table>
+          </div>
+          <div class="hint"><b>合金：</b>置换合金（青铜 = Sn + Cu）与间隙合金（钢 = C 填入 Fe 空隙）。间隙原子让晶格更刚性，<b>降低延展性</b>，但仍保留电子海、继续导电。</div>
+        </div>
+        <div class="practice" data-practice="u3-states"></div>
+      </section>
+
+      <section class="pane" id="u3-gas">
+        <div class="bgn" data-bgn="u3-gas"></div>
+        <div class="card">
+          <h3>气体粒子的运动（分子动理论）</h3>
+          <p class="lead">气体的压强来自粒子<strong>撞击器壁</strong>。看左上角的粒子在盒子里随机飞行、碰壁反弹——温度越高，跑得越快。</p>
+          <div class="u3anim">
+            <div class="u3row" style="align-items:flex-start">
+              <div>
+                <div class="pbox gas big">
+                  <i style="left:12px;top:74px;animation-delay:0s"></i><i style="left:30px;top:40px;animation-delay:.25s"></i>
+                  <i style="left:22px;top:16px;animation-delay:.5s"></i><i style="left:60px;top:80px;animation-delay:.75s"></i>
+                  <i style="left:74px;top:34px;animation-delay:1s"></i><i style="left:106px;top:62px;animation-delay:1.25s"></i>
+                  <i style="left:130px;top:22px;animation-delay:1.5s"></i><i style="left:96px;top:96px;animation-delay:1.75s"></i>
+                </div>
+                <div class="cap">粒子随机运动 → 碰壁产生压强</div>
+              </div>
+              <div>
+                <svg viewBox="0 0 220 130" width="220" role="img">
+                  <title>麦克斯韦–玻尔兹曼分布</title>
+                  <line x1="24" y1="108" x2="208" y2="108" stroke="#b9c6d8" stroke-width="1"/>
+                  <line x1="24" y1="14" x2="24" y2="108" stroke="#b9c6d8" stroke-width="1"/>
+                  <path d="M28 106 C 60 30, 96 20, 118 40 C 138 60, 170 96, 204 106" fill="none" stroke="#9fb6cd" stroke-width="2"/>
+                  <path d="M28 106 C 76 24, 124 24, 152 56 C 176 82, 196 100, 204 106" fill="none" stroke="#235a74" stroke-width="2"/>
+                  <text x="206" y="122" text-anchor="end" font-size="11" fill="#5b6a7c">分子速率 →</text>
+                  <text x="30" y="24" font-size="11" fill="#5b6a7c">T 较高</text>
+                  <text x="120" y="20" font-size="11" fill="#9fb6cd">T 较低</text>
+                </svg>
+                <div class="cap">温度升高，分布右移、峰变低</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>KMT 四条假设：</b>① 粒子体积可忽略；② 粒子不停随机运动，碰壁即压强；③ 粒子之间无吸引/排斥；④ <b>平均动能正比于开尔文温度</b>（KE = ½mv²）。<br>
+            <b>理想气体定律：</b>PV = nRT（R = 0.08206 L·atm/mol·K）。<br>
+            <b>分压（道尔顿）：</b>P<sub>总</sub> = P<sub>A</sub> + P<sub>B</sub> + …，且 P<sub>A</sub> = P<sub>总</sub> × X<sub>A</sub>，X<sub>A</sub> = n<sub>A</sub>/n<sub>总</sub>。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>23 °C、25.0 L、3.18 atm 的轮胎里有多少摩尔空气？<br>
+            n = PV/RT = (3.18 × 25.0) ÷ (0.08206 × 296) = 79.5 ÷ 24.29 ≈ <b>3.27 mol</b>。</div>
+        </div>
+        <div class="card">
+          <h3>真实气体为什么会偏离理想行为</h3>
+          <p class="lead">两个原因：分子之间的吸引，以及分子本身占的体积。</p>
+          <div class="readout">
+            ① <b>分子间吸引</b>：在低温、接近液化时最明显，使压强低于理想值；<br>
+            ② <b>分子本身体积</b>：在极高压下最明显，使压强高于理想值。<br><br>
+            <b>什么时候最接近理想气体？</b> <b>高温 + 低压</b>——此时动能远大于分子间势能、粒子间距远大于粒子尺寸。
+          </div>
+        </div>
+        <div class="practice" data-practice="u3-gas"></div>
+      </section>
+
+      <section class="pane" id="u3-solution">
+        <div class="bgn" data-bgn="u3-solution"></div>
+        <div class="card">
+          <h3>溶解过程 · 动态示意</h3>
+          <p class="lead">离子从晶体表面脱离，被水分子包围形成“水合离子”。溶解能否发生，取决于溶质–溶质、溶剂–溶剂、溶质–溶剂三种作用力的相对强弱。</p>
+          <div class="u3anim">
+            <div class="u3row">
+              <div class="lat">
+                <i style="left:6px;top:26px"></i><i style="left:26px;top:26px"></i><i style="left:6px;top:46px"></i>
+                <i style="left:26px;top:46px"></i><i style="left:46px;top:36px" class="free"></i>
+              </div>
+              <div class="solv">
+                <span class="w w1">O</span><span class="w w2">H</span><span class="w w3">H</span>
+                <span class="ion">Na⁺</span>
+              </div>
+              <div class="u3row" style="gap:4px;flex-direction:column">
+                <div class="cap" style="margin:0">离子脱离晶格 → 被水分子包围</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>浓度：</b>摩尔浓度 M = 溶质的物质的量(mol) ÷ 溶液体积(L)。<br>
+            <b>例题（PPT）：</b>10.5 g NaCl 加入 250 mL 水 → n = 10.5/58.4 = 0.180 mol，M = 0.180/0.250 = <b>0.72 mol/L</b>。
+          </div>
+        </div>
+        <div class="card">
+          <h3>“相似相溶”与分离方法</h3>
+          <div class="readout">
+            <b>溶解度规律：</b>IMF 类型相似的物质更容易互溶（like dissolves like）。<br>
+            乙醇 C₂H₅OH 能与水、氨互溶（都能形成氢键），却<b>不能</b>与己烷 C₆H₁₄ 互溶（己烷只有色散力）。<br><br>
+            <b>色谱法（chromatography）：</b>利用各组分与固定相、流动相之间<b>IMF 强弱不同</b>，迁移速度不同而分离。<br>
+            <b>蒸馏（distillation）：</b>利用各组分<b>沸点（蒸气压）不同</b>，先蒸出低沸点组分，再用冷凝管冷凝收集。
+          </div>
+          <div class="hint"><b>微粒表征：</b>画溶液时要标出各组分的<b>相对浓度</b>和粒子之间的相互作用，而不是把所有粒子画得一样多。</div>
+        </div>
+        <div class="practice" data-practice="u3-solution"></div>
+      </section>
+
+      <section class="pane" id="u3-spectra">
+        <div class="bgn" data-bgn="u3-spectra"></div>
+        <div class="card">
+          <h3>电磁波谱与分子跃迁 · 动态示意</h3>
+          <p class="lead">不同波段的辐射对应不同的分子运动：微波 → 转动，红外 → 振动，紫外/可见 → 电子跃迁。</p>
+          <div class="u3anim">
+            <div class="u3row">
+              <div>
+                <svg viewBox="0 0 260 90" width="260" role="img">
+                  <title>电磁波动画</title>
+                  <path class="wave" d="M8 45 Q 28 8, 48 45 T 88 45 T 128 45 T 168 45 T 208 45 T 248 45" fill="none" stroke="#235a74" stroke-width="2.2"/>
+                </svg>
+                <div class="cap">波长 λ × 频率 ν = 光速 c</div>
+              </div>
+              <div class="trans">
+                <div class="tr"><span class="tr-k">微波</span><span class="tr-v">分子转动</span></div>
+                <div class="tr"><span class="tr-k">红外</span><span class="tr-v">键的弯曲 / 伸缩</span></div>
+                <div class="tr"><span class="tr-k">紫外可见</span><span class="tr-v">电子跃迁</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>光电效应 / 光子能量：</b>能量是量子化的，辐射由一份份“光子”组成：<br>
+            E = hν = hc/λ，其中 h = 6.626 × 10⁻³⁴ J·s，c = 3.00 × 10⁸ m/s。<br>
+            <b>例题（PPT）：</b>CuCl 发出 450 nm 蓝光，求每个光子的能量。<br>
+            E = hc/λ = (6.626×10⁻³⁴ × 3.00×10⁸) ÷ (4.50×10⁻⁷) ≈ <b>4.42 × 10⁻¹⁹ J</b>。
+          </div>
+          <div class="hint"><b>注意：</b>波长用<b>米</b>——450 nm 必须先写成 4.50 × 10⁻⁷ m，否则数量级会错。</div>
+        </div>
+        <div class="card">
+          <h3>比尔–朗伯定律（Beer-Lambert）</h3>
+          <p class="lead">溶液颜色深浅与浓度成正比，这正是分光光度法定量的依据。</p>
+          <div class="u3anim">
+            <div class="u3row">
+              <div class="bl">
+                <span class="bl-lamp"></span>
+                <span class="bl-cuv"></span>
+                <span class="bl-det"></span>
+              </div>
+            </div>
+            <div class="cap">光穿过溶液时被吸收，浓度越高透过的光越弱</div>
+          </div>
+          <div class="readout">
+            <b>A = a·b·c</b>：A 为吸光度，a 为摩尔吸光系数（特定波长下为常数），b 为光程（比色皿厚度），c 为浓度。<br>
+            实验中通常固定 b 与波长，于是 <b>A ∝ c</b>——吸光度只与浓度成正比。
+          </div>
+        </div>
+        <div class="practice" data-practice="u3-spectra"></div>
+      </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u4">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u4-equations" data-pane="u4-equations">4.1–4.3 方程式与净离子方程式</a>
+        <a class="tab" href="#u4-changes" data-pane="u4-changes">4.4 物理变化与化学变化</a>
+        <a class="tab" href="#u4-stoichiometry" data-pane="u4-stoichiometry">4.5 化学计量与溶液计算</a>
+        <a class="tab" href="#u4-titration" data-pane="u4-titration">4.6–4.7 滴定与反应类型</a>
+        <a class="tab" href="#u4-redox" data-pane="u4-redox">4.8–4.9 酸碱反应与氧化还原</a>
+      </nav>
+
+      <section class="pane on" id="u4-equations">
+        <div class="bgn" data-bgn="u4-equations"></div>
+        <div class="card">
+          <h3>三种方程式 · 旁观离子是怎么被删掉的</h3>
+          <p class="lead">同一个反应可以有三种写法：<b>分子方程式</b>、<b>完全离子方程式</b>、<b>净离子方程式</b>。净离子方程式只保留真正发生变化的粒子。</p>
+          <div class="u4anim">
+            <div class="nie">
+              <span class="ion keep">Ag⁺</span>
+              <span class="ion drop">NO₃⁻</span>
+              <span class="op">+</span>
+              <span class="ion drop">Na⁺</span>
+              <span class="ion keep">Cl⁻</span>
+              <span class="arrow">→</span>
+              <span class="ion drop">Na⁺</span>
+              <span class="ion drop">NO₃⁻</span>
+              <span class="op">+</span>
+              <span class="solid">AgCl(s)</span>
+            </div>
+            <div class="cap">Na⁺ 与 NO₃⁻（灰色）两边都原样存在 → 它们是<b>旁观离子</b>，从净离子方程式中删去</div>
+          </div>
+          <div class="readout">
+            <b>① 分子方程式：</b>AgNO₃(aq) + NaCl(aq) → AgCl(s) + NaNO₃(aq)<br>
+            <b>② 完全离子方程式：</b>Ag⁺ + NO₃⁻ + Na⁺ + Cl⁻ → AgCl(s) + Na⁺ + NO₃⁻<br>
+            <b>③ 净离子方程式：</b>Ag⁺(aq) + Cl⁻(aq) → AgCl(s)
+          </div>
+          <div class="hint"><b>为什么必须配平：</b>化学变化只是原子的<b>重新组合</b>，所以方程式中每种元素的原子数在反应前后必须相等 —— 这就是质量守恒。</div>
+        </div>
+        <div class="card">
+          <h3>怎么选写哪种形式</h3>
+          <div class="readout">
+            • 想看清<b>实际参加反应的粒子</b> → 写净离子方程式；<br>
+            • 想看清<b>每种物质的完整形态</b>（谁沉淀、谁放气） → 写分子方程式；<br>
+            • 溶液中的反应，题目常要求「先写完全离子、再约掉旁观离子得到净离子」。<br><br>
+            <b>易错点：</b>只有<b>强电解质且溶于水</b>的物质才拆成离子。弱酸（CH₃COOH）、弱碱、沉淀、气体、水<b>都不拆</b>。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>Ag⁺ + Cl⁻ → AgCl(s)，其中 Na⁺ 和 NO₃⁻ 是旁观离子。</div>
+        </div>
+        <div class="practice" data-practice="u4-equations"></div>
+      </section>
+
+      <section class="pane" id="u4-changes">
+        <div class="bgn" data-bgn="u4-changes"></div>
+        <div class="card">
+          <h3>物理变化 vs 化学变化 · 分子层面发生了什么</h3>
+          <p class="lead">区别不在于「看起来变没变」，而在于<b>分子本身有没有被拆散重组</b>。</p>
+          <div class="u4anim">
+            <div class="u4row">
+              <div>
+                <div class="cbox phys">
+                  <i class="p1"></i><i class="p2"></i><i class="p3"></i>
+                </div>
+                <div class="cap">物理变化：分子原样，只是分散开</div>
+              </div>
+              <div>
+                <div class="cbox chem">
+                  <i class="c1"></i><i class="c2"></i><i class="c3"></i>
+                </div>
+                <div class="cap">化学变化：旧分子断裂 → 重组成新分子</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>物理变化：</b>物质性质改变但<b>组成不变</b>。常见的是相变（固↔液↔气）与混合物的生成/分离。<br>
+            <b>化学变化：</b>物质被转化为<b>组成不同的新物质</b>。<br><br>
+            <b>化学变化的四条证据：</b>① 放出热或光；② 生成气体；③ 生成沉淀；④ 颜色改变。
+          </div>
+        </div>
+        <div class="card">
+          <h3>分类判断练习</h3>
+          <table class="dtable">
+            <tr><th>过程</th><th>类别</th><th>判断依据</th></tr>
+            <tr><td>铁熔化</td><td>物理</td><td>只是相变，仍是 Fe</td></tr>
+            <tr><td>木头在空气中燃烧</td><td>化学</td><td>生成 CO₂、H₂O 与灰</td></tr>
+            <tr><td>光合作用</td><td>化学</td><td>生成新物质（葡萄糖、O₂）</td></tr>
+            <tr><td>干冰（固态 CO₂）在室温下</td><td>物理</td><td>升华，仍是 CO₂</td></tr>
+            <tr><td>咬过的苹果变褐</td><td>化学</td><td>氧化生成新物质</td></tr>
+            <tr><td>雪变成雨</td><td>物理</td><td>只是相变</td></tr>
+            <tr><td>盐溶于水</td><td>边界情况</td><td>断了离子键、又形成离子–偶极作用，两种说法都讲得通</td></tr>
+          </table>
+          <div class="hint"><b>核心判据：</b>过程如果只涉及<b>分子间作用力</b>的改变（相变等）→ 物理；如果涉及<b>化学键的断裂与生成</b> → 化学。</div>
+        </div>
+        <div class="practice" data-practice="u4-changes"></div>
+      </section>
+
+      <section class="pane" id="u4-stoichiometry">
+        <div class="bgn" data-bgn="u4-stoichiometry"></div>
+        <div class="card">
+          <h3>化学计量 · 限量反应物动画</h3>
+          <p class="lead">方程式的系数就是<b>摩尔比</b>。反应物按这个比例「配对」，配不上的就剩下来 —— 剩下的那个是过量的，先用完的才是限量反应物。</p>
+          <div class="u4anim">
+            <div class="u4row">
+              <div class="sgrp">
+                <span class="smo h2">H₂</span><span class="smo h2">H₂</span>
+              </div>
+              <span class="op">+</span>
+              <div class="sgrp"><span class="smo o2">O₂</span></div>
+              <span class="arrow">→</span>
+              <div class="sgrp"><span class="smo h2o">H₂O</span><span class="smo h2o">H₂O</span></div>
+            </div>
+            <div class="cap">2H₂ + O₂ → 2H₂O：系数比 2 : 1 : 2</div>
+          </div>
+          <div class="readout">
+            <b>解题四步：</b>① 把已知量换算成摩尔（n = m/M 或 n = M×V）；② 用方程式系数比换算目标物；③ 换算回要求的单位（克、升、mol/L）；④ 有多个反应物时先判断限量试剂。
+          </div>
+          <div class="hint"><b>例题 1（PPT）：</b>75.0 mL 的 0.100 M AgNO₃ 需要多少克 Na₂CrO₄ 才能把银离子全部沉淀？<br>
+            n(Ag⁺) = 0.0750 × 0.100 = 0.00750 mol；2Ag⁺ + CrO₄²⁻ → Ag₂CrO₄↓，需 CrO₄²⁻ 0.00375 mol；<br>
+            m(Na₂CrO₄) = 0.00375 × 162.0 ≈ <b>0.608 g</b>。</div>
+          <div class="hint"><b>例题 2（PPT · 限量反应物）：</b>50.0 mL 的 0.200 M Al(NO₃)₃ 加入 200.0 mL 的 0.100 M KOH，最多生成多少克 Al(OH)₃？<br>
+            n(Al³⁺) = 0.0100 mol，n(OH⁻) = 0.0200 mol；Al³⁺ + 3OH⁻ → Al(OH)₃↓，需 3×0.0100 = 0.0300 mol OH⁻ &gt; 0.0200 → <b>OH⁻ 限量</b>；<br>
+            n(Al(OH)₃) = 0.0200 / 3 = 0.00667 mol → m = 0.00667 × 78.0 ≈ <b>0.520 g</b>。</div>
+        </div>
+        <div class="card">
+          <h3>与气体、溶液结合</h3>
+          <div class="readout">
+            化学计量可以和另外两条式子串起来用：<br>
+            <b>溶液：</b>n = M × V（摩尔浓度 × 体积，体积用升）<br>
+            <b>气体：</b>n = PV / RT（理想气体定律，T 用开尔文）<br><br>
+            这样就能从「几毫升溶液」一路算到「几升气体」，把宏观测量和粒子数量连起来。
+          </div>
+        </div>
+        <div class="practice" data-practice="u4-stoichiometry"></div>
+      </section>
+
+      <section class="pane" id="u4-titration">
+        <div class="bgn" data-bgn="u4-titration"></div>
+        <div class="card"><h3>沉淀反应过程</h3><p class="lead">溶液中的离子自由移动，相遇后结合成难溶固体，逐渐沉降到容器底部。</p><div id="animPrecip"></div><div class="anim-detail"><b>详细讲解</b>　沉淀反应是两种离子结合成难溶固体的过程。<ul><li>Ag⁺ 与 Cl⁻ 在溶液中相遇，静电吸引使它们结合成<b>难溶</b>的 AgCl。</li><li>固体不断聚集、长大，最终因密度较大而<span class='hl'>沉降</span>到底部形成沉淀。</li></ul>要点：是否生成沉淀由<b>溶解度（Ksp）</b>决定；净离子方程式中 Ag⁺ + Cl⁻ → AgCl(s)，旁观离子不参与。这也是定量分析（重量法、滴定）的基础。</div></div>
+        <div class="card">
+          <h3>滴定 · 从滴落到变色</h3>
+          <p class="lead">滴定用<b>已知浓度</b>的滴定剂（titrant）去定量消耗待测物（analyte）。当待测物被恰好完全消耗时，到达<b>等当点</b>。</p>
+          <div class="u4anim">
+            <div class="tit">
+              <div class="burette"><span class="drop"></span><span class="drop d2"></span></div>
+              <div class="flask"></div>
+            </div>
+            <div class="cap">滴定剂逐滴落下 → 等当点附近指示剂突然变色（终点）</div>
+          </div>
+          <div class="readout">
+            <b>等当点（equivalence point）：</b>待测物被滴定剂<b>恰好完全反应</b>的那一刻（理论点）。<br>
+            <b>终点（endpoint）：</b>指示剂<b>实际变色</b>被观察到的那一刻（实验点）。<br>
+            理想情况下两者重合 —— 这是选择指示剂的依据。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>10.00 mL 的 HCl 用 0.6362 M NaOH 滴定，到达等当点用去 15.28 mL，求 HCl 的浓度。<br>
+            n(NaOH) = 0.01528 × 0.6362 = 9.722 × 10⁻³ mol；HCl 与 NaOH 是 <b>1 : 1</b>；<br>
+            M(HCl) = 9.722 × 10⁻³ ÷ 0.01000 = <b>0.9722 mol/L</b>。</div>
+        </div>
+        <div class="card">
+          <h3>反应类型与溶解性规则</h3>
+          <div class="readout">
+            <b>沉淀反应：</b>两种溶液混合后生成难溶的离子化合物。例如 K₂CrO₄(aq) + Ba(NO₃)₂(aq) → BaCrO₄(s) + 2KNO₃(aq)。<br>
+            <b>酸碱反应：</b>质子（H⁺）在两物种之间转移。<br>
+            <b>氧化还原反应：</b>电子在两物种之间转移（详见下一节）。<br>
+            <b>燃烧反应：</b>氧化还原的一类 —— 与 O₂ 反应。烃完全燃烧生成 CO₂ + H₂O；不完全燃烧还会生成 CO 与 C。
+          </div>
+          <div class="hint"><b>必背溶解性规则：</b>所有 <b>Na⁺、K⁺、NH₄⁺、NO₃⁻</b> 的盐都可溶 —— 这四类离子永远不会生成沉淀。</div>
+        </div>
+        <div class="practice" data-practice="u4-titration"></div>
+      </section>
+
+      <section class="pane" id="u4-redox">
+        <div class="bgn" data-bgn="u4-redox"></div>
+        <div class="card">
+          <h3>电子转移 · OIL RIG 动画</h3>
+          <p class="lead">氧化还原反应的实质是<b>电子从一个物种转移到另一个物种</b>。失电子的被氧化、得电子的被还原 —— 两者永远同时发生。</p>
+          <div class="u4anim">
+            <div class="redo">
+              <div class="rsp ox"><b>Zn</b><span class="onum">0</span><span class="tag">被氧化</span></div>
+              <span class="edot"></span>
+              <div class="rsp rd"><b>Cu²⁺</b><span class="onum">+2</span><span class="tag">被还原</span></div>
+            </div>
+            <div class="cap">Zn 失 2e⁻ → 氧化数 0 → +2（OIL）；Cu²⁺ 得 2e⁻ → 氧化数 +2 → 0（RIG）</div>
+          </div>
+          <div class="readout">
+            <b>口诀 OIL RIG：</b>Oxidation Is Loss（氧化是失电子），Reduction Is Gain（还原是得电子）。<br>
+            <b>记忆技巧：</b>氧化数<b>升高</b> = 被氧化 = 还原剂；氧化数<b>降低</b> = 被还原 = 氧化剂。
+          </div>
+        </div>
+        <div class="card">
+          <h3>氧化数七条规则</h3>
+          <div class="readout">
+            ① 单质中元素的氧化数 = <b>0</b><br>
+            ② 单原子离子的氧化数 = <b>该离子的电荷</b><br>
+            ③ 氧在共价化合物中 = <b>−2</b>（过氧化物中 = <b>−1</b>）<br>
+            ④ 氢在共价化合物中 = <b>+1</b><br>
+            ⑤ 氟在化合物中 = <b>−1</b>（永远）<br>
+            ⑥ 化合物中各氧化数之和 = <b>0</b><br>
+            ⑦ 多原子离子中各氧化数之和 = <b>离子的电荷</b>
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>求 K₂Cr₂O₇ 中 Cr 的氧化数。<br>
+            设 Cr 为 x：2(+1) + 2x + 7(−2) = 0 → 2 + 2x − 14 = 0 → x = <b>+6</b>。<br>
+            （同理 CO₃²⁻ 中 C 为 +4；MnO₂ 中 Mn 为 +4；PCl₅ 中 P 为 +5；H₂O₂ 中 O 为 −1。）</div>
+        </div>
+        <div class="card">
+          <h3>酸碱反应与半反应法</h3>
+          <div class="readout">
+            <b>布朗斯特–劳里定义：</b>酸 = 质子（H⁺）给体，碱 = 质子受体。<br>
+            HCl + H₂O → Cl⁻ + H₃O⁺ 中，HCl 是酸、H₂O 是碱。<br>
+            <b>共轭酸碱对：</b>强酸给出质子后得到<b>弱</b>共轭碱；弱碱得到质子后得到<b>强</b>共轭酸。<br>
+            水既能给质子又能接受质子，所以在水溶液里扮演两性角色。<br><br>
+            <b>半反应法配平：</b>把总反应拆成<b>氧化半反应</b>与<b>还原半反应</b>，分别配平（元素 → 氧用 H₂O → 氢用 H⁺ → 电荷用 e⁻），再让两边电子数相等后相加。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>用半反应法配平 Fe²⁺ + Al → Al³⁺ + Fe。<br>
+            氧化：Al → Al³⁺ + 3e⁻　｜　还原：Fe²⁺ + 2e⁻ → Fe<br>
+            取 2 与 3 通分（6e⁻）：2Al → 2Al³⁺ + 6e⁻；3Fe²⁺ + 6e⁻ → 3Fe<br>
+            相加：<b>3Fe²⁺ + 2Al → 2Al³⁺ + 3Fe</b></div>
+        </div>
+        <div class="practice" data-practice="u4-redox"></div>
+      </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u5">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u5-rates" data-pane="u5-rates">5.1–5.2 反应速率与速率定律</a>
+        <a class="tab" href="#u5-integrated" data-pane="u5-integrated">5.3 浓度随时间变化与半衰期</a>
+        <a class="tab" href="#u5-collision" data-pane="u5-collision">5.4–5.6 基元反应与碰撞模型</a>
+        <a class="tab" href="#u5-mechanism" data-pane="u5-mechanism">5.7–5.8 反应机理与速率定律</a>
+        <a class="tab" href="#u5-catalysis" data-pane="u5-catalysis">5.9–5.11 稳态近似与催化</a>
+      </nav>
+
+      <section class="pane on" id="u5-rates">
+        <div class="bgn" data-bgn="u5-rates"></div>
+        <div class="card">
+          <h3>速率定律 · 初始速率法动画</h3>
+          <p class="lead">反应速率是「单位时间内反应物转化为产物的量」（单位 mol·L⁻¹·s⁻¹）。速率定律把速率写成各反应物浓度的幂次乘积，而<b>指数只能由实验测定</b>，不能从方程式直接读出来。</p>
+          <div class="u5anim">
+            <div class="ratecmp">
+              <div class="rc-row"><span class="rc-lab">[A] = 0.10 M</span><span class="rc-bar"><i style="--w:25%"></i></span><span class="rc-v">基准</span></div>
+              <div class="rc-row"><span class="rc-lab">[A] = 0.20 M</span><span class="rc-bar"><i style="--w:100%"></i></span><span class="rc-v">快 4×</span></div>
+              <div class="rc-row"><span class="rc-lab">[B] 减半</span><span class="rc-bar"><i style="--w:50%;--c:#9c3a3a"></i></span><span class="rc-v">慢 2×</span></div>
+            </div>
+            <div class="cap">[A] 加倍 → 速率 ×4 ⇒ 对 A 是 2 级；[B] 减半 → 速率 ×½ ⇒ 对 B 是 1 级</div>
+          </div>
+          <div class="readout">
+            <b>速率定律：</b>Rate = k[A]ⁿ[B]ᵐ<br>
+            • <b>反应级数</b>：某一反应物的指数（如 n 是对 A 的级数）<br>
+            • <b>总级数</b>：所有指数之和 = n + m<br>
+            • <b>速率常数 k</b>：与温度有关，<b>单位随总级数变化</b><br><br>
+            <b>初始速率法三步：</b>① 找两组只改变一个反应物浓度的实验；② 比较速率之比 → 求出该反应物的级数；③ 把级数代回任一实验求 k。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>A + 2B → C，测得 [A]=0.1/[B]=0.02 时 Rate=0.005；[A]=0.2/[B]=0.02 时 Rate=0.02；[A]=0.1/[B]=0.01 时 Rate=0.0025。<br>
+            第 1→2 组：[A] 加倍、速率 ×4 → 对 A 是 <b>2 级</b>；第 1→3 组：[B] 减半、速率 ×½ → 对 B 是 <b>1 级</b>；<br>
+            所以 <b>Rate = k[A]²[B]</b>，总级数 3，k = 0.005 / (0.1² × 0.02) = <b>25 L²·mol⁻²·s⁻¹</b>。</div>
+          <div class="hint"><b>影响速率的因素：</b>反应物浓度、温度、接触面积（表面积）、催化剂，以及其他环境因素。</div>
+        </div>
+        <div class="practice" data-practice="u5-rates"></div>
+      </section>
+
+      <section class="pane" id="u5-integrated">
+        <div class="bgn" data-bgn="u5-integrated"></div>
+        <div class="card">
+          <h3>用哪种图是直线，就说明是几级</h3>
+          <p class="lead">把浓度–时间数据做不同变换，<b>哪一种变换后是直线，反应就是那一种级数</b>。这是 AP 判断级数最快的方法。</p>
+          <div class="u5anim">
+            <div class="g3">
+              <div><div class="mini"><svg viewBox="0 0 100 62"><line x1="8" y1="54" x2="94" y2="54" stroke="#d8dfe8"/><line x1="8" y1="8" x2="8" y2="54" stroke="#d8dfe8"/><path class="gline" d="M8 10 L92 54"/></svg></div><div class="cap">[A]–t 直线 → <b>0 级</b></div></div>
+              <div><div class="mini"><svg viewBox="0 0 100 62"><line x1="8" y1="54" x2="94" y2="54" stroke="#d8dfe8"/><line x1="8" y1="8" x2="8" y2="54" stroke="#d8dfe8"/><path class="gline" d="M8 10 L92 54"/></svg></div><div class="cap">ln[A]–t 直线 → <b>1 级</b></div></div>
+              <div><div class="mini"><svg viewBox="0 0 100 62"><line x1="8" y1="54" x2="94" y2="54" stroke="#d8dfe8"/><line x1="8" y1="8" x2="8" y2="54" stroke="#d8dfe8"/><path class="gline" d="M8 54 L92 8"/></svg></div><div class="cap">1/[A]–t 直线 → <b>2 级</b></div></div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>积分速率定律：</b><br>
+            0 级：Rate = k　→　<b>[A]ₜ − [A]₀ = −kt</b><br>
+            1 级：Rate = k[A]　→　<b>ln[A]ₜ − ln[A]₀ = −kt</b><br>
+            2 级：Rate = k[A]²　→　<b>1/[A]ₜ − 1/[A]₀ = kt</b><br><br>
+            <b>斜率的意义：</b>0 级与 1 级图的斜率为 −k；2 级图的斜率为 +k。
+          </div>
+          <div class="hint"><b>一级反应的半衰期：</b>t<sub>1/2</sub> = 0.693 / k —— 一级反应的半衰期是<b>常数</b>，与初始浓度无关。<br><br>
+            <b>例题（PPT）：</b>某一级反应 40 s 完成 25%。求 k 与达到 95% 所需时间。<br>
+            剩余 75% → ln(0.75) = −kt → k = −ln(0.75)/40 = <b>7.19 × 10⁻³ s⁻¹</b>；<br>
+            达到 95% 完成（剩 5%）：ln(0.05) = −kt → t = −ln(0.05)/k ≈ <b>417 s</b>。</div>
+          <div class="hint"><b>再练一道（PPT）：</b>1/[A]–t 图为直线且斜率 +3.40 × 10⁻² L·mol⁻¹·s⁻¹ → <b>二级反应</b>，k = 3.40 × 10⁻²，速率定律 Rate = k[A]²。</div>
+        </div>
+        <div class="practice" data-practice="u5-integrated"></div>
+      </section>
+
+      <section class="pane" id="u5-collision">
+        <div class="bgn" data-bgn="u5-collision"></div>
+        <div class="card"><h3>麦克斯韦–玻尔兹曼分布</h3><p class="lead">温度升高使分子能量分布曲线右移、变矮——超过活化能的分子比例大幅增加。</p><div id="animMaxwell"></div><div class="anim-detail"><b>详细讲解</b>　分子的能量并非都一样，而是呈<b>分布</b>（麦克斯韦–玻尔兹曼分布）。<ul><li>只有能量 ≥ <span class='hl'>活化能 Ea</span> 的分子碰撞才是有效碰撞。</li><li>升温使分布曲线<b>右移且变矮变宽</b>——曲线右侧（超过 Ea 的部分）面积明显增大。</li></ul>这就是「升温加快反应」的本质：有效碰撞比例大幅增加。注意曲线变矮但总面积（分子总数）不变，只是分布更「平坦」。</div></div>
+        <div class="card">
+          <h3>碰撞模型 · 只有能量够、方向对的碰撞才有效</h3>
+          <p class="lead">绝大多数碰撞都不产生反应。一次<b>有效碰撞</b>必须同时满足两点：能量足够越过能垒，且取向正确。</p>
+          <div class="u5anim">
+            <div class="u4row" style="align-items:flex-start">
+              <div>
+                <div class="pbox gas big">
+                  <i style="left:10px;top:70px;animation-delay:0s"></i><i style="left:28px;top:36px;animation-delay:.3s"></i>
+                  <i style="left:20px;top:14px;animation-delay:.6s"></i><i style="left:58px;top:78px;animation-delay:.9s"></i>
+                  <i style="left:72px;top:30px;animation-delay:1.2s"></i><i style="left:104px;top:58px;animation-delay:1.5s"></i>
+                  <i style="left:126px;top:20px;animation-delay:1.8s"></i><i style="left:94px;top:94px;animation-delay:2.1s"></i>
+                </div>
+                <div class="cap">粒子不断碰撞，但多数无效</div>
+              </div>
+              <div>
+                <svg viewBox="0 0 230 120" width="230" role="img">
+                  <title>麦克斯韦–玻尔兹曼分布与活化能</title>
+                  <line x1="24" y1="100" x2="214" y2="100" stroke="#d8dfe8"/>
+                  <line x1="24" y1="12" x2="24" y2="100" stroke="#d8dfe8"/>
+                  <path d="M26 98 C 62 26, 98 16, 120 36 C 142 56, 174 90, 208 98" fill="none" stroke="#9fb6cd" stroke-width="2"/>
+                  <path class="shade" d="M150 46 C 170 68, 190 92, 208 98 L 208 100 L 150 100 Z" fill="#9c3a3a" opacity=".2"/>
+                  <line class="ealine" x1="150" y1="14" x2="150" y2="100" stroke="#9c3a3a" stroke-width="1.4" stroke-dasharray="3 3"/>
+                  <text x="154" y="24" font-size="10" fill="#9c3a3a">Eₐ</text>
+                  <text x="206" y="114" text-anchor="end" font-size="10" fill="#5b6a7c">分子能量 →</text>
+                </svg>
+                <div class="cap">阴影面积 = 能量 ≥ Eₐ 的比例（有效碰撞分数）</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>基元反应：</b>一步完成、没有中间步骤的反应。它的速率定律<b>可以直接由碰撞的粒子数写出</b>（即分子数）。<br>
+            三个（或更多）粒子同时碰撞的基元反应非常罕见 —— 所以基元反应多为单分子或双分子。<br><br>
+            <b>温度的影响：</b>升温使麦克斯韦–玻尔兹曼分布整体右移、峰变低，Eₐ 右侧的面积（有效碰撞比例）<b>大幅增加</b>。
+          </div>
+          <div class="hint"><b>注意：</b>「从方程式系数写速率定律」<b>只对基元反应成立</b>。总反应绝大多数是复合反应，必须靠实验测定级数。</div>
+        </div>
+        <div class="card">
+          <h3>反应能量图：从反应物 → 过渡态 → 产物</h3>
+          <div class="u5anim">
+            <svg viewBox="0 0 320 130" width="100%" style="max-width:340px" role="img">
+              <title>能量图与活化能</title>
+              <line x1="24" y1="112" x2="308" y2="112" stroke="#d8dfe8"/>
+              <line x1="24" y1="10" x2="24" y2="112" stroke="#d8dfe8"/>
+              <path class="prof" d="M26 78 C 60 78, 74 24, 106 24 C 138 24, 150 96, 186 96 L 302 96" fill="none" stroke="#235a74" stroke-width="2.4"/>
+              <line x1="26" y1="78" x2="60" y2="78" stroke="#235a74" stroke-width="2.4"/>
+              <line x1="150" y1="24" x2="150" y2="78" stroke="#9c3a3a" stroke-width="1.4" stroke-dasharray="3 3"/>
+              <text x="154" y="56" font-size="10" fill="#9c3a3a">Eₐ（活化能）</text>
+              <text x="30" y="94" font-size="10" fill="#5b6a7c">反应物</text>
+              <text x="112" y="18" font-size="10" fill="#5b6a7c">过渡态</text>
+              <text x="272" y="90" font-size="10" fill="#5b6a7c">产物</text>
+              <text x="300" y="126" text-anchor="end" font-size="10" fill="#5b6a7c">反应坐标 →</text>
+            </svg>
+            <div class="cap">反应物与过渡态之间的能量差就是正反应的活化能 Eₐ</div>
+          </div>
+          <div class="readout">
+            <b>反应坐标：</b>描述反应物重排为产物这一整套运动过程的横轴。<br>
+            <b>过渡态：</b>能量最高点的不稳定组合（不是中间体 —— 中间体是能量<b>低</b>谷，能被检测到）。<br>
+            <b>ΔE / ΔH：</b>反应物与产物之间的能量差。产物更低 → 放热；产物更高 → 吸热。
+          </div>
+        </div>
+        <div class="practice" data-practice="u5-collision"></div>
+      </section>
+
+      <section class="pane" id="u5-mechanism">
+        <div class="bgn" data-bgn="u5-mechanism"></div>
+        <div class="card">
+          <h3>反应机理 · 中间体在几步之间「闪现」</h3>
+          <p class="lead">反应机理是一系列按顺序发生的基元步骤。把各步相加应当得到总反应式。在这过程中<b>先被生成、后被消耗</b>的粒子叫中间体。</p>
+          <div class="u5anim">
+            <div class="mech">
+              <div class="mstep"><span class="mno">第 1 步（慢）</span><span class="spe">A</span><span class="op">+</span><span class="spe">B</span><span class="arrow">→</span><span class="spe inter">C</span><span class="op">+</span><span class="spe">D</span></div>
+              <div class="mstep"><span class="mno">第 2 步（快）</span><span class="spe inter">C</span><span class="op">+</span><span class="spe">E</span><span class="arrow">→</span><span class="spe">D</span><span class="op">+</span><span class="spe">F</span></div>
+              <div class="cap">C 在第 1 步生成、第 2 步被消耗 → <b>中间体</b>，不会出现在总反应式中</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>中间体 vs 催化剂：</b><br>
+            • <b>中间体</b>：先生成、后消耗（净浓度从 0 开始，最后也为 0）<br>
+            • <b>催化剂</b>：先消耗、后再生（净浓度始终不变）<br><br>
+            <b>三步法求总反应：</b>把各步相加，两边都出现的粒子互相约掉。剩余的就是总反应式。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>Step 1: 2A + B → C + D；Step 2: C + E → D + F；Step 3: G → B + F。<br>
+            C 在 step 1 生成、step 2 消耗 → <b>中间体</b>；B 在 step 1 消耗、step 3 再生 → <b>催化剂</b>；<br>
+            相加并约去后总反应为 <b>2A + E + G → 2D + 2F</b>。</div>
+        </div>
+        <div class="card">
+          <h3>速率定律由最慢的一步决定</h3>
+          <div class="readout">
+            <b>速率控制步（rate-determining step）：</b>机理中最慢的那一步。若各基元步骤不可逆、或第一步就是慢步，则<b>总速率定律 = 该慢步的速率定律</b>。<br><br>
+            <b>「分子数」写法：</b>基元步骤 A + B → … 的速率 = k[A][B]；2A → … 的速率 = k[A]²。指数就是该步中该粒子的<b>系数</b>。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>C₄H₉Br → C₄H₉⁺ + Br⁻（慢）；C₄H₉⁺ + H₂O → C₄H₉OH₂⁺（快）；C₄H₉OH₂⁺ + H₂O → C₄H₉OH + H₃O⁺（快）。<br>
+            总反应：<b>C₄H₉Br + 2H₂O → C₄H₉OH + H₃O⁺ + Br⁻</b>；中间体：<b>C₄H₉⁺、C₄H₉OH₂⁺</b>；<br>
+            因为第一步是慢步，速率定律为 <b>Rate = k[C₄H₉Br]</b>（与 H₂O 浓度无关）。</div>
+        </div>
+        <div class="practice" data-practice="u5-mechanism"></div>
+      </section>
+
+      <section class="pane" id="u5-catalysis">
+        <div class="bgn" data-bgn="u5-catalysis"></div>
+        <div class="card">
+          <h3>稳态近似与多步能量图</h3>
+          <p class="lead">如果<b>第一步不是</b>慢步，就不能直接把第一步写成速率定律，需要用近似方法处理。</p>
+          <div class="readout">
+            <b>稳态近似（steady-state）：</b>假设活性中间体的浓度在反应过程中基本不变（生成速率 ≈ 消耗速率），据此把它消去，得到只含稳定物种的速率定律。<br><br>
+            <b>怎么判断用哪种：</b><br>
+            • 第一步是慢步 → 直接取第一步的速率定律；<br>
+            • 第一步很快、后面有慢步 → 用稳态近似处理中间体。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>Step 1: A + B → E（快）；Step 2: E + B → C + D（慢）。<br>
+            E 是中间体。对 E 做稳态近似可得 <b>Rate = k[A][B]²</b> —— 注意级数与「第一步的系数」并不一致，这正是不能用第一步直接写速率定律的原因。</div>
+          <div class="u5anim">
+            <svg viewBox="0 0 340 130" width="100%" style="max-width:360px" role="img">
+              <title>多步反应能量图</title>
+              <line x1="20" y1="112" x2="326" y2="112" stroke="#d8dfe8"/>
+              <path class="prof" d="M22 76 C 46 76, 56 30, 80 30 C 104 30, 110 84, 132 84 C 156 84, 164 46, 190 46 C 216 46, 222 98, 246 98 L 320 98" fill="none" stroke="#235a74" stroke-width="2.4"/>
+              <text x="80" y="24" font-size="10" fill="#5b6a7c">峰 1（慢步，最高）</text>
+              <text x="190" y="40" font-size="10" fill="#5b6a7c">峰 2</text>
+              <text x="300" y="126" text-anchor="end" font-size="10" fill="#5b6a7c">反应坐标 →</text>
+            </svg>
+            <div class="cap">多步反应的能量图有多个峰 —— 最高的那个峰对应最慢的步骤</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>催化 · 把能垒降下来</h3>
+          <p class="lead">催化剂加快反应的方式只有两种：<b>增加有效碰撞数</b>，或<b>提供活化能更低的路径</b>。</p>
+          <div class="u5anim">
+            <div class="prof2">
+              <svg viewBox="0 0 320 132" width="100%" style="max-width:340px" role="img">
+                <title>催化剂降低活化能</title>
+                <line x1="22" y1="114" x2="308" y2="114" stroke="#d8dfe8"/>
+                <path d="M24 98 C 62 16, 84 16, 122 98 L 300 98" fill="none" stroke="#9c3a3a" stroke-width="2" stroke-dasharray="5 4"/>
+                <path class="lo" d="M24 98 C 56 56, 78 56, 110 98 L 300 98" fill="none" stroke="#235a74" stroke-width="2.6"/>
+                <text x="58" y="26" font-size="10" fill="#9c3a3a">无催化剂：Eₐ 高</text>
+                <text x="150" y="74" font-size="10" fill="#235a74">有催化剂：Eₐ 低</text>
+                <text x="300" y="128" text-anchor="end" font-size="10" fill="#5b6a7c">反应坐标 →</text>
+              </svg>
+              <div class="cap">两条路径的<b>起点与终点相同</b>（ΔH 不变），但能垒高度不同</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>催化剂的三条要点：</b><br>
+            ① 净浓度<b>不变</b> —— 常在速率控制步被消耗，随后又在后续步骤再生；<br>
+            ② 剂<b>不改变</b> ΔH、不改变平衡位置，只改变到达平衡的<b>快慢</b>；<br>
+            ③ 常见类型：<b>结合型催化</b>（催化剂与反应物结合，使其取向更有利，如酶）、<b>酸碱催化</b>（质子转移）、<b>表面催化</b>（反应物吸附在固体表面）。
+          </div>
+        </div>
+        <div class="practice" data-practice="u5-catalysis"></div>
+      </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u6">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u6-energy" data-pane="u6-energy">6.1–6.3 吸热放热与热平衡</a>
+        <a class="tab" href="#u6-calorimetry" data-pane="u6-calorimetry">6.4 热容与量热法</a>
+        <a class="tab" href="#u6-enthalpy" data-pane="u6-enthalpy">6.5–6.6 相变能量与反应焓</a>
+        <a class="tab" href="#u6-bond-formation" data-pane="u6-bond-formation">6.7–6.8 键焓与生成焓</a>
+        <a class="tab" href="#u6-hess" data-pane="u6-hess">6.9 盖斯定律</a>
+      </nav>
+
+      <section class="pane on" id="u6-energy">
+        <div class="bgn" data-bgn="u6-energy"></div>
+        <div class="card">
+          <h3>吸热还是放热 · 两张能量图对比</h3>
+          <p class="lead">温度变化说明系统发生了能量变化。反应发生时，系统的能量可能<b>降低</b>（放热）、<b>升高</b>（吸热）或<b>不变</b>。</p>
+          <div class="u6anim">
+            <div class="u4row">
+              <div>
+                <svg viewBox="0 0 130 100" width="130" role="img">
+                  <title>放热反应能量图</title>
+                  <line x1="10" y1="92" x2="122" y2="92" stroke="#d8dfe8"/>
+                  <line x1="12" y1="34" x2="52" y2="34" stroke="#235a74" stroke-width="2.6"/>
+                  <line x1="78" y1="72" x2="118" y2="72" stroke="#235a74" stroke-width="2.6"/>
+                  <path d="M12 34 L52 34 C 62 34, 68 72, 78 72 L118 72" fill="none" stroke="#5b6a7c" stroke-width="1.2" stroke-dasharray="3 3"/>
+                  <line class="dh" x1="52" y1="34" x2="52" y2="72" stroke="#2e6f40" stroke-width="2"/>
+                  <text x="56" y="56" font-size="10" fill="#2e6f40">ΔH &lt; 0</text>
+                  <text x="12" y="26" font-size="10" fill="#5b6a7c">反应物</text>
+                  <text x="90" y="88" font-size="10" fill="#5b6a7c">产物</text>
+                </svg>
+                <div class="cap">放热：产物能量更低，向环境放热</div>
+              </div>
+              <div>
+                <svg viewBox="0 0 130 100" width="130" role="img">
+                  <title>吸热反应能量图</title>
+                  <line x1="10" y1="92" x2="122" y2="92" stroke="#d8dfe8"/>
+                  <line x1="12" y1="72" x2="52" y2="72" stroke="#235a74" stroke-width="2.6"/>
+                  <line x1="78" y1="30" x2="118" y2="30" stroke="#235a74" stroke-width="2.6"/>
+                  <path d="M12 72 L52 72 C 62 72, 68 30, 78 30 L118 30" fill="none" stroke="#5b6a7c" stroke-width="1.2" stroke-dasharray="3 3"/>
+                  <line class="dh" x1="52" y1="30" x2="52" y2="72" stroke="#9c3a3a" stroke-width="2"/>
+                  <text x="56" y="56" font-size="10" fill="#9c3a3a">ΔH &gt; 0</text>
+                  <text x="12" y="64" font-size="10" fill="#5b6a7c">反应物</text>
+                  <text x="90" y="46" font-size="10" fill="#5b6a7c">产物</text>
+                </svg>
+                <div class="cap">吸热：产物能量更高，从环境吸热</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>放热反应：</b>反应物（系统）失去的能量 = 环境得到的能量（以热或功的形式）。<br>
+            <b>吸热反应：</b>系统从环境吸收能量（环境对系统传热或做功）。<br><br>
+            <b>溶解也可能是放热或吸热</b> —— 取决于溶解前后分子间/粒子间作用力的相对强弱。任何性质改变或变成另一种物质，都需要能量交换。
+          </div>
+          <div class="hint"><b>判断练习（PPT）：</b>手摸冰变冷（<b>吸热</b>，手放热给冰）；冰变暖（<b>吸热</b>）；壶中水被加热沸腾（<b>吸热</b>）；水蒸气在冷管上凝结（<b>放热</b>）；冰激凌熔化（<b>吸热</b>）。</div>
+        </div>
+        <div class="card">
+          <h3>热传递与热平衡</h3>
+          <div class="u6anim">
+            <div class="calo">
+              <div class="cb hot"><span class="ct">T 高</span><span class="cbar"><i></i></span></div>
+              <span class="hflow">热量 →</span>
+              <div class="cb cold"><span class="ct">T 低</span><span class="cbar"><i class="cl"></i></span></div>
+              <div class="eqline">碰撞持续进行 → 温度相同（热平衡）</div>
+            </div>
+          </div>
+          <div class="readout">
+            温度较高物体的粒子<b>平均动能更大</b>。两个物体接触时，粒子碰撞会把能量从高温物体传给低温物体，这个过程叫<b>热传递</b>。<br>
+            一直碰撞下去，两个物体的<b>平均动能趋于相同</b>，也就是温度相同 —— 这时达到<b>热平衡</b>。
+          </div>
+        </div>
+        <div class="practice" data-practice="u6-energy"></div>
+      </section>
+
+      <section class="pane" id="u6-calorimetry">
+        <div class="bgn" data-bgn="u6-calorimetry"></div>
+        <div class="card"><h3>量热法测比热</h3><p class="lead">高温金属投入冷水，热量由金属传给水，两者最终达到相同温度。</p><div id="animCalorim"></div><div class="anim-detail"><b>详细讲解</b>　量热法通过测温度变化来求热量或比热。<ul><li>高温金属投入冷水，热量由金属传给水，直到两者<span class='hl'>温度相等（热平衡）</span>。</li><li>核心公式 <b>q = mcΔT</b>；由热量守恒：金属放出的热 = 水吸收的热。</li></ul>据此可反求金属的比热容：c_金属 = m_水·c_水·ΔT_水 ÷ (m_金属·ΔT_金属)。升温的金属颜色可由红渐变为冷色，直观体现「降温放热」。</div></div>
+        <div class="card">
+          <h3>量热法 · q = mcΔT</h3>
+          <p class="lead">量热实验测量热量的传递。核心公式只有一条：<b>q = mcΔT</b>，其中 c 是比热容。</p>
+          <div class="u6anim">
+            <div class="u4row">
+              <div class="cbox" style="width:170px">
+                <div class="thermo"><i style="--h:35%"></i></div>
+                <div class="cap" style="margin-top:4px">低温：粒子动能小</div>
+              </div>
+              <div class="cbox" style="width:170px">
+                <div class="thermo"><i style="--h:85%"></i></div>
+                <div class="cap" style="margin-top:4px">加热后：粒子动能大</div>
+              </div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>q = mcΔT</b>：q 为热量（J），m 为质量（g），c 为比热容（J·g⁻¹·°C⁻¹），ΔT 为温度变化。<br>
+            <b>热力学第一定律：</b>能量在化学与物理过程中守恒。<br>
+            相同质量、不同比热容的物质，吸收同样的热量后<b>温度变化不同</b> —— 比热容越大越「抗热」。<br><br>
+            比热容与<b>摩尔热容</b>都常用于能量计算：加热系统使其能量增加，冷却则减少。系统改变能量的三条途径：<b>加热/冷却、相变、化学反应</b>。
+          </div>
+          <div class="hint"><b>例题 1（PPT）：</b>银的比热容 = 0.24 J·g⁻¹·°C⁻¹（摩尔质量 107.9 g/mol）。<br>
+            a. 150.0 g 银从 273 K 升到 298 K：q = 150.0 × 0.24 × 25 = <b>900 J</b>；<br>
+            b. 1.0 mol 银升高 1.0 °C：0.24 × 107.9 = <b>25.9 J·mol⁻¹·°C⁻¹</b>（这就是摩尔热容）；<br>
+            c. 用 1.25 kJ 把一块银从 12.0 °C 加热到 15.2 °C：m = 1250 ÷ (0.24 × 3.2) ≈ <b>1.63 × 10³ g</b>。</div>
+          <div class="hint"><b>例题 2（PPT · 热平衡）：</b>100.0 g 的 90 °C 水加入 500.0 g 的 10 °C 水，求末温。<br>
+            m₁cΔT₁ = m₂cΔT₂（c 相同可约掉）→ 100(90 − T) = 500(T − 10) → 9000 − 100T = 500T − 5000 → T = <b>23.3 °C</b>。</div>
+        </div>
+        <div class="practice" data-practice="u6-calorimetry"></div>
+      </section>
+
+      <section class="pane" id="u6-enthalpy">
+        <div class="bgn" data-bgn="u6-enthalpy"></div>
+        <div class="card"><h3>相变中的分子排列</h3><p class="lead">熔化/汽化时分子从有序排列变为无序，需要克服分子间作用力吸收能量。</p><div id="animPhase"></div><div class="anim-detail"><b>详细讲解</b>　同一物质的三态差别在于分子排列与运动方式。<ul><li><b>固态</b>：分子固定在晶格上，只在原位振动，排列有序。</li><li><b>液态</b>：分子可相互滑动，较无序。</li><li><b>气态</b>：分子完全摆脱束缚、四散飞开。</li></ul>熔化、汽化都要<b>克服分子间作用力</b>、<span class='hl'>吸收能量</span>（ΔH > 0）。而熔化/汽化过程中温度不变（能量用于破坏作用力而非升温）。</div></div>
+        <div class="card">
+          <h3>相变能量 · 加热曲线上的两个「平台」</h3>
+          <p class="lead">纯物质在<b>相变过程中温度保持不变</b> —— 吸收的能量全部用来打破粒子间作用力，而不是升温。</p>
+          <div class="u6anim">
+            <div class="heatwrap">
+              <svg viewBox="0 0 330 140" width="100%" style="max-width:350px" role="img">
+                <title>加热曲线</title>
+                <line x1="26" y1="118" x2="318" y2="118" stroke="#d8dfe8"/>
+                <line x1="26" y1="10" x2="26" y2="118" stroke="#d8dfe8"/>
+                <polyline class="heatcurve" points="28,112 78,74 112,74 168,38 202,38 296,12" fill="none" stroke="#235a74" stroke-width="2.6"/>
+                <text x="86" y="68" font-size="10" fill="#9c3a3a">熔化平台</text>
+                <text x="178" y="32" font-size="10" fill="#9c3a3a">沸腾平台</text>
+                <text x="60" y="98" font-size="10" fill="#5b6a7c">固</text>
+                <text x="132" y="92" font-size="10" fill="#5b6a7c">液</text>
+                <text x="240" y="52" font-size="10" fill="#5b6a7c">气</text>
+                <text x="312" y="132" text-anchor="end" font-size="10" fill="#5b6a7c">加热时间 →</text>
+              </svg>
+              <div class="cap">上升段 = 升温；水平段 = 相变（温度不变）</div>
+            </div>
+          </div>
+          <div class="readout">
+            熔化（固→液）与沸腾（液→气）都要<b>吸收能量</b>，系统的能量因此增加；<br>
+            凝固（液→固）与凝结（气→液）都会<b>放出能量</b>，系统的能量因此减少。<br><br>
+            <b>可逆性：</b>相变吸收的能量 = 反向相变放出的能量。例如某物质的<b>摩尔凝结热 = −（摩尔汽化热）</b>。
+          </div>
+        </div>
+        <div class="card">
+          <h3>反应焓 ΔH</h3>
+          <div class="readout">
+            <b>ΔH = q（恒压条件下）</b>，<b>ΔH = H(产物) − H(反应物)</b><br>
+            • ΔH &lt; 0 → 放热（化学能转化为热）<br>
+            • ΔH &gt; 0 → 吸热（热转化为化学能）<br><br>
+            <b>产物与环境的能量交换：</b>当产物温度与环境不同时，会通过热传递达到热平衡 —— 放热反应的产物把热能传给环境，吸热反应的产物则从环境吸收热能。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>丙烷燃烧 C₃H₈(g) + 5O₂(g) → 3CO₂(g) + 4H₂O(l)，ΔH = −2221 kJ（每摩尔丙烷）。<br>
+            5.00 g 丙烷（44.1 g/mol）= 5.00/44.1 = 0.1134 mol → ΔH = 0.1134 × (−2221) ≈ <b>−252 kJ</b>。</div>
+        </div>
+        <div class="practice" data-practice="u6-enthalpy"></div>
+      </section>
+
+      <section class="pane" id="u6-bond-formation">
+        <div class="bgn" data-bgn="u6-bond-formation"></div>
+        <div class="card">
+          <h3>断键吸热 · 成键放热</h3>
+          <p class="lead">反应中既有键的断裂、也有键的生成，两者都会改变系统的势能。比较两者的<b>收支</b>，就能判断放热还是吸热。</p>
+          <div class="u6anim">
+            <div class="u4row">
+              <div>
+                <div class="brow">
+                  <span class="bond brk">H—H</span><span class="arrow">→</span>
+                  <span class="fr">H</span><span class="fr">H</span>
+                </div>
+                <div class="cap">断键：<b>吸收能量</b></div>
+              </div>
+              <div>
+                <div class="brow">
+                  <span class="fr">H</span><span class="fr">Cl</span><span class="arrow">→</span>
+                  <span class="bond frm">H—Cl</span>
+                </div>
+                <div class="cap">成键：<b>放出能量</b></div>
+              </div>
+            </div>
+            <div class="cap" style="margin-top:12px">净结果 = 断键吸热 − 成键放热：放热更多 → 反应放热</div>
+          </div>
+          <div class="readout">
+            <b>估算方法：</b>把反应物里所有键的平均键能相加 = 断键需要的能量；把产物里所有键的平均键能相加 = 成键放出的能量。<br>
+            • 放出的 &gt; 需要的 → ΔH &lt; 0，<b>放热</b><br>
+            • 需要的 &gt; 放出的 → ΔH &gt; 0，<b>吸热</b>
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>用键能估算气相反应 ΔH ——<br>
+            a. H₂ + Cl₂ → 2HCl：断键 H—H(436) + Cl—Cl(243) = 679 kJ；成键 2 × H—Cl(432) = 864 kJ → ΔH = 679 − 864 = <b>−185 kJ</b>（放热）。<br>
+            b. N₂ + 3H₂ → 2NH₃：断键 N≡N(946) + 3×436 = 2254 kJ；成键 6 × N—H(391) = 2346 kJ → ΔH ≈ <b>−92 kJ</b>。</div>
+        </div>
+        <div class="card">
+          <h3>标准生成焓 ΔH°f</h3>
+          <div class="readout">
+            <b>定义：</b>在标准状态下，由<b>组成元素</b>生成 <b>1 mol</b> 化合物时的焓变。<br>
+            • 元素的<b>标准生成焓 = 0</b>（如 O₂(g)、N₂(g)、C(s) 的 ΔH°f 都是 0）<br><br>
+            <b>反应焓计算式：</b><br>
+            ΔH°<sub>reaction</sub> = Σn·ΔH°<sub>f</sub>(产物) − Σm·ΔH°<sub>f</sub>(反应物)<br>
+            （n、m 是配平方程式中的系数，元素本身取 0）
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>4N₂H₃CH₃(l) + 5N₂O₄(l) → 12H₂O(g) + 9N₂(g) + 4CO₂(g)<br>
+            已知 ΔH°f：N₂H₃CH₃ = +54、N₂O₄ = −20、H₂O(g) = −242、CO₂ = −393.5 kJ/mol；N₂ 元素为 0。<br>
+            产物：12×(−242) + 9×0 + 4×(−393.5) = −2904 − 1574 = −4478<br>
+            反应物：4×(+54) + 5×(−20) = 216 − 100 = 116<br>
+            ΔH° = −4478 − 116 = <b>−4594 kJ</b>（强烈放热，适合做火箭推进剂）。</div>
+        </div>
+        <div class="practice" data-practice="u6-bond-formation"></div>
+      </section>
+
+      <section class="pane" id="u6-hess">
+        <div class="bgn" data-bgn="u6-hess"></div>
+        <div class="card"><h3>盖斯定律</h3><p class="lead">不论走一步还是分几步，反应的总能量变化都一样——能量是状态函数。</p><div id="animHess"></div><div class="anim-detail"><b>详细讲解</b>　盖斯定律：<span class='hl'>反应的总焓变只与始态、终态有关，与路径无关</span>。<ul><li>无论一步完成还是分多步，总 ΔH 相同。</li><li>因此可以用已知反应的 ΔH 相加减，算出难以直接测量的反应焓。</li></ul>关键操作：把目标反应「拆」成已知反应，注意<b>方向</b>（逆反应 ΔH 反号）和<b>系数</b>（乘以几，ΔH 也乘以几）。本质是焓是状态函数。</div></div>
+        <div class="card">
+          <h3>盖斯定律 · 走哪条路，ΔH 都一样</h3>
+          <p class="lead">总反应的焓变只取决于<b>起点与终点</b>，与中间经过几步无关。所以可以把已知反应「拼装」成目标反应。</p>
+          <div class="u6anim">
+            <div class="hesswrap">
+              <svg viewBox="0 0 330 130" width="100%" style="max-width:350px" role="img">
+                <title>盖斯定律路径</title>
+                <line x1="26" y1="34" x2="304" y2="34" stroke="#235a74" stroke-width="2.6"/>
+                <text x="30" y="26" font-size="10" fill="#5b6a7c">反应物</text>
+                <text x="300" y="26" text-anchor="end" font-size="10" fill="#5b6a7c">产物</text>
+                <text x="165" y="20" text-anchor="middle" font-size="10" fill="#235a74">直接一步 ΔH</text>
+                <path class="detour" d="M26 34 L165 108 L304 34" fill="none" stroke="#9c3a3a" stroke-width="2" stroke-dasharray="5 4"/>
+                <text x="165" y="124" text-anchor="middle" font-size="10" fill="#9c3a3a">分两步：ΔH₁ + ΔH₂</text>
+              </svg>
+              <div class="cap">蓝色直路与红色绕路：<b>ΔH 完全相同</b></div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>盖斯定律三条运算规则：</b><br>
+            ① 反应<b>逆转</b> → ΔH <b>变号</b>（数值不变）；<br>
+            ② 系数<b>乘以 n</b> → ΔH 也<b>乘以 n</b>；<br>
+            ③ 几个反应<b>相加</b> → ΔH 也相加。<br><br>
+            <b>解题三步：</b>① 依次考虑每个已知反应，判断是否需要逆转；② 判断需要乘多少倍；③ 把处理后的反应相加、约掉两边都有的物种，核对是否等于目标反应，最后把 ΔH 一起相加。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>已知<br>
+            ① P₄(s) + 6Cl₂(g) → 4PCl₃(g)　ΔH = −1225.6 kJ<br>
+            ② P₄(s) + 5O₂(g) → P₄O₁₀(s)　ΔH = −2967.3 kJ<br>
+            ③ PCl₃(g) + Cl₂(g) → PCl₅(g)　ΔH = −84.2 kJ<br>
+            ④ PCl₃(g) + ½O₂(g) → Cl₃PO(g)　ΔH = −285.7 kJ<br>
+            求 P₄O₁₀(s) + 6PCl₅(g) → 10Cl₃PO(g) 的 ΔH。<br>
+            <b>拼装：</b>① + ②逆 + ③逆×6 + ④×10。<br>
+            ΔH = −1225.6 + (+2967.3) + 6×(+84.2) + 10×(−285.7)<br>
+            　　= −1225.6 + 2967.3 + 505.2 − 2857 = <b>−610.1 kJ</b></div>
+        </div>
+        <div class="practice" data-practice="u6-hess"></div>
+      </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u7">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u7-intro" data-pane="u7-intro">7.1–7.2 平衡的建立与方向</a>
+        <a class="tab" href="#u7-qk" data-pane="u7-qk">7.3–7.6 反应商 Q 与平衡常数 K</a>
+        <a class="tab" href="#u7-ice" data-pane="u7-ice">7.7–7.8 计算平衡浓度（ICE 表）</a>
+        <a class="tab" href="#u7-lechatelier" data-pane="u7-lechatelier">7.9–7.10 勒夏特列原理</a>
+        <a class="tab" href="#u7-ksp" data-pane="u7-ksp">7.11–7.13 溶解平衡与同离子效应</a>
+      </nav>
+
+      <section class="pane on" id="u7-intro">
+        <div class="bgn" data-bgn="u7-intro"></div>
+        <div class="card">
+          <h3>平衡是动态的 · 正逆速率收敛动画</h3>
+          <p class="lead">很多反应既能正向也能逆向进行。当<b>正反应速率 = 逆反应速率</b>时，宏观上不再变化，但微观上两个方向仍在同时进行 —— 这就是<b>动态平衡</b>。</p>
+          <div class="u7anim">
+            <div class="eqcurves">
+              <svg viewBox="0 0 320 120" width="100%" style="max-width:340px" role="img">
+                <title>正逆反应速率随时间的收敛</title>
+                <line x1="24" y1="100" x2="308" y2="100" stroke="#d8dfe8"/>
+                <line x1="24" y1="10" x2="24" y2="100" stroke="#d8dfe8"/>
+                <path class="cv fwd" d="M26 20 C 70 46, 96 62, 150 66 L 300 66" fill="none" stroke="#235a74" stroke-width="2.4"/>
+                <path class="cv rev" d="M26 96 C 76 78, 110 68, 150 66 L 300 66" fill="none" stroke="#9c3a3a" stroke-width="2.4"/>
+                <line class="eqline-y" x1="150" y1="18" x2="150" y2="100" stroke="#2e6f40" stroke-width="1.3" stroke-dasharray="3 3"/>
+                <text x="154" y="30" font-size="10" fill="#2e6f40">速率相等 → 平衡</text>
+                <text x="30" y="16" font-size="10" fill="#235a74">正反应速率</text>
+                <text x="30" y="94" font-size="10" fill="#9c3a3a">逆反应速率</text>
+                <text x="300" y="114" text-anchor="end" font-size="10" fill="#5b6a7c">时间 →</text>
+              </svg>
+              <div class="cap">两条速率曲线最终重合 —— 此时浓度不再变化</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>平衡的特征：</b><br>
+            • 反应物与产物<b>同时存在</b>，浓度（或分压）保持恒定；<br>
+            • 状态是<b>动态</b>的：正逆过程以<b>相等速率</b>持续进行，所以观察不到净变化；<br>
+            • 平衡可以在<b>任意方向</b>建立 —— 从纯反应物出发、从纯产物出发，最终到达同一平衡状态。<br><br>
+            <b>常见的可逆过程：</b>水的蒸发与凝结、气体的吸附与脱附、盐的溶解与沉淀；化学上还包括酸碱反应（质子转移）与氧化还原反应（电子转移）。
+          </div>
+          <div class="hint"><b>方向判据（7.2）：</b>正速率 &gt; 逆速率 → 净转化为产物；逆速率 &gt; 正速率 → 净转化为反应物；两者<b>相等</b>时才达到平衡。</div>
+        </div>
+        <div class="practice" data-practice="u7-intro"></div>
+      </section>
+
+      <section class="pane" id="u7-qk">
+        <div class="bgn" data-bgn="u7-qk"></div>
+        <div class="card"><h3>平衡建立动画</h3><p class="lead">反应刚开始正反应快、逆反应慢；随着反应进行两者逐渐相等，浓度不再变化，达到平衡。</p><div id="animEquil"></div><div class="anim-detail"><b>详细讲解</b>　可逆反应中，正、逆反应<b>同时</b>进行。<ul><li>开始时只有反应物，<span class='hl'>正反应速率最大</span>，产物不断生成。</li><li>随产物增多，逆反应加快、正反应减慢，两条速率逐渐靠拢。</li><li>当<span class='hl'>正逆反应速率相等</span>时，各物质浓度不再变化——达到<b>动态平衡</b>。</li></ul><b>关键</b>：平衡是「动态」的，反应并未停止，只是正逆速率相等、宏观浓度不变。平衡常数 K 就是在这个状态下由各物质浓度算出的比值。</div></div>
+        <div class="card">
+          <h3>Q 与 K · 反应商向平衡常数的靠拢</h3>
+          <p class="lead"><b>反应商 Q</b> 描述任意时刻各物种的相对浓度（或分压）；<b>平衡常数 K</b> 是 Q 在平衡时的取值。比较两者就能判断反应往哪个方向走。</p>
+          <div class="u7anim">
+            <div class="qkbar">
+              <span class="qk-q">Q</span>
+              <span class="qk-track"><i class="qk-dot"></i></span>
+              <span class="qk-k">K</span>
+            </div>
+            <div class="cap">Q 会不断向 K 靠拢，直到 Q = K 建立平衡</div>
+          </div>
+          <div class="readout">
+            <b>写法（以 jA + kB ⇌ lC + mD 为例）：</b><br>
+            K<sub>c</sub> = [C]<sup>l</sup>[D]<sup>m</sup> / ([A]<sup>j</sup>[B]<sup>k</sup>)　　（气相可用分压写成 K<sub>p</sub>）<br><br>
+            <b>三条要点：</b><br>
+            ① <b>纯固体与纯液体不写入</b> —— 它们的浓度与物质的量无关；<br>
+            ② K <b>不带单位</b>（只有动力学的 k 才带单位）；<br>
+            ③ 比较 Q 与 K：Q &lt; K → 正向移动；Q &gt; K → 逆向移动；Q = K → 已达平衡。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>H₂O(g) + Cl₂O(g) ⇌ 2HOCl(g)，25 °C 时 K = 0.0900。判断下列条件是否平衡、不平衡则往哪移：<br>
+            a. 三个分压都是 1.00 atm → Q = 1.00² / (1.00 × 1.00) = <b>1.00 &gt; K</b> → <b>逆向移动</b>；<br>
+            b. 200. / 49.8 / 21.0 torr → Q = 21.0² / (200. × 49.8) = <b>0.0443 &lt; K</b> → <b>正向移动</b>；<br>
+            c. 296 / 15.0 / 20.0 torr → Q = 20.0² / (296 × 15.0) = <b>0.0901 ≈ K</b> → <b>已经平衡</b>。</div>
+        </div>
+        <div class="card">
+          <h3>K 的大小与运算规则</h3>
+          <div class="u7anim">
+            <div class="kops">
+              <div class="kop"><span class="kop-t">逆转</span><span class="kop-e">K → 1/K</span></div>
+              <div class="kop"><span class="kop-t">系数 × c</span><span class="kop-e">K → K<sup>c</sup></span></div>
+              <div class="kop"><span class="kop-t">反应相加</span><span class="kop-e">K → K₁ × K₂</span></div>
+            </div>
+            <div class="cap">Q 与 K 的数学形式相同，所以这些运算规则对 Q 同样成立</div>
+          </div>
+          <div class="readout">
+            <b>K 的大小说明什么：</b>K ≫ 1 → 基本进行到底（<b>产物占优</b>）；K ≪ 1 → 几乎不发生（<b>反应物占优</b>）；K ≈ 1 → 两者量相当。<br>
+            <b>K 的测定：</b>由平衡时的浓度或分压实测得到。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>2H₂O(g) ⇌ 2H₂(g) + O₂(g)，K = 2.4 × 10⁻³。<br>
+            ① 4H₂O(g) ⇌ 4H₂(g) + 2O₂(g)（系数 ×2）→ K′ = (2.4 × 10⁻³)² = <b>5.8 × 10⁻⁶</b>；<br>
+            ② 2H₂(g) + O₂(g) ⇌ 2H₂O(g)（逆转）→ K″ = 1 / (2.4 × 10⁻³) = <b>4.2 × 10²</b>。</div>
+        </div>
+        <div class="practice" data-practice="u7-qk"></div>
+      </section>
+
+      <section class="pane" id="u7-ice">
+        <div class="bgn" data-bgn="u7-ice"></div>
+        <div class="card">
+          <h3>ICE 表 · 三行就把平衡浓度算出来</h3>
+          <p class="lead">已知<b>反应式 + 初始浓度 + K</b>，就能预测平衡时的浓度。标准工具是 <b>ICE 表</b>：I（Initial 初始）、C（Change 变化）、E（Equilibrium 平衡）。</p>
+          <div class="u7anim">
+            <div class="icetable">
+              <div class="ice-row ice-h"><span class="ice-lab"></span><span>A</span><span>B</span><span>C</span></div>
+              <div class="ice-row i"><span class="ice-lab">I</span><span>初始</span><span>初始</span><span>0</span></div>
+              <div class="ice-row c"><span class="ice-lab">C</span><span>−x</span><span>−x</span><span>+x</span></div>
+              <div class="ice-row e"><span class="ice-lab">E</span><span>初−x</span><span>初−x</span><span>x</span></div>
+            </div>
+            <div class="cap">把 E 行代进 K 的表达式 → 解出 x → 得到所有平衡浓度</div>
+          </div>
+          <div class="readout">
+            <b>解题四步：</b>① 写出配平方程式；② 列 ICE 表（注意系数决定变化量的比例）；③ 把 E 行代入 K 表达式；④ 解出 x 并算出各物种的平衡浓度。<br><br>
+            <b>什么时候可以近似：</b>当 K 很小（或电离度很小）时，可以在 E 行把 x 视为可忽略以简化计算 —— 这属于常见近似手法，若题目要求精确解则需解二次方程。
+          </div>
+          <div class="hint"><b>例题 1（PPT）：</b>N₂ + 3H₂ ⇌ 2NH₃，200 °C 密闭容器中初始 1.00 atm N₂ 与 2.00 atm H₂，平衡时总压 2.00 atm。求平衡时 H₂ 的分压与 K<sub>p</sub>。<br>
+            设 N₂ 消耗 x：总压 = (1.00 − x) + (2.00 − 3x) + 2x = 3.00 − 2x = 2.00 → x = 0.50 atm；<br>
+            P(H₂) = 2.00 − 3(0.50) = <b>0.50 atm</b>，P(N₂) = 0.50 atm，P(NH₃) = 1.00 atm；<br>
+            K<sub>p</sub> = 1.00² / (0.50 × 0.50³) = <b>16</b>。</div>
+          <div class="hint"><b>例题 2（PPT）：</b>SO₂(g) + NO₂(g) ⇌ SO₃(g) + NO(g)，K = 3.75，四种气体初始浓度都是 0.800 M。<br>
+            ［SO₃］=［NO］= x，［SO₂］=［NO₂］= 0.800 − x → x²/(0.800−x)² = 3.75 → x/(0.800−x) = 1.94 → x = 0.528；<br>
+            平衡浓度：<b>［SO₂］=［NO₂］= 0.272 M，［SO₃］=［NO］= 0.528 M</b>。</div>
+        </div>
+        <div class="practice" data-practice="u7-ice"></div>
+      </section>
+
+      <section class="pane" id="u7-lechatelier">
+        <div class="bgn" data-bgn="u7-lechatelier"></div>
+        <div class="card"><h3>勒夏特列原理动画</h3><p class="lead">对已达平衡的体系施加扰动（改变浓度/温度），观察平衡如何移动、重新建立。</p><div id="animLechat"></div><div class="anim-detail"><b>详细讲解</b>　勒夏特列原理：<span class='hl'>改变影响平衡的一个条件，平衡会向「减弱这种改变」的方向移动</span>。<ul><li>增大反应物浓度 → 平衡正向移动（消耗多余反应物）。</li><li>升温 → 平衡向吸热方向移动；降温 → 向放热方向移动。</li><li>增大压强 → 平衡向气体分子数减少的方向移动。</li></ul>注意：催化剂只加快达到平衡的速率，<b>不改变</b>平衡位置；平衡移动后会在新条件下建立新的平衡，K 仅在温度改变时才变。</div></div>
+        <div class="card">
+          <h3>勒夏特列原理 · 平衡总是「反抗」扰动</h3>
+          <p class="lead">对平衡系统施加扰动，系统会朝<b>减弱这个扰动</b>的方向移动，建立新的平衡。</p>
+          <div class="u7anim">
+            <div class="lcscale">
+              <div class="lc-side left"><span class="lc-lab">反应物</span></div>
+              <div class="lc-pivot"><span class="lc-beam"></span></div>
+              <div class="lc-side right"><span class="lc-lab">产物</span></div>
+              <div class="lc-note">加反应物 → 右移　｜　加产物 → 左移　｜　升体积 → 向气体分子数多的一侧移</div>
+            </div>
+            <div class="cap">平衡像一架天平：扰动让它倾一下，随即重新回到水平</div>
+          </div>
+          <div class="readout">
+            <b>四类常见扰动：</b><br>
+            ① <b>加入/移除某物种</b>：加入谁就向消耗它的方向移；<br>
+            ② <b>改变体积/压强</b>（气相）：体积减小 → 向气体<b>摩尔数较小</b>的一侧移；<br>
+            ③ <b>改变温度</b>：升温向<b>吸热</b>方向移，降温向<b>放热</b>方向移；<br>
+            ④ <b>稀释</b>：向溶质粒子数较多的一侧移。<br><br>
+            <b>不产生移动的情况：</b>加入<b>惰性气体</b>（恒容）不改变各组分分压，平衡<b>不移</b>；加入<b>催化剂</b>只加快到达平衡的速度，<b>不移动平衡</b>。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>3A(g) + 2B(aq) ⇌ 2C(g) + 2D(aq) + 2E(g)，ΔH = −66 kJ/mol（放热）。<br>
+            [B] 增大 → <b>右移</b>；[D] 增大 → <b>左移</b>；[E] 减小 → <b>右移</b>；[A] 减小 → <b>左移</b>；<br>
+            体积加倍 → 气体侧：左 3 mol、右 4 mol → 向<b>右</b>移；<br>
+            加入热量（升温）→ 向<b>吸热方向（左）</b>移；放入冰浴（降温）→ 向<b>右</b>移；<br>
+            加入 Ne（惰性）→ <b>不移</b>；加入催化剂 → <b>不移</b>。</div>
+        </div>
+        <div class="card">
+          <h3>用 Q 与 K 解释移动（7.10）</h3>
+          <div class="readout">
+            扰动使系统偏离平衡，本质上是让 <b>Q ≠ K</b>：<br>
+            • 系统会通过让 Q 重新等于 K 来建立新平衡；<br>
+            • <b>浓度/体积类</b>扰动只改变 <b>Q</b>（K 不变）；<br>
+            • <b>温度类</b>扰动改变的是 <b>K 本身</b>。<br><br>
+            两种情况下，各物种的浓度或分压都会重新分配，使 Q 与 K 再次相等。
+          </div>
+        </div>
+        <div class="practice" data-practice="u7-lechatelier"></div>
+      </section>
+
+      <section class="pane" id="u7-ksp">
+        <div class="bgn" data-bgn="u7-ksp"></div>
+        <div class="card">
+          <h3>溶解平衡与 Ksp · 同离子效应动画</h3>
+          <p class="lead">难溶盐的溶解是可逆过程，其程度用<b>溶度积常数 K<sub>sp</sub></b> 描述。往饱和溶液里再加一种<b>相同的离子</b>，溶解度会下降。</p>
+          <div class="u7anim">
+            <div class="kspwrap">
+              <div class="solidbox"><span>AgCl(s)</span><i class="ion-a"></i><i class="ion-b"></i></div>
+              <div class="ksparrow">⇌</div>
+              <div class="solbox"><span class="dis">Ag⁺</span><span class="dis">Cl⁻</span></div>
+              <div class="kspnote">加入 Cl⁻（同离子）→ 平衡<b>左移</b> → 更多 AgCl 析出、溶解度下降</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>K<sub>sp</sub> 的写法（以 Bi₂S₃ 为例）：</b>Bi₂S₃(s) ⇌ 2Bi³⁺(aq) + 3S²⁻(aq)　→　K<sub>sp</sub> = [Bi³⁺]²[S²⁻]³（固体不写入）。<br>
+            • 对给定固体、给定温度，<b>K<sub>sp</sub> 只有一个值</b>；<br>
+            • 溶解度是<b>平衡位置</b>，会随溶液条件变化；<br>
+            • K<sub>sp</sub> 越大，通常越易溶。<br><br>
+            <b>由 Ksp 求溶解度：</b>设溶解度为 s，按化学式写出各离子浓度（含系数），再代入 Ksp 表达式解出 s。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b><br>
+            ① AgCl(s) ⇌ Ag⁺ + Cl⁻，K<sub>sp</sub> = 1.6 × 10⁻¹⁰ → s² = 1.6 × 10⁻¹⁰ → s ≈ <b>1.3 × 10⁻⁵ mol/L</b>；<br>
+            ② Ag₃PO₄(s) ⇌ 3Ag⁺ + PO₄³⁻，K<sub>sp</sub> = 1.8 × 10⁻¹⁸ → Ksp = 27s⁴ → s⁴ = 6.7 × 10⁻²⁰ → s ≈ <b>1.6 × 10⁻⁵ mol/L</b>。</div>
+          <div class="hint"><b>同离子效应（7.12）：</b>加入的离子与配对离子结合，使平衡<b>向反应物一侧（左）</b>移动，从而抑制溶解。<br>
+            <b>pH 与溶解度（7.13）：</b>当盐中的某个离子是<b>弱酸或弱碱</b>时，溶解度会受 pH 影响 —— 同样可用勒夏特列原理定性解释（例如 OH⁻ 被 H⁺ 消耗 → 平衡右移、溶解度增大）。</div>
+        </div>
+        <div class="practice" data-practice="u7-ksp"></div>
+      </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u8">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u8-intro" data-pane="u8-intro">8.1–8.2 酸碱定义与 pH 计算</a>
+        <a class="tab" href="#u8-weak" data-pane="u8-weak">8.3 弱酸弱碱平衡</a>
+        <a class="tab" href="#u8-titration" data-pane="u8-titration">8.4–8.5 酸碱反应与滴定</a>
+        <a class="tab" href="#u8-structure" data-pane="u8-structure">8.6–8.7 结构与 pH/pKa</a>
+        <a class="tab" href="#u8-buffer" data-pane="u8-buffer">8.8–8.10 缓冲溶液</a>
+      </nav>
+
+      <section class="pane on" id="u8-intro">
+        <div class="bgn" data-bgn="u8-intro"></div>
+        <div class="card">
+          <h3>两种酸碱定义 · pH 标尺动画</h3>
+          <p class="lead">阿伦尼乌斯从「产生什么离子」定义酸碱，布朗斯特–劳里从<b>质子转移</b>定义 —— 后者更通用，也是 AP 的主用定义。</p>
+          <div class="u8anim">
+            <div class="phscale">
+              <span class="ph-grad"></span>
+              <span class="ph-mark"></span>
+              <span class="ph-l"><i>0</i><i>7</i><i>14</i></span>
+            </div>
+            <div class="cap">pH &lt; 7 酸性 ｜ pH = 7 中性（25 °C）｜ pH &gt; 7 碱性 —— 标尺上的标记随 pH 往复移动</div>
+          </div>
+          <div class="readout">
+            <b>Arrhenius：</b>酸在水中产生 H⁺，碱产生 OH⁻。<br>
+            <b>Brønsted–Lowry：</b>酸 = 质子（H⁺）<b>给体</b>，碱 = 质子<b>受体</b>。<br>
+            HCl + H₂O → Cl⁻ + H₃O⁺（HCl 是酸、H₂O 是碱）；NH₃ + H₂O ⇌ NH₄⁺ + OH⁻。<br><br>
+            <b>共轭关系：</b>酸失去质子后剩下的部分叫<b>共轭碱</b>；碱得到质子后形成<b>共轭酸</b>。二者合称<b>共轭酸碱对</b>（如 HF / F⁻）。
+          </div>
+          <div class="readout">
+            <b>pH 与 pOH：</b>pH = −log[H₃O⁺]，[H₃O⁺] = 10<sup>−pH</sup>；pOH = −log[OH⁻]，[OH⁻] = 10<sup>−pOH</sup><br>
+            <b>水的自偶电离：</b>K<sub>w</sub> = [H₃O⁺][OH⁻] = 1.0 × 10⁻¹⁴（25 °C）→ pK<sub>w</sub> = 14 = pH + pOH<br>
+            • 纯水中 pH = pOH = 7.0（中性）；<br>
+            • K<sub>w</sub> 随温度变化，所以非 25 °C 时纯水的 pH 不再是 7.0。<br><br>
+            <b>强酸强碱（8.2）：</b>HCl、HBr、HI、HClO₄、HNO₃ <b>完全电离</b>，所以 [H₃O⁺] = 酸的初始浓度；1 族、2 族氢氧化物完全解离，[OH⁻] = 碱的初始浓度。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>① 1.0 × 10⁻⁴ M H⁺ → pH = <b>4.00</b>；② 0.040 M OH⁻ → pOH = 1.40 → pH = <b>12.60</b>；<br>
+            ③ pH = 5.85 时 → [H⁺] = 10<sup>−5.85</sup> ≈ <b>1.4 × 10⁻⁶ M</b>，[OH⁻] = 1.0×10⁻¹⁴ ÷ 1.4×10⁻⁶ ≈ <b>7.1 × 10⁻⁹ M</b>。</div>
+        </div>
+        <div class="practice" data-practice="u8-intro"></div>
+      </section>
+
+      <section class="pane" id="u8-weak">
+        <div class="bgn" data-bgn="u8-weak"></div>
+        <div class="card">
+          <h3>弱酸只「部分电离」</h3>
+          <p class="lead">与强酸不同，弱酸分子只有<b>很小一部分</b>与水反应生成 H₃O⁺，绝大多数仍以分子形式存在。所以 [H₃O⁺] <b>远小于</b>酸的初始浓度。</p>
+          <div class="u8anim">
+            <div class="weakion">
+              <i class="m" style="--d:0s"></i><i class="m" style="--d:.2s"></i><i class="m" style="--d:.4s"></i>
+              <i class="m" style="--d:.6s"></i><i class="m" style="--d:.8s"></i><i class="m" style="--d:1s"></i>
+              <i class="m" style="--d:1.2s"></i><i class="m" style="--d:1.4s"></i><i class="m" style="--d:1.6s"></i>
+              <i class="ion" style="--d:1.8s"></i><i class="ion" style="--d:2s"></i>
+            </div>
+            <div class="cap">11 个分子里只有 2 个电离 → 电离度约 18%（示意图，实际弱酸通常远低于此）</div>
+          </div>
+          <div class="readout">
+            <b>弱酸平衡：</b>HA(aq) + H₂O ⇌ H₃O⁺(aq) + A⁻(aq)　→　K<sub>a</sub> = [H₃O⁺][A⁻] / [HA]，pK<sub>a</sub> = −log K<sub>a</sub><br>
+            <b>弱碱平衡：</b>B(aq) + H₂O ⇌ HB⁺(aq) + OH⁻(aq)　→　K<sub>b</sub> = [OH⁻][HB⁺] / [B]，pK<sub>b</sub> = −log K<sub>b</sub><br><br>
+            <b>由初始浓度和 pKa 求 pH：</b>设电离量为 x → K<sub>a</sub> = x²/(c − x)，小电离时可近似 x ≈ √(K<sub>a</sub>·c)，再由 pH = −log x 得到结果。<br>
+            <b>电离度（percent ionization）：</b>= (已电离的量 ÷ 初始量) × 100%。<b>浓度越稀，电离度越大</b>（但 [H₃O⁺] 更小）。
+          </div>
+          <div class="hint"><b>例题 1（PPT）：</b>0.50 M HF（K<sub>a</sub> = 7.2 × 10⁻⁴）求 pH。<br>
+            x ≈ √(7.2×10⁻⁴ × 0.50) = √(3.6×10⁻⁴) ≈ 0.019 M → pH = −log(0.019) ≈ <b>1.72</b>。<br>
+            注意：溶液中<b>主要物种</b>是 HF 分子和 H₂O，H⁺ 与 F⁻ 只是少量产物 —— 所以由 HF 的电离（而不是水的自偶电离）控制 pH。</div>
+          <div class="hint"><b>例题 2（PPT）：</b>8.00 M 甲酸有 0.47% 电离，求 K<sub>a</sub>。<br>
+            [H₃O⁺] = 8.00 × 0.0047 = 0.038 M → K<sub>a</sub> = 0.038² / (8.00 − 0.038) ≈ <b>1.8 × 10⁻⁴</b>。</div>
+          <div class="hint"><b>例题 3（PPT）：</b>4.00 M 甲酸（K<sub>a</sub> = 1.8 × 10⁻⁴）的电离度？<br>
+            x ≈ 0.027 M → 电离度 = 0.027 ÷ 4.00 × 100% ≈ <b>0.67%</b>。<br>
+            对比例题 2：浓度从 8.00 M 降到 4.00 M，电离度反而从 0.47% 升到 0.67% —— 印证「越稀越电离」。</div>
+        </div>
+        <div class="practice" data-practice="u8-weak"></div>
+      </section>
+
+      <section class="pane" id="u8-titration">
+        <div class="bgn" data-bgn="u8-titration"></div>
+        <div class="card"><h3>滴定全过程动画</h3><p class="lead">碱液逐滴加入酸中，pH 缓慢上升；接近等当点时曲线陡升、指示剂突变。</p><div id="animTitrate"></div><div class="anim-detail"><b>详细讲解</b>　酸碱滴定是用已知浓度的滴定剂去测定未知浓度。<ul><li>滴定过程中 pH 缓慢变化，接近<span class='hl'>等当点</span>时发生<b>突跃</b>（pH 急剧变化）。</li><li>等当点是酸与碱<b>恰好按化学计量完全反应</b>的时刻（弱酸强碱滴定的等当点呈碱性）。</li><li>指示剂在突跃范围内变色，颜色突变即为<b>滴定终点</b>——应与等当点尽量接近。</li></ul>要点：等当点由化学计量决定，终点由指示剂决定，二者越接近结果越准。</div></div><div class="card"><h3>滴定曲线动态绘制</h3><p class="lead">滴定过程中 pH 随滴定剂体积实时变化，等当点处出现陡峭的突跃。</p><div id="animTitCurve"></div><div class="anim-detail"><b>详细讲解</b>　滴定曲线把 pH 对加入的滴定剂体积作图。<ul><li>起始段平缓（弱酸的缓冲效应），pH 上升慢。</li><li><span class='hl'>半等当点</span>处 pH = pKa（此时 [HA] = [A⁻]），是读取弱酸 pKa 的常用位置。</li><li>等当点附近曲线<b>几乎垂直</b>（突跃），此后进入强碱过量区、pH 高而平缓。</li></ul>要点：曲线形态由「被滴物是强酸还是弱酸」决定；弱酸曲线的等当点 pH > 7，且半等当点是关键读图点。</div></div>
+        <div class="card">
+          <h3>酸碱混合与滴定曲线</h3>
+          <p class="lead">酸碱混合「按化学计量定量反应」。滴定曲线把 pH 对滴定剂体积作图，能一眼读出等当点与半等当点。</p>
+          <div class="u8anim">
+            <div class="titcurve">
+              <svg viewBox="0 0 330 140" width="100%" style="max-width:350px" role="img">
+                <title>弱酸被强碱滴定的曲线</title>
+                <line x1="26" y1="118" x2="316" y2="118" stroke="#d8dfe8"/>
+                <line x1="26" y1="10" x2="26" y2="118" stroke="#d8dfe8"/>
+                <path class="tcurve" d="M30 104 C 70 100, 100 92, 130 78 C 160 62, 170 30, 200 22 C 226 16, 240 20, 300 14" fill="none" stroke="#235a74" stroke-width="2.6"/>
+                <line class="halfmark" x1="130" y1="20" x2="130" y2="118" stroke="#2e6f40" stroke-width="1.3" stroke-dasharray="3 3"/>
+                <text x="134" y="30" font-size="10" fill="#2e6f40">半等当点 pH = pKa</text>
+                <text x="206" y="14" font-size="10" fill="#9c3a3a">等当点</text>
+                <text x="310" y="132" text-anchor="end" font-size="10" fill="#5b6a7c">滴定剂体积 →</text>
+              </svg>
+              <div class="cap">缓坡段（缓冲区）→ 陡升段（等当点附近）</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>四种混合情形（8.4）：</b><br>
+            • <b>强酸 + 强碱</b>：H⁺ + OH⁻ → H₂O，完全定量反应，pH 由过量的一方决定；<br>
+            • <b>弱酸 + 强碱</b>：HA + OH⁻ → A⁻ + H₂O。弱酸过量 → 形成<b>缓冲液</b>（用 H-H 方程）；强碱过量 → 由过量 OH⁻ 决定 pH；恰好等摩尔 → 由 A⁻ 的水解决定（<b>偏碱性</b>）；<br>
+            • <b>弱碱 + 强酸</b>：B + H₃O⁺ → HB⁺ + H₂O，情形与上面对称（等摩尔时<b>偏酸性</b>）；<br>
+            • <b>弱酸 + 弱碱</b>：HA + B ⇌ A⁻ + HB⁺，建立平衡。<br><br>
+            <b>滴定要点（8.5）：</b>等当点时<b>滴定剂的物质的量 = 待测物的物质的量</b>（按系数比），可据此求待测浓度。<br>
+            <b>半等当点：</b>[HA] = [A⁻]，此时 <b>pH = pK<sub>a</sub></b> —— 这是从滴定曲线读取 pKa 的标准方法。<br>
+            <b>多元酸：</b>滴定曲线上的多个陡升段对应多个可电离质子，每段半等当点给出一个 pK<sub>a</sub>。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>0.20 mol HC₂H₃O₂（K<sub>a</sub> = 1.8 × 10⁻⁵）与 0.030 mol NaOH 在 1.0 L 溶液中混合，求 pH。<br>
+            OH⁻ 先与 HA 定量反应：HA 剩 0.20 − 0.030 = 0.17 mol，生成 A⁻ 0.030 mol → 形成缓冲液；<br>
+            pK<sub>a</sub> = −log(1.8 × 10⁻⁵) = 4.74 → pH = 4.74 + log(0.030 / 0.17) ≈ <b>3.99</b>。</div>
+        </div>
+        <div class="practice" data-practice="u8-titration"></div>
+      </section>
+
+      <section class="pane" id="u8-structure">
+        <div class="bgn" data-bgn="u8-structure"></div>
+        <div class="card">
+          <h3>分子结构如何决定酸性强弱</h3>
+          <p class="lead">哪些质子会参与酸碱反应、以及它们有多「酸」，都能从分子结构推断。核心思想：<b>共轭碱越稳定，酸性越强</b>。</p>
+          <div class="u8anim">
+            <div class="stab">
+              <div class="stab-row"><span class="stab-k">电负性</span><span class="stab-v">把负电荷拉走 → 共轭碱更稳定 → 酸性更强</span></div>
+              <div class="stab-row"><span class="stab-k">诱导效应</span><span class="stab-v">吸电子基团通过 σ 键传递 → 稳定共轭碱</span></div>
+              <div class="stab-row"><span class="stab-k">共振</span><span class="stab-v">负电荷可离域到多个原子上 → 显著稳定</span></div>
+            </div>
+            <div class="cap">三种稳定化方式的示意图 —— 这也是「为什么 HClO₄ 是强酸」的答案</div>
+          </div>
+          <div class="readout">
+            <b>强酸：</b>HCl、HBr、HI、HClO₄、HNO₃ —— 它们的共轭碱（Cl⁻、Br⁻、I⁻、ClO₄⁻、NO₃⁻）非常弱，靠电负性、诱导效应、共振（或其组合）稳定。<br>
+            <b>弱酸：</b>羧酸（—COOH）是常见的一类。<br>
+            <b>强碱：</b>1 族与 2 族氢氧化物 —— 共轭酸极弱。<br>
+            <b>常见弱碱：</b>含氮碱（如氨）与羧酸根离子。<br>
+            <b>规律：</b>电负性大的元素能<b>相对稳定共轭碱</b>，从而提高酸性（同一周期从左到右酸性增强；同一族从上到下酸性增强）。
+          </div>
+        </div>
+        <div class="card">
+          <h3>pH 与 pKa · 谁占多数，一算就知道</h3>
+          <div class="u8anim">
+            <div class="phka">
+              <span class="pk-bar"><i class="pk-acid"></i><i class="pk-base"></i></span>
+              <span class="pk-marks"><i>pH &lt; pKa：酸型 HA 占优</i><i>pH &gt; pKa：碱型 A⁻ 占优</i></span>
+            </div>
+            <div class="cap">把溶液的 pH 与酸的 pKa 比较，就能判断质子化状态</div>
+          </div>
+          <div class="readout">
+            <b>判据（8.7）：</b><br>
+            • pH <b>&lt;</b> pKa → 溶液更酸 → <b>酸型 HA 占多数</b>；<br>
+            • pH <b>&gt;</b> pKa → 溶液更碱 → <b>碱型 A⁻ 占多数</b>；<br>
+            • pH = pKa → 两者浓度相等。<br><br>
+            <b>酸碱指示剂：</b>HIn(aq) ⇌ H⁺(aq) + In⁻(aq)，质子化与去质子化状态<b>颜色不同</b>，因此颜色会随 pH 变化。指示剂用来标记滴定的<b>终点</b>；终点与等当点理想上尽量接近，但不必然相同。
+          </div>
+        </div>
+        <div class="practice" data-practice="u8-structure"></div>
+      </section>
+
+      <section class="pane" id="u8-buffer">
+        <div class="bgn" data-bgn="u8-buffer"></div>
+        <div class="card">
+          <h3>缓冲溶液 · 加入酸/碱，pH 几乎不动</h3>
+          <p class="lead">缓冲液同时含有共轭酸碱对的<b>两个成员且浓度都较大</b>。共轭酸中和外加的碱，共轭碱中和外加的酸 —— 所以 pH 被「稳住」。</p>
+          <div class="u8anim">
+            <div class="bufdemo">
+              <div class="buf-col"><span class="buf-lab">加 H⁺</span><span class="buf-arrow">→</span><span class="buf-res">被 A⁻ 中和</span></div>
+              <div class="buf-col"><span class="buf-lab">加 OH⁻</span><span class="buf-arrow">→</span><span class="buf-res">被 HA 中和</span></div>
+              <div class="buf-ph">pH 变化很小</div>
+            </div>
+            <div class="cap">缓冲体系里，外加的强酸/强碱都会被「吃掉」，所以 pH 变化远小于纯水</div>
+          </div>
+          <div class="readout">
+            <b>常见组成（8.8）：</b>弱酸 + 它的盐（如 HF / NaF）、弱碱 + 它的盐（如 NH₃ / NH₄Cl）。<br><br>
+            <b>Henderson–Hasselbalch（8.9）：</b><br>
+            <b>pH = pK<sub>a</sub> + log( [A⁻] / [HA] )</b><br>
+            它由弱酸电离的平衡表达式变形而来，说明缓冲液的 pH 取决于 <b>pKa 与共轭酸碱的浓度比</b>。<br>
+            加入少量酸或碱时 [A⁻]/[HA] 的比例变化很小，所以 pH 几乎不变 —— 这就是缓冲作用的定量解释。
+          </div>
+          <div class="hint"><b>缓冲容量（8.10）：</b>把缓冲组分的<b>浓度同比例提高</b>（比例不变）→ pH 不变，但<b>缓冲容量</b>（能中和的外加酸/碱的量）增大。<br>
+            当共轭酸多于共轭碱时，对<b>加碱</b>的缓冲容量更大；反之当共轭碱更多时，对<b>加酸</b>的缓冲容量更大。<br>
+            缓冲液最有效的区间是 <b>pH ≈ pKa ± 1</b>。</div>
+        </div>
+        <div class="practice" data-practice="u8-buffer"></div>
+      </section>
+    </div>
+
+    <div class="unit-panel" id="unit-u9">
+      <nav class="tabs" data-tabs>
+        <a class="tab on" href="#u9-entropy" data-pane="u9-entropy">9.1–9.2 熵与熵变</a>
+        <a class="tab" href="#u9-gibbs" data-pane="u9-gibbs">9.3–9.4 吉布斯自由能与有利性</a>
+        <a class="tab" href="#u9-equilibrium" data-pane="u9-equilibrium">9.5–9.6 自由能与平衡、耦合反应</a>
+        <a class="tab" href="#u9-cells" data-pane="u9-cells">9.7–9.8 电化学电池与电池电势</a>
+        <a class="tab" href="#u9-nernst" data-pane="u9-nernst">9.9–9.10 非标准条件与电解</a>
+      </nav>
+
+      <section class="pane on" id="u9-entropy">
+        <div class="bgn" data-bgn="u9-entropy"></div>
+        <div class="card">
+          <h3>熵 · 物质与能量「越分散越无序」</h3>
+          <p class="lead"><b>熵（S）</b>是分子无序程度（混乱度）的度量。自发过程的驱动力是<b>宇宙总熵增加</b>。</p>
+          <div class="u9anim">
+            <div class="u4row">
+              <div>
+                <div class="pbox solid" style="width:150px;height:100px">
+                  <i style="left:28px;top:34px"></i><i style="left:44px;top:34px"></i><i style="left:60px;top:34px"></i>
+                  <i style="left:28px;top:50px"></i><i style="left:44px;top:50px"></i><i style="left:60px;top:50px"></i>
+                </div>
+                <div class="cap">低熵：排列整齐、运动受限</div>
+              </div>
+              <div class="ent-arrow">ΔS &gt; 0 →</div>
+              <div>
+                <div class="pbox gas" style="width:150px;height:100px">
+                  <i style="left:10px;top:70px;animation-delay:0s"></i><i style="left:30px;top:36px;animation-delay:.3s"></i>
+                  <i style="left:22px;top:12px;animation-delay:.6s"></i><i style="left:60px;top:78px;animation-delay:.9s"></i>
+                  <i style="left:76px;top:30px;animation-delay:1.2s"></i><i style="left:108px;top:58px;animation-delay:1.5s"></i>
+                  <i style="left:126px;top:18px;animation-delay:1.8s"></i>
+                </div>
+                <div class="cap">高熵：分散开、自由运动</div>
+              </div>
+            </div>
+            <div class="cap" style="margin-top:12px">相变（固→液→气）、体积增大、温度升高，都会让熵增加</div>
+          </div>
+          <div class="readout">
+            <b>熵增加的三种典型情形（9.1）：</b><br>
+            ① <b>物质更分散</b>：固 → 液 → 气（粒子更自由、占据更大体积）；<br>
+            ② <b>气体摩尔数增加</b>：气相产物的总摩尔数 &gt; 气相反应物的总摩尔数；<br>
+            ③ <b>能量更分散</b>：升温使分子动理论中的动能分布变宽，熵随之增大。<br><br>
+            恒温下气体体积增大 → 分子有更大活动空间 → ΔS 为正。
+          </div>
+          <div class="hint"><b>判断 ΔS 符号（PPT 例题）：</b>酒精蒸发 → <b>正</b>；水结冰 → <b>负</b>；恒温压缩理想气体 → <b>负</b>；恒压加热理想气体 → <b>正</b>；NaCl 溶解 → <b>正</b>（晶格被拆散、粒子分散）。</div>
+        </div>
+        <div class="card">
+          <h3>用绝对熵计算熵变（9.2）</h3>
+          <div class="readout">
+            <b>公式：</b>ΔS°<sub>反应</sub> = Σn·S°(产物) − Σm·S°(反应物)<br>
+            注意用的是<b>绝对熵 S°</b>（不是生成熵），单位 J·K⁻¹·mol⁻¹。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>2Na(s) + 2H₂O(l) → 2NaOH(aq) + H₂(g)<br>
+            已知 S°（J/K·mol）：Na(s) = 51、H₂O(l) = 70、NaOH(aq) = 50、H₂(g) = 131。<br>
+            产物：2 × 50 + 131 = 231；反应物：2 × 51 + 2 × 70 = 242<br>
+            ΔS° = 231 − 242 = <b>−11 J·K⁻¹·mol⁻¹</b>（略负 —— 因为水由液态变成水合离子，抵消了产生气体的熵增）。</div>
+        </div>
+        <div class="practice" data-practice="u9-entropy"></div>
+      </section>
+
+      <section class="pane" id="u9-gibbs">
+        <div class="bgn" data-bgn="u9-gibbs"></div>
+        <div class="card"><h3>熵增与自发性</h3><p class="lead">孤立体系中粒子由有序趋于无序，熵增大——这是许多自发过程的驱动力。</p><div id="animEntropy"></div><div class="anim-detail"><b>详细讲解</b>　熵 S 是<b>混乱度（无序度）</b>的度量。<ul><li>粒子由集中、有序趋向于分散、无序 → <span class='hl'>ΔS > 0</span>，这是自发的方向。</li><li>同一物质：气态熵 > 液态 > 固态；温度越高、粒子越多，熵越大。</li></ul>判断自发：ΔG = ΔH − TΔS，ΔG < 0 时自发。很多「吸热却自发」的过程（如硝酸铵溶解）正是靠熵增驱动。</div></div>
+        <div class="card">
+          <h3>吉布斯自由能 · 判断「热力学是否有有利」</h3>
+          <p class="lead">ΔG° 是判断过程<b>热力学有利性</b>的量度。AP 更推荐说「thermodynamically favored」而不是「spontaneous」（避免被误解为「突然、无缘无故」）。</p>
+          <div class="u9anim">
+            <div class="gsign">
+              <div class="gs-row"><span class="gs-h">ΔH°</span><span class="gs-h">ΔS°</span><span class="gs-h">ΔG° = ΔH° − TΔS°</span><span class="gs-h">结论</span></div>
+              <div class="gs-row"><span class="neg">−</span><span class="pos">+</span><span class="fav">永远 &lt; 0</span><span class="fav">任何温度都有利</span></div>
+              <div class="gs-row"><span class="pos">+</span><span class="neg">−</span><span class="unfav">永远 &gt; 0</span><span class="unfav">任何温度都不利</span></div>
+              <div class="gs-row"><span class="neg">−</span><span class="neg">−</span><span class="cond">低温 &lt; 0</span><span class="cond">低温有利</span></div>
+              <div class="gs-row"><span class="pos">+</span><span class="pos">+</span><span class="cond">高温 &lt; 0</span><span class="cond">高温有利</span></div>
+            </div>
+            <div class="cap">ΔH° 与 ΔS° 的符号组合决定「什么温度下有利」</div>
+          </div>
+          <div class="readout">
+            <b>标准态（9.3）：</b>纯物质、1.0 mol/L 溶液、或 1.0 atm（1.0 bar）气体 —— 这些条件下的 ΔG 记作 ΔG°。<br>
+            <b>两种算法：</b><br>
+            ① 由生成自由能：ΔG°<sub>反应</sub> = Σn<sub>p</sub>G°(产物) − Σn<sub>r</sub>G°(反应物)；<br>
+            ② 由焓与熵：<b>ΔG° = ΔH° − TΔS°</b>（T 用开尔文）。<br><br>
+            <b>快速判据：</b>ΔS° &gt; 0 且 ΔH° &lt; 0 → 不必计算就知道 ΔG° &lt; 0；ΔH° &gt; 0 且 ΔS° &lt; 0 → 不必计算就知道 ΔG° &gt; 0。
+          </div>
+          <div class="hint"><b>为什么需要同时看焓和熵：</b>水的凝固、硝酸钠的溶解就是典型 —— 单看焓或单看熵都不足以判断，必须放在一起算 ΔG°。</div>
+        </div>
+        <div class="card">
+          <h3>热力学控制 vs 动力学控制（9.4）</h3>
+          <div class="readout">
+            许多<b>热力学有利</b>的过程实际上<b>几乎不发生</b>，或发生得极慢 —— 这时过程处于<b>动力学控制</b>之下，最常见的原因是<b>活化能很高</b>。<br><br>
+            <b>重要区分：</b>过程没有可观察的速率，<b>并不等于</b>系统处于平衡。如果已知某过程热力学有利却测不到速率，合理结论就是它受动力学控制。<br>
+            （回想 Unit 5：热力学只说「能不能」，动力学才说「快不快」。金刚石转化为石墨就是经典例子 —— 有利，但慢到看不出来。）
+          </div>
+        </div>
+        <div class="practice" data-practice="u9-gibbs"></div>
+      </section>
+
+      <section class="pane" id="u9-equilibrium">
+        <div class="bgn" data-bgn="u9-equilibrium"></div>
+        <div class="card">
+          <h3>ΔG° 与 K · 一边是热力学，一边是平衡</h3>
+          <p class="lead">「热力学有利（ΔG° &lt; 0）」等价于「平衡时产物占优（K &gt; 1）」。两者由一条式子联系起来。</p>
+          <div class="u9anim">
+            <div class="gkmove">
+              <div class="gk-col"><span class="gk-t">&lt; 0</span><span class="gk-lab">ΔG°</span><span class="gk-r">K &gt; 1 产物占优</span></div>
+              <div class="gk-col mid"><span class="gk-t">≈ 0</span><span class="gk-lab">ΔG°</span><span class="gk-r">K ≈ 1 两者相当</span></div>
+              <div class="gk-col"><span class="gk-t">&gt; 0</span><span class="gk-lab">ΔG°</span><span class="gk-r">K &lt; 1 反应物占优</span></div>
+            </div>
+            <div class="cap">ΔG° 越负 → K 越大，定量关系是 ΔG° = −RT ln K</div>
+          </div>
+          <div class="readout">
+            <b>两个等价形式：</b><br>
+            ΔG° = −RT ln K　　与　　K = e<sup>−ΔG°/RT</sup>，其中 R = 8.314 J·mol⁻¹·K⁻¹。<br><br>
+            <b>定性理解：</b>ΔG° 接近 0 时 K 接近 1；ΔG° 与 RT 相比很大或很小时，K 会显著偏离 1。<br>
+            ΔG° &lt; 0 → 产物占优（K &gt; 1）；ΔG° &gt; 0 → 反应物占优（K &lt; 1）。
+          </div>
+        </div>
+        <div class="card">
+          <h3>耦合反应（9.6）· 用「有利」带动「不利」</h3>
+          <div class="u9anim">
+            <div class="coupled">
+              <div class="cp unfav"><span>不利反应</span><b>ΔG° &gt; 0</b></div>
+              <span class="cp-plus">+</span>
+              <div class="cp fav"><span>有利反应</span><b>ΔG° &lt; 0</b></div>
+              <span class="cp-arrow">→</span>
+              <div class="cp total"><span>总反应</span><b>ΔG° &lt; 0</b></div>
+            </div>
+            <div class="cap">两个反应共享中间体，把 ΔG° 相加 → 总过程变得有利</div>
+          </div>
+          <div class="readout">
+            <b>外部能源可以驱动不利过程：</b><br>
+            ① <b>电能</b>驱动电解池或给电池充电；<br>
+            ② <b>光能</b>驱动光合作用中 CO₂ → 葡萄糖的整体转化。<br><br>
+            <b>耦合反应：</b>把「产生目标产物的不利反应」与一个有利反应耦合（如生物体内 ATP → ADP 的转化）。耦合系统中两个反应<b>共享一个或多个共同中间体</b>，相加后的总反应 ΔG° &lt; 0，从而达成目标。
+          </div>
+          <div class="hint"><b>溶解的自由能（7.14 回顾）：</b>ΔG°<sub>溶解</sub> 同时受三件事影响 —— 拆开固体内部的相互作用、溶剂围绕溶质重组、以及溶质与溶剂之间的相互作用。三者可能互相抵消，所以溶解的 ΔG° 正负需要具体分析。</div>
+        </div>
+        <div class="practice" data-practice="u9-equilibrium"></div>
+      </section>
+
+      <section class="pane" id="u9-cells">
+        <div class="bgn" data-bgn="u9-cells"></div>
+        <div class="card"><h3>原电池工作动画</h3><p class="lead">电子从负极经导线流向正极，盐桥中离子定向迁移维持电中性，反应持续进行。</p><div id="animCell"></div><div class="anim-detail"><b>详细讲解</b>　原电池把自发的氧化还原反应拆成两半，让电子通过外电路做功。<ul><li><b>负极（阳极）</b>发生氧化：Zn → Zn²⁺ + 2e⁻，失去电子。</li><li><b>正极（阴极）</b>发生还原：Ag⁺ + e⁻ → Ag，得到电子。</li><li>电子经<b>导线</b>由负极流向正极；<b>盐桥</b>中的离子定向迁移，维持两个半池的电中性。</li></ul>要点：原电池对应 ΔG < 0（自发）；阳极是负极、阴极是正极，别与电解池混淆。</div></div>
+        <div class="card">
+          <h3>电化学电池 · 电子永远从阳极流向阴极</h3>
+          <p class="lead"><b>原电池</b>（galvanic / voltaic）利用热力学有利的反应产生电压；<b>电解池</b>（electrolytic）则要靠外加电压驱动不利反应。</p>
+          <div class="u9anim">
+            <div class="cellfig">
+              <svg viewBox="0 0 340 150" width="100%" style="max-width:360px" role="img">
+                <title>原电池示意图</title>
+                <rect x="34" y="52" width="60" height="66" rx="4" fill="#eff5fa" stroke="#b6cee0"/>
+                <rect x="246" y="52" width="60" height="66" rx="4" fill="#fbf1ec" stroke="#e6c5b4"/>
+                <line x1="64" y1="52" x2="64" y2="20" stroke="#5b6a7c" stroke-width="3"/>
+                <line x1="276" y1="52" x2="276" y2="20" stroke="#5b6a7c" stroke-width="3"/>
+                <line x1="64" y1="20" x2="276" y2="20" stroke="#5b6a7c" stroke-width="2"/>
+                <text x="170" y="14" text-anchor="middle" font-size="10" fill="#5b6a7c">导线｜电子流动</text>
+                <text class="edot2" x="64" y="14" font-size="11">e⁻</text>
+                <rect x="156" y="60" width="24" height="58" rx="3" fill="#f4f7fa" stroke="#c9d6e2"/>
+                <text x="168" y="132" text-anchor="middle" font-size="10" fill="#5b6a7c">盐桥</text>
+                <text x="64" y="46" text-anchor="middle" font-size="11" fill="#9c3a3a">阳极 −</text>
+                <text x="276" y="46" text-anchor="middle" font-size="11" fill="#2e6f40">阴极 +</text>
+                <text x="64" y="86" text-anchor="middle" font-size="10" fill="#5b6a7c">氧化</text>
+                <text x="276" y="86" text-anchor="middle" font-size="10" fill="#5b6a7c">还原</text>
+              </svg>
+              <div class="cap">氧化发生在阳极、还原发生在阴极（电解池同样如此）</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>电池各组件的角色（9.7）：</b>电极、半电池中的溶液、盐桥、电压/电流测量装置 —— 每个部件都有特定作用。<br>
+            <b>可以从宏观与粒子两个层面描述：</b>电池类型、电子流动方向、各半电池发生的反应、电极质量变化、电极上是否析出气体、离子通过盐桥的流向。<br><br>
+            <b>类型对比：</b>原电池涉及<b>热力学有利</b>的反应（E°&gt;0）；电解池涉及<b>热力学不利</b>的反应（E°&lt;0，需要外部电源）。<br>
+            <b>铁律：</b><b>所有</b>电化学电池都是「阳极氧化、阴极还原」。原电池中阳极是负极，电解池中阳极是正极。
+          </div>
+        </div>
+        <div class="card">
+          <h3>电池电势 E° 与 ΔG°</h3>
+          <div class="readout">
+            <b>电池电势（cell potential / emf）：</b>把电子从还原剂「拉」向氧化剂的驱动力。单位是<b>伏特 V</b> = 每库仑电荷做 1 焦耳的功。<br>
+            <b>标准表给出的是还原电位</b>（1 M、1 atm、25 °C）：<br>
+            • 半反应<b>逆转</b> → E° <b>变号</b>；<br>
+            • 半反应<b>乘整数</b> → E° <b>不变</b>（这点与 ΔH 不同！）；<br>
+            • 原电池自发方向 = 使 E°<sub>cell</sub> 为正的方向。<br><br>
+            <b>计算公式：</b>E°<sub>cell</sub> = E°(阴极) − E°(阳极)
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>Fe³⁺(aq) + Cu(s) → Cu²⁺(aq) + Fe²⁺(aq)<br>
+            已知 Fe³⁺ + e⁻ → Fe²⁺ 的 E° = 0.77 V；Cu²⁺ + 2e⁻ → Cu 的 E° = 0.34 V。<br>
+            要配平需<b>逆转</b>铜的半反应（Cu → Cu²⁺ + 2e⁻，E° = −0.34 V），并把铁的半反应 ×2（E° 仍为 0.77 V）：<br>
+            总反应：Cu + 2Fe³⁺ → Cu²⁺ + 2Fe²⁺<br>
+            E°<sub>cell</sub> = 0.77 − 0.34 = <b>0.43 V</b>（为正，说明正向有利）。</div>
+          <div class="readout">
+            <b>与自由能的关系（9.8）：</b>ΔG° 与电池电势的关系是<br>
+            <b>ΔG° = −nFE°</b>，其中 n 为转移的电子摩尔数，<b>F = 96,485 C/mol e⁻</b>（法拉第常数）。<br>
+            • E° &gt; 0 → ΔG° &lt; 0 → 热力学有利；<br>
+            • E° &lt; 0 → ΔG° &gt; 0 → 不利，需要外加电压。<br>
+            （F 可由一个电子的电荷 1.602 × 10⁻¹⁹ C 乘阿伏伽德罗常数 6.022 × 10²³ 得到。）
+          </div>
+          <div class="hint"><b>算一下上面的例子：</b>n = 2、E° = 0.43 V → ΔG° = −2 × 96485 × 0.43 ≈ <b>−8.3 × 10⁴ J/mol = −83 kJ/mol</b>。</div>
+        </div>
+        <div class="practice" data-practice="u9-cells"></div>
+      </section>
+
+      <section class="pane" id="u9-nernst">
+        <div class="bgn" data-bgn="u9-nernst"></div>
+        <div class="card">
+          <h3>非标准条件下的电池电势（9.9）</h3>
+          <p class="lead">真实系统的浓度往往不是标准态，此时电池电势会随浓度变化。电池电势是<b>趋向平衡的驱动力</b> —— 离平衡越远，电势越大。</p>
+          <div class="u9anim">
+            <div class="emfcurve">
+              <svg viewBox="0 0 320 120" width="100%" style="max-width:340px" role="img">
+                <title>电池电势随反应进行而衰减</title>
+                <line x1="26" y1="98" x2="306" y2="98" stroke="#d8dfe8"/>
+                <line x1="26" y1="12" x2="26" y2="98" stroke="#d8dfe8"/>
+                <path class="emf" d="M28 22 C 90 40, 160 74, 300 96" fill="none" stroke="#235a74" stroke-width="2.6"/>
+                <line class="emfzero" x1="300" y1="20" x2="300" y2="98" stroke="#9c3a3a" stroke-width="1.3" stroke-dasharray="3 3"/>
+                <text x="196" y="20" font-size="10" fill="#9c3a3a">平衡时电势 = 0</text>
+                <text x="30" y="16" font-size="10" fill="#5b6a7c">E°</text>
+                <text x="306" y="112" text-anchor="end" font-size="10" fill="#5b6a7c">反应进程 →</text>
+              </svg>
+              <div class="cap">反应越接近平衡，|E| 越小；到达平衡（Q = K）时 E = 0</div>
+            </div>
+          </div>
+          <div class="readout">
+            <b>Nernst 方程：</b>E = E° − (RT / nF) ln Q<br>
+            • 标准电势 E° 对应 Q = 1 的条件；<br>
+            • 系统接近平衡时 |E| 减小，平衡时（Q = K）降为 0；<br>
+            • 偏离标准态后若使 Q <b>更远离</b>平衡（比 Q = 1 更小）→ |E| 比 E° <b>更大</b>；<br>
+            • 若使 Q <b>更接近</b>平衡 → |E| 比 E° <b>更小</b>。<br><br>
+            <b>浓度电池：</b>两个半电池只有浓度不同，自发电子流向就是「使浓度趋于相等」的方向。
+          </div>
+          <div class="hint"><b>重要提醒：</b>电池<b>不处于平衡</b>，所以勒夏特列原理这类平衡论证<b>不适用</b>于电化学系统。AP 更看重对浓度效应的<b>定性理解与推理</b>，而不是套 Nernst 方程做繁琐计算。</div>
+        </div>
+        <div class="card">
+          <h3>电解与法拉第定律（9.10）</h3>
+          <p class="lead">法拉第定律把「通了多少电」与「发生了多少化学变化」定量连起来，可以求电子数、电极上沉积/溶解的质量、电流、时间与离子电荷。</p>
+          <div class="u9anim">
+            <div class="platefig">
+              <div class="cellbox"><span class="cb-el neg">−</span><span class="cb-sol"></span><span class="cb-el pos">+</span></div>
+              <div class="plate-note">电子从电源负极流向阴极 → 金属离子在阴极被还原并沉积</div>
+            </div>
+            <div class="cap">电流 × 时间 = 电荷量；电荷量 ÷ 法拉第常数 = 电子的物质的量</div>
+          </div>
+          <div class="readout">
+            <b>换算链条：</b><br>
+            电荷量 q = I × t（C = A × s）→ 电子的物质的量 n(e⁻) = q / F → 按半反应系数比得到金属/气体的物质的量 → 换算成质量或体积。<br>
+            <b>公式：I = q / t</b>，其中 F = 96,485 C/mol。
+          </div>
+          <div class="hint"><b>例题（PPT）：</b>某未知金属 M 用电解沉积：2.00 A 电流通电 52.8 s，从 M(NO₃)₃ 溶液中析出 0.0719 g 金属。求 M 是什么。<br>
+            q = I × t = 2.00 × 52.8 = <b>105.6 C</b>；<br>
+            n(e⁻) = 105.6 ÷ 96485 ≈ <b>1.09 × 10⁻³ mol</b>；<br>
+            由 M³⁺ + 3e⁻ → M，n(M) = 1.09 × 10⁻³ ÷ 3 ≈ <b>3.65 × 10⁻⁴ mol</b>；<br>
+            摩尔质量 = 0.0719 ÷ 3.65 × 10⁻⁴ ≈ <b>197 g/mol</b> → 该金属是 <b>金（Au）</b>。</div>
+        </div>
+        <div class="practice" data-practice="u9-nernst"></div>
+      </section>
+    </div>
+    </div>
+  </div>
+
+  <!-- ===== ★ [新增] 题库（与 Unit 1 / Unit 2 / 生词本并列） ===== -->
+  <div class="module bank" id="mod-bank">
+    <noscript><div class="nojs-need"><b>题库需要浏览器</b>题库的 470+ 道题（全部来自真题原卷与课件，含 AP 官方真题）、题型筛选、判分与中英解析都由 JavaScript 实时生成，当前预览器禁用了脚本，所以这里无法显示。<br>请在 Safari 中打开本文件，或使用在线链接。</div></noscript>
+    <div class="module-head"><h2>题库 · Question Bank</h2><p>所有 PDF 与 PPT 题目汇总在这里。先选题型（MCQ / FRQ，可同时选），再选范围与题量，然后开始做题。</p></div>
+    <div id="bankSelView">
+    <div class="card">
+      <h3>第一步 · 选择题型</h3>
+      <p class="lead">MCQ 与 FRQ 可以<b>同时选择</b>。范围右侧的题量会随题型筛选实时变化。</p>
+      <div class="type-row" id="bankTypes">
+        <button class="type-btn on" data-type="mcq"><b>MCQ</b><span>选择题 · 单选，自动判分</span></button>
+        <button class="type-btn on" data-type="frq"><b>FRQ</b><span>解答题 · 含评分要点，自评</span></button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>第二步 · 选择范围</h3>
+      <p class="lead">勾选要练习的小节，右侧数字是该范围内的题目总数。</p>
+      <div class="bank-quick">
+        <button class="btn" data-quick="all">全选</button>
+        <button class="btn" data-quick="none">清空</button>
+      </div>
+      <div id="bankRanges"></div>
+    </div>
+    <div class="card">
+      <h3>第三步 · 选择题目数量</h3>
+      <p class="lead">上限就是当前所选范围内的全部题目。</p>
+      <div class="row">
+        <input type="number" id="bankCount" min="1" value="10">
+        <span class="bank-cap">/ 上限 <b id="bankMax">0</b> 题</span>
+        <button class="btn" id="bankAll">取全部</button>
+        <button class="btn bank-start" id="bankStart">开始做题</button>
+      </div>
+    </div>
+    </div>
+    <div class="bank-pane" id="bankQuizView" hidden>
+      <div class="card">
+        <div class="view-head">
+          <button class="btn" id="bankBack">← 返回选题</button>
+          <h3>做题空间</h3>
+        </div>
+      </div>
+      <div id="bankSession"></div>
+    </div>
+  </div>
+
+  <!-- ===== ★ [新增] 错题本 ===== -->
+  <div class="module wrong" id="mod-wrong">
+    <noscript><div class="nojs-need"><b>错题本需要浏览器</b>错题本依赖浏览器的本地存储（localStorage）来记录你答错的题目，禁用脚本时无法读写，因此这里无法显示。<br>请在 Safari 中打开本文件，或使用在线链接。</div></noscript>
+    <div class="module-head"><h2>错题本 · Review Book</h2><p>只收录做错的题：做错 → 进入「待订正」；之后做对 → 移入「已订正」。</p></div>
+    <div id="wrongMain">
+      <div class="card">
+        <div class="wrong-stats" id="wrongStats"></div>
+        <div class="wrong-nav">
+          <button class="btn entry" id="wrongGoNo">
+            <b class="entry-num" id="wrongNoNum">0</b>
+            <span class="entry-title">待订正</span>
+            <span class="entry-sub">To correct · 做错待订正的题</span>
+          </button>
+          <button class="btn entry" id="wrongGoOk">
+            <b class="entry-num" id="wrongOkNum">0</b>
+            <span class="entry-title">已订正</span>
+            <span class="entry-sub">Corrected · 已做对的题</span>
+          </button>
+          <button class="btn entry entry-drill" id="wrongGoDrill">
+            <b class="entry-num">↻</b>
+            <span class="entry-title">巩固训练</span>
+            <span class="entry-sub">按薄弱知识点推送练习</span>
+          </button>
+        </div>
+        <div class="row">
+          <button class="btn bank-start" id="wrongStart">开始订正（重做全部待订正）</button>
+          <button class="btn" id="wrongReset">清空记录</button>
+        </div>
+        <div class="hint"><b>收录规则：</b>仅在做错时把该题加入错题本，做对的题不会预置进来。</div>
+      </div>
+    </div>
+    <div class="wrong-pane" id="wrongViewNo" hidden>
+      <div class="card">
+        <div class="view-head">
+          <button class="btn" id="wrongBackNo">← 返回错题本</button>
+          <h3>待订正 · To correct</h3>
+        </div>
+        <div id="wrongListNo"></div>
+        <div class="row wrong-start-row">
+          <button class="btn bank-start" id="wrongStart2">开始订正（重做全部待订正）</button>
+        </div>
+        <div id="wrongSession"></div>
+      </div>
+    </div>
+    <div class="wrong-pane" id="wrongViewOk" hidden>
+      <div class="card">
+        <div class="view-head">
+          <button class="btn" id="wrongBackOk">← 返回错题本</button>
+          <h3>已订正 · Corrected</h3>
+        </div>
+        <div id="wrongListOk"></div>
+      </div>
+    </div>
+    <div class="wrong-pane" id="wrongViewDrill" hidden>
+      <div class="card">
+        <div class="view-head">
+          <button class="btn" id="wrongBackDrill">← 返回错题本</button>
+          <h3>巩固训练 · 薄弱知识点</h3>
+        </div>
+        <div id="drillAnalysis"></div>
+      </div>
+      <div id="drillSession"></div>
+    </div>
+  </div>
+
+  <!-- ===== ★ [新增] 生词本（与 Unit 1 / Unit 2 并列的独立 UI） ===== -->
+  <div class="module vocab" id="mod-vocab">
+    <noscript><div class="nojs-need"><b>生词本需要浏览器</b>生词本由「翻译」查词后自动收录，依赖 JavaScript 与本地存储，禁用脚本时无法显示。<br>请在 Safari 中打开本文件，或使用在线链接。</div></noscript>
+    <div class="module-head"><h2>生词本 · Vocabulary</h2><p>翻译查过的单词会自动收录到这里：集中复习中文释义与对应知识点，并可进入背诵模式自测。</p></div>
+    <nav class="tabs" data-tabs>
+      <a class="tab on" href="#v-list" data-pane="v-list">单词列表</a>
+      <a class="tab" href="#v-recite" data-pane="v-recite">背诵模式</a>
+    </nav>
+
+    <section class="pane on" id="v-list">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h3 style="margin:0">已收录单词：<span id="vCount">0</span> 个</h3>
+          <button class="btn" id="vClear">清空生词本</button>
+        </div>
+        <div id="vList"></div>
+      </div>
+    </section>
+
+    <section class="pane" id="v-recite">
+      <div class="card">
+        <div class="rec-top">
+          <h3 style="margin:0">背诵模式</h3>
+          <div class="rec-prog">已掌握 <b id="recOk">0</b> / <span id="recTotal">0</span></div>
+        </div>
+        <p class="lead" style="text-align:center">根据下面显示的英文单词，写出它的中文释义。</p>
+        <div class="rec-word" id="recWord">&mdash;</div>
+        <div class="rec-pos" id="recPos"></div>
+        <div class="rec-row">
+          <input id="recInput" type="text" placeholder="写出中文释义…" autocomplete="off">
+          <button class="btn rec-check" id="recCheck">检查</button>
+        </div>
+        <div class="rec-fb" id="recFb"></div>
+        <div class="rec-acts">
+          <button class="btn" id="recSkip">显示答案</button>
+          <button class="btn" id="recMark">标记已掌握</button>
+          <button class="btn" id="recNext">下一个 →</button>
+        </div>
+        <div class="rec-state" id="recState"></div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<div class="modal hide" id="modalTr">
+  <div class="modal-box">
+    <div class="modal-head"><h3>翻译 · 单词翻译</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body">
+      <p class="pn-lead">翻译<b>只翻译一个英文单词</b>（不翻译句子或公式）。翻译完成后，该单词会<b>自动收录进生词本</b>。</p>
+      <div class="tr-row">
+        <input id="trInput" type="text" placeholder="输入一个英文单词，例如 isotope" autocomplete="off" spellcheck="false">
+        <button class="btn tr-go" id="trGo">翻译</button>
+      </div>
+      <div class="tr-out" id="trOut"></div>
+      <div class="tr-hint" id="trHint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ★ [新增] 面板：查缺补漏 / 大纲 ===== -->
+<div class="modal hide" id="modalGap">
+  <div class="modal-box">
+    <div class="modal-head"><h3>查缺补漏</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body" id="gapBody"></div>
+  </div>
+</div>
+<div class="modal hide" id="modalPdf">
+  <div class="modal-box">
+    <div class="modal-head"><h3>大纲</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body" id="pdfBody"></div>
+  </div>
+</div>
+
+<!-- ===== ★ [新增] 面板：设置（深浅 / 字号 / 水印 / 区老师） ===== -->
+<div class="modal hide" id="modalSettings">
+  <div class="modal-box settings-box">
+    <div class="modal-head"><h3>设置</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body">
+      <div class="set-pane on" id="setMain">
+      <div class="set-row">
+        <div class="set-info"><b>深浅模式</b><span>深色主题适合夜间与弱光环境</span></div>
+        <div class="seg" id="setTheme">
+          <button type="button" data-v="light">浅色</button><button type="button" data-v="dark">深色</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-info"><b>字体大小</b><span>更改字体大小后刷新即可应用</span></div>
+        <div class="seg" id="setFont">
+          <button type="button" data-v="0.9">小</button><button type="button" data-v="1">标准</button><button type="button" data-v="1.12">大</button><button type="button" data-v="1.25">特大</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-info"><b>水印大小</b><span>右下角署名水印的字号</span></div>
+        <div class="set-wm">
+          <input type="range" id="setWm" min="8" max="28" step="1" aria-label="水印大小">
+          <b id="setWmVal">12px</b>
+        </div>
+      </div>
+      <div class="set-row set-enter-row" id="rowPetEntry">
+        <div class="set-info"><b>区老师</b><span>一条蠕动的区王 · 点击进入设置</span></div>
+        <div class="set-enter-wrap">
+          <span class="set-state" id="setPetEntryState">关闭</span>
+          <button class="btn set-enter" id="btnPetSettings" type="button" aria-label="进入区老师设置">设置 ›</button>
+        </div>
+      </div>
+            <div class="set-row set-row-last" id="rowDataIO">
+        <div class="set-info"><b>数据备份</b><span>导出或恢复生词本与错题集（跨设备同步）</span></div>
+        <div class="set-enter-wrap">
+          <button class="btn" id="btnExportData" type="button">导出数据</button>
+          <button class="btn" id="btnImportData" type="button">导入数据</button>
+          <input type="file" id="fileImport" accept=".json,application/json" style="display:none">
+        </div>
+      </div>
+</div><!-- /#setMain -->
+      <div class="set-pane" id="setPetPanel">
+        <div class="set-sub-head">
+          <button class="btn set-back" id="btnPetBack" type="button">‹ 返回</button>
+          <h4>区老师设置</h4>
+        </div>
+      <div class="set-row">
+        <div class="set-info"><b>区老师</b><span>一条蠕动的区王</span></div>
+        <label class="switch"><input type="checkbox" id="setPet" aria-label="开启区老师"><i></i></label>
+      </div>
+      <div class="set-row">
+        <div class="set-info"><b>区老师尺寸</b><span>桌宠整体缩放（75%–140%）</span></div>
+        <div class="set-wm">
+          <input type="range" id="setPetSize" min="0.75" max="1.4" step="0.05" aria-label="区老师尺寸">
+          <b id="setPetSizeVal">100%</b>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-info"><b>区老师颜色</b><span>毛毛虫身体圆圈的颜色</span></div>
+        <div class="set-colors">
+          <span class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></span>
+          <span class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></span>
+          <span class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></span>
+          <span class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></span>
+          <span class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></span>
+          <input type="color" id="setPetColor" value="#5cb85c" aria-label="自定义区老师颜色">
+        </div>
+      </div>
+      <div class="set-row set-row-last">
+        <div class="set-info"><b>区老师爬动</b><span>关闭后区老师原地不动（仍会偶尔甩尾巴）</span></div>
+        <label class="switch"><input type="checkbox" id="setPetMove" aria-label="区老师爬动" checked><i></i></label>
+      </div>
+      </div><!-- /#setPetPanel -->
+      <p class="set-note">设置自动保存在本设备的浏览器中（localStorage），换设备或清除浏览器数据后需重新调整。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ★ [新增 · 模块1] Chart.js（仅 PES 能谱图使用）
+     加载失败（离线）时会自动降级为等效条形图，不影响其他模块
+     ============================================================ -->
+<div class="wm" aria-hidden="true">指导:@Lyn             制作:@AAA零食批发<br>服务器提供:@EvanZhu0721       题库资源:@iris</div>
+
+<!-- ★ [兼容] Chart.js 不再用 <script src> 阻塞式引入：
+     微信 / 受限 WebView 里 CDN 常被拦截或超时，会卡住后面整段主脚本，
+     造成“页面能显示但点不动”。改为在主脚本里异步加载，
+     加载成功后再重绘 PES 能谱；失败则用内置 Canvas 条形图。 -->
+
+<!-- ===== 账号弹窗（登录 / 注册 / 个人中心 / 云端同步） ===== -->
+<div class="modal hide" id="modalAccount">
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="acctTitle">账号 · 登录 / 注册</h3><button class="btn modal-close" type="button">关闭</button></div>
+    <div class="modal-body">
+      <div id="acctGuest">
+        <div class="acct-tabs">
+          <button class="acct-tab on" type="button" data-mode="login">登录</button>
+          <button class="acct-tab" type="button" data-mode="register">注册</button>
+        </div>
+        <div class="acct-field"><label>账号名</label><input id="acctUser" type="text" autocomplete="username" placeholder="3–20 位字母 / 数字 / 下划线 / 中文"></div>
+        <div class="acct-field"><label>密码</label><input id="acctPwd" type="password" autocomplete="current-password" placeholder="至少 6 个字符"></div>
+        <button class="btn acct-submit" id="acctSubmit" type="button">登录</button>
+        <div class="acct-msg" id="acctMsg"></div>
+        <div class="acct-hint">数据保存在服务器端；账号名唯一，密码至少 6 个字符。</div>
+      </div>
+      <div id="acctMember" style="display:none">
+        <p class="acct-welcome">已登录：<b id="acctWho">—</b></p>
+        <div class="acct-field"><label>原密码</label><input id="acctOld" type="password" autocomplete="current-password" placeholder="原密码"></div>
+        <div class="acct-field"><label>新密码</label><input id="acctNew" type="password" autocomplete="new-password" placeholder="至少 6 个字符"></div>
+        <button class="btn acct-submit" id="acctChange" type="button">修改密码</button>
+        <button class="btn acct-out" id="acctLogout" type="button">退出登录</button>
+        <div class="acct-msg" id="acctMsg2"></div>
+        <div class="acct-sync">
+          <p class="acct-sync-title">云端同步（错题本 + 生词本）</p>
+          <button class="btn" id="acctPush" type="button">上传本地数据到云端</button>
+          <button class="btn acct-out" id="acctPull" type="button">从云端恢复到本地</button>
+          <div class="acct-msg" id="acctMsg3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 主应用脚本（与单文件版逐字节一致） -->
+<script src="assets/app.js"></script>
+</body>
+</html>

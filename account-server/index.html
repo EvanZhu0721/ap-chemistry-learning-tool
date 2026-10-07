@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>账号系统 · 接口测试台</title>
+<style>
+  :root{--bg:#eef2f8;--card:#fff;--ink:#1b2433;--muted:#5d6b83;--line:#dde4ef;--phy:#2b6de9;--ok:#0f9d58;--bad:#d64545}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.6}
+  .wrap{max-width:880px;margin:0 auto;padding:28px 18px 60px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .card h2{font-size:15px;margin:0 0 12px}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:8px 0 4px}
+  input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--ink)}
+  input:focus{outline:none;border-color:var(--phy)}
+  button{margin-top:12px;width:100%;padding:10px;border:none;border-radius:8px;background:var(--phy);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  button:hover{opacity:.92}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .out{margin-top:14px;background:#0f172a;color:#d7e3ff;border-radius:10px;padding:12px;font-family:ui-monospace,Consolas,monospace;font-size:12px;white-space:pre-wrap;min-height:52px}
+  .status{font-size:12px;margin-top:6px}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .token{word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>账号系统 · 接口测试台</h1>
+  <p class="sub">所有数据保存在服务器端（users.json），浏览器仅通过 JSON 接口读写。账号名唯一、密码至少 6 个字符。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>① 注册 /register</h2>
+      <label>账号名</label><input id="rUser" placeholder="3–20 位，如 alice">
+      <label>密码（≥ 6 位）</label><input id="rPwd" type="text" placeholder="至少 6 个字符">
+      <button onclick="doRegister()">注册</button>
+    </div>
+
+    <div class="card">
+      <h2>② 登录 /login</h2>
+      <label>账号名</label><input id="lUser" placeholder="账号名">
+      <label>密码</label><input id="lPwd" type="text" placeholder="密码">
+      <button onclick="doLogin()">登录</button>
+      <div class="status" id="loginState">当前未登录</div>
+    </div>
+
+    <div class="card">
+      <h2>③ 修改密码 /change-password</h2>
+      <label>账号名</label><input id="cUser" placeholder="账号名">
+      <label>原密码</label><input id="cOld" type="text" placeholder="原密码">
+      <label>新密码（≥ 6 位）</label><input id="cNew" type="text" placeholder="新密码">
+      <button onclick="doChange()">修改密码</button>
+      <button class="ghost" onclick="doLogout()">登出（清除 token）</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>接口响应</h2>
+    <div class="out" id="out">等待操作…</div>
+  </div>
+</div>
+
+<script>
+let token = localStorage.getItem('acct_token') || '';
+
+function show(obj, httpCode){
+  const el = document.getElementById('out');
+  el.textContent = 'HTTP ' + httpCode + '\n' + JSON.stringify(obj, null, 2);
+}
+function renderLoginState(){
+  document.getElementById('loginState').innerHTML = token
+    ? '已登录，token: <span class="token">' + token.slice(0,16) + '…</span>'
+    : '当前未登录';
+}
+
+async function call(path, body){
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(path, { method:'POST', headers, body: JSON.stringify(body) });
+  const data = await res.json().catch(()=>({ok:false,error:'BAD_JSON',message:'响应不是 JSON'}));
+  show(data, res.status);
+  if (path !== '/api/change-password') {  // 改密不改 token 展示
+    if (data.token) { token = data.token; localStorage.setItem('acct_token', token); }
+    if (path === '/api/logout') { token = ''; localStorage.removeItem('acct_token'); }
+    renderLoginState();
+  }
+  return data;
+}
+
+const doRegister = () => call('/api/register', { username: document.getElementById('rUser').value, password: document.getElementById('rPwd').value });
+const doLogin    = () => call('/api/login',    { username: document.getElementById('lUser').value, password: document.getElementById('lPwd').value });
+const doLogout   = () => call('/api/logout',   {});
+const doChange   = () => call('/api/change-password', {
+  username: document.getElementById('cUser').value,
+  oldPassword: document.getElementById('cOld').value,
+  newPassword: document.getElementById('cNew').value
+});
+
+renderLoginState();
+</script>
+</body>
+</html>

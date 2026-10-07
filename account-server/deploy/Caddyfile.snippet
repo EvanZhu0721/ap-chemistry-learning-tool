@@ -1,0 +1,17 @@
+# ============================================================
+# Caddy v2 反代片段（与线上 www.apchemistry.net 站点一致）
+# 用法：把下面 handle 块插入 apchemistry.net 的站点块内，
+#       然后 caddy reload（或 caddy fmt --overwrite + reload）。
+# ============================================================
+
+# 你的站点块大概长这样（示意）：
+#   www.apchemistry.net {
+#       root * /srv/apchemistry/current
+#       file_server
+#       # ↓↓↓ 追加下面这段 ↓↓↓
+#   }
+
+# —— 追加：把 /api/* 反代到本机账号后端 ——
+handle /api/* {
+    reverse_proxy 127.0.0.1:8787
+}

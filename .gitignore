@@ -1,0 +1,18 @@
+# ==== WorkBuddy 内部数据 ====
+.workbuddy/
+
+# ==== 大体积题库/资料（不纳入版本控制）====
+Chemistry_PE3_FRQ/
+Chemistry_PE3_FRQ.zip
+新题库/
+
+# ==== 备份文件 ====
+*.backup*.html
+
+# ==== 后端运行时数据（首次运行自动生成）====
+account-server/users.json
+
+# ==== 系统/编辑器 ====
+.DS_Store
+Thumbs.db
+*.log
