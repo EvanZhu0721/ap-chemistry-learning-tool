@@ -140,7 +140,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
   <div class="topbar">
     <div class="brand"><span class="logo">AP</span> AP Chemistry 学习工具</div>
-    <button class="btn" id="btnPT" title="查看元素周期表">元素周期表</button>
+    <button class="btn" id="btnFormula" title="常用公式与元素周期表">公式表</button>
     <span class="crumb" id="crumb">首页</span>
     <span class="spacer"></span>
     <button class="btn" id="btnGap">查缺补漏</button>
@@ -2383,14 +2383,21 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   </div>
 </div>
 
-<!-- ===== ★ [新增] 元素周期表 ===== -->
-<div class="modal hide" id="modalPT">
+<!-- ===== ★ [新增] 公式表（AP 化学公式速查 + 元素周期表） ===== -->
+<div class="modal hide" id="modalFormula">
   <div class="modal-box pt-box">
-    <div class="modal-head"><h3>元素周期表</h3><button class="btn modal-close">关闭</button></div>
-    <div class="modal-body pt-body">
-      <div class="pt-legend" id="ptLegend"></div>
-      <div class="pt-scroll"><div class="pt-grid" id="ptGrid"></div></div>
-      <div class="pt-detail" id="ptDetail"></div>
+    <div class="modal-head"><h3>公式表</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body ft-body">
+      <div class="seg ft-tabs" id="ftTabs">
+        <button class="on" type="button" data-ft="formula">公式速查</button>
+        <button type="button" data-ft="ptable">元素周期表</button>
+      </div>
+      <div class="ft-pane on" id="ftPaneFormula"></div>
+      <div class="ft-pane" id="ftPanePtable">
+        <div class="pt-legend" id="ftPtLegend"></div>
+        <div class="pt-scroll"><div class="pt-grid" id="ftPtGrid"></div></div>
+        <div class="pt-detail" id="ftPtDetail"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2411,6 +2418,12 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
         <div class="set-info"><b>字体大小</b><span>更改字体大小后刷新即可应用</span></div>
         <div class="seg" id="setFont">
           <button type="button" data-v="0.9">小</button><button type="button" data-v="1">标准</button><button type="button" data-v="1.12">大</button><button type="button" data-v="1.25">特大</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-info"><b>题目呈现</b><span>「单题」一次一题，可上一道/下一道切换；「全部」一次列出所有题</span></div>
+        <div class="seg" id="setBankMode">
+          <button type="button" data-v="single">单题</button><button type="button" data-v="all">全部</button>
         </div>
       </div>
       <div class="set-row">

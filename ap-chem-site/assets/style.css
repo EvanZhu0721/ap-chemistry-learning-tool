@@ -236,6 +236,16 @@ select{
 
 /* ---------- Practice area (English questions) ---------- */
 .practice{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+/* 练习活页：默认折叠为一行标题，点击展开题目 */
+.practice-fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:600;color:var(--phy);user-select:none}
+.practice-fold>summary::-webkit-details-marker{display:none}
+.practice-fold>summary::before{content:"▸";display:inline-block;font-size:12px;transition:transform .15s;color:var(--phy)}
+.practice-fold[open]>summary::before{transform:rotate(90deg)}
+.pf-title{font-size:15px}
+.pf-count{font-size:12px;font-weight:600;background:rgba(43,109,233,.12);color:var(--phy);border-radius:99px;padding:2px 10px}
+.pf-hint{font-size:12.5px;font-weight:400;color:var(--muted)}
+.practice-body{margin-top:16px}
+.practice-fold:not([open]){padding-bottom:2px}
 .pz-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px}
 .pz-badge{font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px;background:var(--phy);color:#fff}
 .u2 .pz-badge{background:var(--math)}
@@ -339,7 +349,7 @@ select{
 .pt-cell:hover{transform:scale(1.16);z-index:6;box-shadow:0 3px 12px rgba(20,35,65,.22);border-color:rgba(20,35,65,.18)}
 .pt-cell .pt-s{font-weight:700;font-size:13px;letter-spacing:.2px}
 .pt-cell .pt-z{font-size:8.5px;opacity:.72}
-.pt-cell .pt-cn{font-size:9.5px}
+.pt-cell .pt-cn{font-size:6.4px;line-height:1.03;word-break:break-word;max-width:100%}
 .pt-cell .pt-m{font-size:8px;opacity:.82}
 .pt-cell.ph{background:#e8edf6;color:#8492ad;cursor:default;min-height:46px;font-size:10.5px;font-weight:600}
 .pt-cell.ph:hover{transform:none;box-shadow:none}
@@ -362,6 +372,33 @@ select{
 [data-theme="dark"] .pt-detail .ptd-row{color:var(--ink)}
 [data-theme="dark"] .pt-detail .ptd-row b{color:var(--muted)}
 @media (max-width:720px){.pt-box{max-width:100%;margin:0 6px}.pt-body{padding:12px 10px 16px}}
+
+/* ===== ★ 公式表（AP 化学公式速查 + 周期表） ===== */
+.ft-body{padding:16px 18px 20px;overflow-y:auto}
+.ft-tabs{margin-bottom:14px}
+.ft-pane{display:none}
+.ft-pane.on{display:block}
+.ft-sec{margin-bottom:16px}
+.ft-sec>h4{margin:0 0 8px;font-size:13.5px;color:var(--phy);padding-bottom:6px;border-bottom:1px solid var(--line);letter-spacing:.3px}
+.ft-row{display:flex;flex-wrap:wrap;gap:3px 14px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line)}
+.ft-row:last-child{border-bottom:none}
+.ft-fx{flex:0 0 auto;min-width:200px;font-weight:600;color:var(--ink);font-size:13.5px}
+.ft-note{flex:1;min-width:150px;font-size:12.5px;color:var(--muted);line-height:1.65}
+.ft-lead{margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.7}
+@media (max-width:640px){.ft-fx{min-width:0;flex-basis:100%}}
+
+/* ---- 首页公式表区块 ---- */
+.formula-section{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.formula-section>h2{margin:0 0 6px;font-size:18px;color:var(--ink)}
+.formula-section .fs-lead{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.7}
+.fs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fs-cat{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(43,109,233,.05)}
+.fs-cat>h3{margin:0 0 8px;font-size:13.5px;color:var(--phy);letter-spacing:.3px}
+.fs-item{padding:6px 0;border-bottom:1px dashed var(--line)}
+.fs-item:last-child{border-bottom:none}
+.fs-fx{font-weight:600;font-size:13px;color:var(--ink)}
+.fs-vars{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.65}
+@media (max-width:760px){.fs-grid{grid-template-columns:1fr}.formula-section{padding:16px 14px}}
 .c-ok{color:#0f7a45}.c-new{color:#2b5cb8}.c-fix{color:#6a35c0}.c-miss{color:#b33b3b}
 .pn-group{margin:10px 0 14px;padding-left:12px;border-left:2px solid #e3eaf6}
 .pn-gk{font-size:13px;font-weight:600;color:#2b5cb8;margin-bottom:7px}
@@ -531,6 +568,32 @@ details.lu summary:hover{background:#f7faff}
 .bank-unit:first-child{margin-top:0}
 .bank-unit-all{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:400;color:#7b8aa5;cursor:pointer;margin-left:auto}
 .bank-unit-all input{width:14px;height:14px;accent-color:var(--bank);cursor:pointer}
+/* 题库活页模式：每个 Unit 折叠 */
+.bank-unit-fold{margin:14px 0 6px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.bank-unit-fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13.5px;font-weight:600;color:#33415c;user-select:none;background:rgba(43,109,233,.05)}
+.bank-unit-fold>summary::-webkit-details-marker{display:none}
+.bank-unit-fold>summary::before{content:"▸";font-size:12px;color:var(--bank);transition:transform .15s}
+.bank-unit-fold[open]>summary::before{transform:rotate(90deg)}
+.bank-unit-name{flex:1}
+.bank-fold-hint{font-size:12px;font-weight:400;color:var(--muted)}
+.bank-unit-body{padding:10px 14px 12px}
+.bank-unit-body .bank-unit-all{margin-bottom:8px}
+[data-theme="dark"] .bank-unit-fold>summary{color:var(--ink)}
+/* 题库 Review 统计栏 + 单题导航 */
+.bk-review{margin-bottom:16px}
+.bk-rv-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.bk-rv-head h3{margin:0}
+.bk-scope{font-size:12.5px;color:var(--muted)}
+.bk-stats{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:12px}
+.bk-stat{display:flex;flex-direction:column;gap:2px}
+.bk-stat b{font-size:22px;color:var(--bank);line-height:1.1}
+.bk-stat small{font-size:12px;color:var(--muted)}
+.bk-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bk-bar i{display:block;height:100%;background:var(--bank);border-radius:99px;transition:width .25s}
+.bk-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.bk-nav .btn:disabled{opacity:.4;cursor:not-allowed}
+.bk-pos{font-size:13px;font-weight:600;color:#33415c}
+[data-theme="dark"] .bk-pos{color:var(--ink)}
 
 
 /* ---------- 学习模块：单元 Tab + 单元面板 ---------- */

@@ -9941,11 +9941,12 @@ drawQuantum();
       return;
     }
     var h = opts.head || "";
+    var noBase = (typeof opts.startNo === "number") ? opts.startNo : 1;   /* 编号基准：单题模式可指定本页题目的起始序号 */
     for (var i = 0; i < list.length; i++){
       var it = list[i];
       if (it.type === "frq"){
         h += '<div class="pz-item pz-frq" data-i="' + i + '" data-qid="' + it.id + '">';
-        h += '<div class="pz-q"><span class="pz-no">' + (i + 1) + "</span><span>" + wrapWords(it.q);
+        h += '<div class="pz-q"><span class="pz-no">' + (noBase + i) + "</span><span>" + wrapWords(it.q);
         if (opts.showRange) h += '<span class="pz-tag pz-tag-r">' + it.r + "</span>";
         h += '<span class="pz-tag pz-tag-frq">FRQ</span>';
         if (it.src && opts.showSource !== false) h += '<span class="pz-tag">' + it.src + "</span>";
@@ -9966,7 +9967,7 @@ drawQuantum();
         continue;
       }
       h += '<div class="pz-item" data-i="' + i + '" data-qid="' + it.id + '">';
-      h += '<div class="pz-q"><span class="pz-no">' + (i + 1) + "</span><span>" + wrapWords(it.q);
+      h += '<div class="pz-q"><span class="pz-no">' + (noBase + i) + "</span><span>" + wrapWords(it.q);
       if (opts.showRange) h += '<span class="pz-tag pz-tag-r">' + it.r + "</span>";
       if (it.src && opts.showSource !== false) h += '<span class="pz-tag">' + it.src + "</span>";
       h += "</span></div>";
@@ -10091,7 +10092,14 @@ drawQuantum();
     var id = mount.dataset.practice;
     var list = QPOOL.filter(function(q){ return q.ch === id || (q.r && q.r.toLowerCase() === id); });
     if (!list.length){ mount.style.display = "none"; return; }
-    renderQ(mount, list, {
+    // 活页形式：默认折叠为一行标题，点击后再展开题目，避免占用纵向空间遮挡后续知识点
+    mount.innerHTML = '<details class="practice-fold"><summary>' +
+      '<span class="pf-title">练习 · Practice</span>' +
+      '<span class="pf-count">' + list.length + ' 题</span>' +
+      '<span class="pf-hint">点击展开题目</span></summary>' +
+      '<div class="practice-body"></div></details>';
+    var body = mount.querySelector(".practice-body");
+    renderQ(body, list, {
       showSource: true,
       head: '<div class="pz-head"><span class="pz-badge">Practice</span>' +
             '<span class="pz-src">Questions from the unit PowerPoint and released AP exam PDFs · click any English word to look it up</span></div>'
@@ -11735,11 +11743,11 @@ drawQuantum();
     var h = "";
     Object.keys(byUnit).sort().forEach(function(u){
       var meta = UNIT_META[u] || [u, ""];
-      h += '<div class="bank-unit"><span>' + meta[0] + (meta[1] ? " · " + meta[1] : "") + "</span>" +
-           '<label class="bank-unit-all"><input type="checkbox" data-unitall="' + u + '"> 全选本单元</label></div>';
+      var title = meta[0] + (meta[1] ? " · " + meta[1] : "");
+      var rangesHtml = "";
       byUnit[u].forEach(function(r){
         var n = POOL.filter(function(q){ return q.r === r.id && !q.nb && typeOK(q); }).length;
-        h += '<label class="bank-range">' +
+        rangesHtml += '<label class="bank-range">' +
                '<input type="checkbox" data-range="' + r.id + '"' + (picked[r.id] ? " checked" : "") + ">" +
                '<span class="bank-r-id">' + r.id + "</span>" +
                '<span class="bank-r-en">' + r.en + "</span>" +
@@ -11747,6 +11755,10 @@ drawQuantum();
                '<span class="bank-r-n">' + n + " 题</span>" +
              "</label>";
       });
+      var allCb = '<label class="bank-unit-all"><input type="checkbox" data-unitall="' + u + '"> 全选本单元</label>';
+      h += '<details class="bank-unit-fold"><summary><span class="bank-unit-name">' + title + "</span>" +
+           '<span class="bank-fold-hint">点击展开</span></summary>' +
+           '<div class="bank-unit-body">' + allCb + rangesHtml + "</div></details>";
     });
     rangesBox.innerHTML = h;
     Array.prototype.forEach.call(rangesBox.querySelectorAll("input[data-range]"), function(cb){
@@ -11766,6 +11778,7 @@ drawQuantum();
     });
     syncMax();
   }
+  window.__renderBankRanges = renderRanges;
 
   function selectedRanges(){
     return RANGES.map(function(r){ return r.id; }).filter(function(id){ return picked[id]; });
@@ -11794,6 +11807,64 @@ drawQuantum();
     if (sv) sv.hidden = (which !== "sel");
     if (qv) qv.hidden = (which !== "quiz");
   }
+  var bankState = { sel: [], ids: [], done: {}, idx: 0 };
+
+  function bkCountDone(){ var n = 0; for (var k in bankState.done){ if (bankState.done[k]) n++; } return n; }
+
+  function bankReviewHTML(){
+    var n = bankState.sel.length, d = bkCountDone();
+    var pct = n ? Math.round(d / n * 100) : 0;
+    var single = (window.__bankView !== "all");
+    var nav = single
+      ? '<div class="bk-nav">' +
+          '<button class="btn" id="bkPrev"' + (bankState.idx <= 0 ? " disabled" : "") + ">← 上一道</button>" +
+          '<span class="bk-pos">第 ' + (bankState.idx + 1) + " / " + n + " 题</span>" +
+          '<button class="btn" id="bkNext"' + (bankState.idx >= n - 1 ? " disabled" : "") + ">下一道 →</button>" +
+        "</div>"
+      : "";
+    return '<div class="card bk-review"><div class="bk-rv-head"><h3>本次练习 · Review</h3>' +
+      '<span class="bk-scope">范围：' + bankState.ids.join("、") + "</span></div>" +
+      '<div class="bk-stats">' +
+        '<span class="bk-stat"><b>' + n + "</b><small>题目总数</small></span>" +
+        '<span class="bk-stat"><b id="bkDone">' + d + "</b><small>已完成</small></span>" +
+        '<span class="bk-stat"><b id="bkPct">' + pct + "%</b><small>进度</small></span>" +
+      "</div>" +
+      '<div class="bk-bar"><i id="bkBar" style="width:' + pct + '%"></i></div>' + nav + "</div>";
+  }
+
+  function refreshBankReview(){
+    var n = bankState.sel.length, d = bkCountDone();
+    var pct = n ? Math.round(d / n * 100) : 0;
+    var de = $("bkDone"), pe = $("bkPct"), ba = $("bkBar");
+    if (de) de.textContent = d;
+    if (pe) pe.textContent = pct + "%";
+    if (ba) ba.style.width = pct + "%";
+  }
+
+  function bindBankNav(){
+    var prev = $("bkPrev"), next = $("bkNext");
+    if (prev) prev.addEventListener("click", function(){ if (bankState.idx > 0){ bankState.idx--; renderBankQuiz(); } });
+    if (next) next.addEventListener("click", function(){ if (bankState.idx < bankState.sel.length - 1){ bankState.idx++; renderBankQuiz(); } });
+  }
+
+  function renderBankQuiz(){
+    if (!session) return;
+    var single = (window.__bankView !== "all");
+    session.innerHTML = bankReviewHTML() + '<div class="card"><div id="bankQBox"></div></div>';
+    var onAns = function(ok, it){ bankState.done[it.id] = 1; refreshBankReview(); };
+    if (single){
+      Q.renderQ($("bankQBox"), [bankState.sel[bankState.idx]], { showSource: true, showRange: true, startNo: bankState.idx + 1, onAnswer: onAns });
+    } else {
+      Q.renderQ($("bankQBox"), bankState.sel, { showSource: true, showRange: true, onAnswer: onAns });
+    }
+    refreshBankReview();
+    bindBankNav();
+  }
+  window.__refreshBankQuiz = function(){
+    var qv = $("bankQuizView");
+    if (qv && !qv.hidden && bankState.sel.length) renderBankQuiz();
+  };
+
   function startBank(){
     showBankPane("quiz");
     var ids = selectedRanges();
@@ -11806,20 +11877,11 @@ drawQuantum();
     want = Math.max(1, Math.min(want, list.length));
     var copy = list.slice();
     for (var i = copy.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = copy[i]; copy[i] = copy[j]; copy[j] = t; }
-    var sel = copy.slice(0, want);
-    var head = '<div class="card"><h3>本次练习</h3>' +
-      '<p class="lead">范围：' + ids.join("、") + '　共抽取 <b>' + sel.length + "</b> 题（该范围共 " + list.length + " 题）" +
-      '　<span class="bank-prog" id="bankProg">已作答 0 / ' + sel.length + "</span></p></div>";
-    session.innerHTML = head + '<div class="card"><div id="bankQBox"></div></div>';
-    var done = 0;
-    Q.renderQ($("bankQBox"), sel, {
-      showSource: true, showRange: true,
-      onAnswer: function(){
-        done++;
-        var p = $("bankProg");
-        if (p) p.innerHTML = "已作答 " + done + " / " + sel.length + (done >= sel.length ? "　 全部完成" : "");
-      }
-    });
+    bankState.sel = copy.slice(0, want);
+    bankState.ids = ids;
+    bankState.done = {};
+    bankState.idx = 0;
+    renderBankQuiz();
     if (session.scrollIntoView) session.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -12234,6 +12296,16 @@ drawQuantum();
     segSync(document.getElementById("setFont"), v);
   }
   wireSeg(document.getElementById("setFont"), function(v){ applyFont(v, true); });
+
+  /* —— 题目呈现方式（single 单题 / all 全部） —— */
+  function applyBankMode(v, save){
+    if (v !== "all") v = "single";
+    window.__bankView = v;
+    if (save !== false) LS.set("apchem.bankView", v);
+    segSync(document.getElementById("setBankMode"), v);
+    if (typeof window.__refreshBankQuiz === "function"){ try { window.__refreshBankQuiz(); } catch(e){} }
+  }
+  wireSeg(document.getElementById("setBankMode"), function(v){ applyBankMode(v, true); });
 
   /* —— 水印大小 —— */
   var wmEl = document.querySelector(".wm");
@@ -12681,6 +12753,7 @@ drawQuantum();
   applyTheme(isDark(), false);
   applyFont(LS.get("apchem.fontScale", "1"), false);
   applyWm(LS.get("apchem.wmSize", "12"), false);
+  applyBankMode(LS.get("apchem.bankView", "single"), false);
   applyPetMove(LS.get("apchem.petMove", "1") === "1", false);
   applyPet(LS.get("apchem.pet", "0") === "1", false);
   applyPetSize(LS.get("apchem.petSize", "1"), false);
@@ -13493,162 +13566,151 @@ drawQuantum();
   show(0);
 })();
 
-/* ==================== 元素周期表 ==================== */
+/* ==================== 元素周期表（可复用：左上角弹窗 + 公式表内嵌） ==================== */
 (function(){
-  var btnPT = document.getElementById("btnPT"), modalPT = document.getElementById("modalPT");
-  if (!btnPT || !modalPT) return;
-
   // 元素分类：key → 中文名 + 图例色（与 .pt-cell 类别 class 对应）
   var CAT = {
-    alkali:     ["碱金属", "#f2c3c3"],
-    alkaline:   ["碱土金属", "#f6d9b1"],
-    transition: ["过渡金属", "#f4e3a4"],
-    post:       ["后过渡金属", "#b6e0d1"],
-    metalloid:  ["准金属", "#c2e5c1"],
-    nonmetal:   ["非金属", "#b6ddf0"],
-    halogen:    ["卤素", "#bccff0"],
-    noble:      ["稀有气体", "#d6c8f0"],
-    lanthanide: ["镧系", "#f6cde2"],
-    actinide:   ["锕系", "#e4c7ed"]
+    alkali:     ["Alkali metal", "#f2c3c3"],
+    alkaline:   ["Alkaline earth metal", "#f6d9b1"],
+    transition: ["Transition metal", "#f4e3a4"],
+    post:       ["Post-transition metal", "#b6e0d1"],
+    metalloid:  ["Metalloid", "#c2e5c1"],
+    nonmetal:   ["Nonmetal", "#b6ddf0"],
+    halogen:    ["Halogen", "#bccff0"],
+    noble:      ["Noble gas", "#d6c8f0"],
+    lanthanide: ["Lanthanide", "#f6cde2"],
+    actinide:   ["Actinide", "#e4c7ed"]
   };
 
   // 完整 118 元素：[z, s, cn, m(相对原子质量), cat, ec(电子排布), ox(常见化合价), r(行), c(列)]
   var PTE = [
-    [1,"H","氢","1.008","nonmetal","1s¹","+1, -1",1,1],
-    [2,"He","氦","4.0026","noble","1s²","0",1,18],
-    [3,"Li","锂","6.94","alkali","[He]2s¹","+1",2,1],
-    [4,"Be","铍","9.0122","alkaline","[He]2s²","+2",2,2],
-    [5,"B","硼","10.81","metalloid","[He]2s²2p¹","+3",2,13],
-    [6,"C","碳","12.011","nonmetal","[He]2s²2p²","-4, +2, +4",2,14],
-    [7,"N","氮","14.007","nonmetal","[He]2s²2p³","-3, +3, +5",2,15],
-    [8,"O","氧","15.999","nonmetal","[He]2s²2p⁴","-2",2,16],
-    [9,"F","氟","18.998","halogen","[He]2s²2p⁵","-1",2,17],
-    [10,"Ne","氖","20.180","noble","[He]2s²2p⁶","0",2,18],
-    [11,"Na","钠","22.990","alkali","[Ne]3s¹","+1",3,1],
-    [12,"Mg","镁","24.305","alkaline","[Ne]3s²","+2",3,2],
-    [13,"Al","铝","26.982","post","[Ne]3s²3p¹","+3",3,13],
-    [14,"Si","硅","28.085","metalloid","[Ne]3s²3p²","-4, +2, +4",3,14],
-    [15,"P","磷","30.974","nonmetal","[Ne]3s²3p³","-3, +3, +5",3,15],
-    [16,"S","硫","32.06","nonmetal","[Ne]3s²3p⁴","-2, +4, +6",3,16],
-    [17,"Cl","氯","35.45","halogen","[Ne]3s²3p⁵","-1, +1, +3, +5, +7",3,17],
-    [18,"Ar","氩","39.948","noble","[Ne]3s²3p⁶","0",3,18],
-    [19,"K","钾","39.098","alkali","[Ar]4s¹","+1",4,1],
-    [20,"Ca","钙","40.078","alkaline","[Ar]4s²","+2",4,2],
-    [21,"Sc","钪","44.956","transition","[Ar]3d¹4s²","+3",4,3],
-    [22,"Ti","钛","47.867","transition","[Ar]3d²4s²","+2, +3, +4",4,4],
-    [23,"V","钒","50.942","transition","[Ar]3d³4s²","+2, +3, +4, +5",4,5],
-    [24,"Cr","铬","51.996","transition","[Ar]3d⁵4s¹","+2, +3, +6",4,6],
-    [25,"Mn","锰","54.938","transition","[Ar]3d⁵4s²","+2, +3, +4, +6, +7",4,7],
-    [26,"Fe","铁","55.845","transition","[Ar]3d⁶4s²","+2, +3",4,8],
-    [27,"Co","钴","58.933","transition","[Ar]3d⁷4s²","+2, +3",4,9],
-    [28,"Ni","镍","58.693","transition","[Ar]3d⁸4s²","+2",4,10],
-    [29,"Cu","铜","63.546","transition","[Ar]3d¹⁰4s¹","+1, +2",4,11],
-    [30,"Zn","锌","65.38","transition","[Ar]3d¹⁰4s²","+2",4,12],
-    [31,"Ga","镓","69.723","post","[Ar]3d¹⁰4s²4p¹","+3",4,13],
-    [32,"Ge","锗","72.630","metalloid","[Ar]3d¹⁰4s²4p²","-4, +2, +4",4,14],
-    [33,"As","砷","74.922","metalloid","[Ar]3d¹⁰4s²4p³","-3, +3, +5",4,15],
-    [34,"Se","硒","78.971","nonmetal","[Ar]3d¹⁰4s²4p⁴","-2, +4, +6",4,16],
-    [35,"Br","溴","79.904","halogen","[Ar]3d¹⁰4s²4p⁵","-1, +1, +3, +5",4,17],
-    [36,"Kr","氪","83.798","noble","[Ar]3d¹⁰4s²4p⁶","0",4,18],
-    [37,"Rb","铷","85.468","alkali","[Kr]5s¹","+1",5,1],
-    [38,"Sr","锶","87.62","alkaline","[Kr]5s²","+2",5,2],
-    [39,"Y","钇","88.906","transition","[Kr]4d¹5s²","+3",5,3],
-    [40,"Zr","锆","91.224","transition","[Kr]4d²5s²","+4",5,4],
-    [41,"Nb","铌","92.906","transition","[Kr]4d⁴5s¹","+3, +5",5,5],
-    [42,"Mo","钼","95.95","transition","[Kr]4d⁵5s¹","+2, +3, +4, +6",5,6],
-    [43,"Tc","锝","98","transition","[Kr]4d⁵5s²","+4, +7",5,7],
-    [44,"Ru","钌","101.07","transition","[Kr]4d⁷5s¹","+2, +3, +4",5,8],
-    [45,"Rh","铑","102.91","transition","[Kr]4d⁸5s¹","+3",5,9],
-    [46,"Pd","钯","106.42","transition","[Kr]4d¹⁰","+2, +4",5,10],
-    [47,"Ag","银","107.87","transition","[Kr]4d¹⁰5s¹","+1",5,11],
-    [48,"Cd","镉","112.41","transition","[Kr]4d¹⁰5s²","+2",5,12],
-    [49,"In","铟","114.82","post","[Kr]4d¹⁰5s²5p¹","+3",5,13],
-    [50,"Sn","锡","118.71","post","[Kr]4d¹⁰5s²5p²","+2, +4",5,14],
-    [51,"Sb","锑","121.76","metalloid","[Kr]4d¹⁰5s²5p³","-3, +3, +5",5,15],
-    [52,"Te","碲","127.60","metalloid","[Kr]4d¹⁰5s²5p⁴","-2, +4, +6",5,16],
-    [53,"I","碘","126.90","halogen","[Kr]4d¹⁰5s²5p⁵","-1, +1, +3, +5, +7",5,17],
-    [54,"Xe","氙","131.29","noble","[Kr]4d¹⁰5s²5p⁶","0",5,18],
-    [55,"Cs","铯","132.91","alkali","[Xe]6s¹","+1",6,1],
-    [56,"Ba","钡","137.33","alkaline","[Xe]6s²","+2",6,2],
-    [72,"Hf","铪","178.49","transition","[Xe]4f¹⁴5d²6s²","+4",6,4],
-    [73,"Ta","钽","180.95","transition","[Xe]4f¹⁴5d³6s²","+5",6,5],
-    [74,"W","钨","183.84","transition","[Xe]4f¹⁴5d⁴6s²","+2, +3, +4, +5, +6",6,6],
-    [75,"Re","铼","186.21","transition","[Xe]4f¹⁴5d⁵6s²","+4, +7",6,7],
-    [76,"Os","锇","190.23","transition","[Xe]4f¹⁴5d⁶6s²","+3, +4, +6, +8",6,8],
-    [77,"Ir","铱","192.22","transition","[Xe]4f¹⁴5d⁷6s²","+3, +4",6,9],
-    [78,"Pt","铂","195.08","transition","[Xe]4f¹⁴5d⁹6s¹","+2, +4",6,10],
-    [79,"Au","金","196.97","transition","[Xe]4f¹⁴5d¹⁰6s¹","+1, +3",6,11],
-    [80,"Hg","汞","200.59","transition","[Xe]4f¹⁴5d¹⁰6s²","+1, +2",6,12],
-    [81,"Tl","铊","204.38","post","[Xe]4f¹⁴5d¹⁰6s²6p¹","+1, +3",6,13],
-    [82,"Pb","铅","207.2","post","[Xe]4f¹⁴5d¹⁰6s²6p²","+2, +4",6,14],
-    [83,"Bi","铋","208.98","post","[Xe]4f¹⁴5d¹⁰6s²6p³","+3, +5",6,15],
-    [84,"Po","钋","209","post","[Xe]4f¹⁴5d¹⁰6s²6p⁴","+2, +4",6,16],
-    [85,"At","砹","210","halogen","[Xe]4f¹⁴5d¹⁰6s²6p⁵","-1, +1",6,17],
-    [86,"Rn","氡","222","noble","[Xe]4f¹⁴5d¹⁰6s²6p⁶","0",6,18],
-    [87,"Fr","钫","223","alkali","[Rn]7s¹","+1",7,1],
-    [88,"Ra","镭","226","alkaline","[Rn]7s²","+2",7,2],
-    [104,"Rf","鑪","267","transition","[Rn]5f¹⁴6d²7s²","+4",7,4],
-    [105,"Db","𨧀","268","transition","[Rn]5f¹⁴6d³7s²","+5",7,5],
-    [106,"Sg","𨭎","269","transition","[Rn]5f¹⁴6d⁴7s²","+6",7,6],
-    [107,"Bh","𨨏","270","transition","[Rn]5f¹⁴6d⁵7s²","+7",7,7],
-    [108,"Hs","𨭆","269","transition","[Rn]5f¹⁴6d⁶7s²","+8",7,8],
-    [109,"Mt","鿏","278","transition","[Rn]5f¹⁴6d⁷7s²","—",7,9],
-    [110,"Ds","𫟼","281","transition","[Rn]5f¹⁴6d⁸7s²","—",7,10],
-    [111,"Rg","𬬭","282","transition","[Rn]5f¹⁴6d⁹7s²","—",7,11],
-    [112,"Cn","鿔","285","transition","[Rn]5f¹⁴6d¹⁰7s²","+2",7,12],
-    [113,"Nh","鿭","286","post","[Rn]5f¹⁴6d¹⁰7s²7p¹","—",7,13],
-    [114,"Fl","𫓧","289","post","[Rn]5f¹⁴6d¹⁰7s²7p²","—",7,14],
-    [115,"Mc","镆","290","post","[Rn]5f¹⁴6d¹⁰7s²7p³","—",7,15],
-    [116,"Lv","𫟷","293","post","[Rn]5f¹⁴6d¹⁰7s²7p⁴","—",7,16],
-    [117,"Ts","鿬","294","halogen","[Rn]5f¹⁴6d¹⁰7s²7p⁵","—",7,17],
-    [118,"Og","鿫","294","noble","[Rn]5f¹⁴6d¹⁰7s²7p⁶","—",7,18],
-    [57,"La","镧","138.91","lanthanide","[Xe]5d¹6s²","+3",8,3],
-    [58,"Ce","铈","140.12","lanthanide","[Xe]4f¹5d¹6s²","+3, +4",8,4],
-    [59,"Pr","镨","140.91","lanthanide","[Xe]4f³6s²","+3",8,5],
-    [60,"Nd","钕","144.24","lanthanide","[Xe]4f⁴6s²","+3",8,6],
-    [61,"Pm","钷","145","lanthanide","[Xe]4f⁵6s²","+3",8,7],
-    [62,"Sm","钐","150.36","lanthanide","[Xe]4f⁶6s²","+2, +3",8,8],
-    [63,"Eu","铕","151.96","lanthanide","[Xe]4f⁷6s²","+2, +3",8,9],
-    [64,"Gd","钆","157.25","lanthanide","[Xe]4f⁷5d¹6s²","+3",8,10],
-    [65,"Tb","铽","158.93","lanthanide","[Xe]4f⁹6s²","+3, +4",8,11],
-    [66,"Dy","镝","162.50","lanthanide","[Xe]4f¹⁰6s²","+3",8,12],
-    [67,"Ho","钬","164.93","lanthanide","[Xe]4f¹¹6s²","+3",8,13],
-    [68,"Er","铒","167.26","lanthanide","[Xe]4f¹²6s²","+3",8,14],
-    [69,"Tm","铥","168.93","lanthanide","[Xe]4f¹³6s²","+3",8,15],
-    [70,"Yb","镱","173.05","lanthanide","[Xe]4f¹⁴6s²","+2, +3",8,16],
-    [71,"Lu","镥","174.97","lanthanide","[Xe]4f¹⁴5d¹6s²","+3",8,17],
-    [89,"Ac","锕","227","actinide","[Rn]6d¹7s²","+3",9,3],
-    [90,"Th","钍","232.04","actinide","[Rn]6d²7s²","+4",9,4],
-    [91,"Pa","镤","231.04","actinide","[Rn]5f²6d¹7s²","+4, +5",9,5],
-    [92,"U","铀","238.03","actinide","[Rn]5f³6d¹7s²","+3, +4, +5, +6",9,6],
-    [93,"Np","镎","237","actinide","[Rn]5f⁴6d¹7s²","+3, +4, +5, +6, +7",9,7],
-    [94,"Pu","钚","244","actinide","[Rn]5f⁶7s²","+3, +4, +5, +6",9,8],
-    [95,"Am","镅","243","actinide","[Rn]5f⁷7s²","+3, +4, +5, +6",9,9],
-    [96,"Cm","锔","247","actinide","[Rn]5f⁷6d¹7s²","+3",9,10],
-    [97,"Bk","锫","247","actinide","[Rn]5f⁹7s²","+3, +4",9,11],
-    [98,"Cf","锎","251","actinide","[Rn]5f¹⁰7s²","+3",9,12],
-    [99,"Es","锿","252","actinide","[Rn]5f¹¹7s²","+3",9,13],
-    [100,"Fm","镄","257","actinide","[Rn]5f¹²7s²","+3",9,14],
-    [101,"Md","钔","258","actinide","[Rn]5f¹³7s²","+2, +3",9,15],
-    [102,"No","锘","259","actinide","[Rn]5f¹⁴7s²","+2, +3",9,16],
-    [103,"Lr","铹","266","actinide","[Rn]5f¹⁴7s²7p¹","+3",9,17]
+    [1,"H","Hydrogen","1.008","nonmetal","1s¹","+1, -1",1,1],
+    [2,"He","Helium","4.0026","noble","1s²","0",1,18],
+    [3,"Li","Lithium","6.94","alkali","[He]2s¹","+1",2,1],
+    [4,"Be","Beryllium","9.0122","alkaline","[He]2s²","+2",2,2],
+    [5,"B","Boron","10.81","metalloid","[He]2s²2p¹","+3",2,13],
+    [6,"C","Carbon","12.011","nonmetal","[He]2s²2p²","-4, +2, +4",2,14],
+    [7,"N","Nitrogen","14.007","nonmetal","[He]2s²2p³","-3, +3, +5",2,15],
+    [8,"O","Oxygen","15.999","nonmetal","[He]2s²2p⁴","-2",2,16],
+    [9,"F","Fluorine","18.998","halogen","[He]2s²2p⁵","-1",2,17],
+    [10,"Ne","Neon","20.180","noble","[He]2s²2p⁶","0",2,18],
+    [11,"Na","Sodium","22.990","alkali","[Ne]3s¹","+1",3,1],
+    [12,"Mg","Magnesium","24.305","alkaline","[Ne]3s²","+2",3,2],
+    [13,"Al","Aluminium","26.982","post","[Ne]3s²3p¹","+3",3,13],
+    [14,"Si","Silicon","28.085","metalloid","[Ne]3s²3p²","-4, +2, +4",3,14],
+    [15,"P","Phosphorus","30.974","nonmetal","[Ne]3s²3p³","-3, +3, +5",3,15],
+    [16,"S","Sulfur","32.06","nonmetal","[Ne]3s²3p⁴","-2, +4, +6",3,16],
+    [17,"Cl","Chlorine","35.45","halogen","[Ne]3s²3p⁵","-1, +1, +3, +5, +7",3,17],
+    [18,"Ar","Argon","39.948","noble","[Ne]3s²3p⁶","0",3,18],
+    [19,"K","Potassium","39.098","alkali","[Ar]4s¹","+1",4,1],
+    [20,"Ca","Calcium","40.078","alkaline","[Ar]4s²","+2",4,2],
+    [21,"Sc","Scandium","44.956","transition","[Ar]3d¹4s²","+3",4,3],
+    [22,"Ti","Titanium","47.867","transition","[Ar]3d²4s²","+2, +3, +4",4,4],
+    [23,"V","Vanadium","50.942","transition","[Ar]3d³4s²","+2, +3, +4, +5",4,5],
+    [24,"Cr","Chromium","51.996","transition","[Ar]3d⁵4s¹","+2, +3, +6",4,6],
+    [25,"Mn","Manganese","54.938","transition","[Ar]3d⁵4s²","+2, +3, +4, +6, +7",4,7],
+    [26,"Fe","Iron","55.845","transition","[Ar]3d⁶4s²","+2, +3",4,8],
+    [27,"Co","Cobalt","58.933","transition","[Ar]3d⁷4s²","+2, +3",4,9],
+    [28,"Ni","Nickel","58.693","transition","[Ar]3d⁸4s²","+2",4,10],
+    [29,"Cu","Copper","63.546","transition","[Ar]3d¹⁰4s¹","+1, +2",4,11],
+    [30,"Zn","Zinc","65.38","transition","[Ar]3d¹⁰4s²","+2",4,12],
+    [31,"Ga","Gallium","69.723","post","[Ar]3d¹⁰4s²4p¹","+3",4,13],
+    [32,"Ge","Germanium","72.630","metalloid","[Ar]3d¹⁰4s²4p²","-4, +2, +4",4,14],
+    [33,"As","Arsenic","74.922","metalloid","[Ar]3d¹⁰4s²4p³","-3, +3, +5",4,15],
+    [34,"Se","Selenium","78.971","nonmetal","[Ar]3d¹⁰4s²4p⁴","-2, +4, +6",4,16],
+    [35,"Br","Bromine","79.904","halogen","[Ar]3d¹⁰4s²4p⁵","-1, +1, +3, +5",4,17],
+    [36,"Kr","Krypton","83.798","noble","[Ar]3d¹⁰4s²4p⁶","0",4,18],
+    [37,"Rb","Rubidium","85.468","alkali","[Kr]5s¹","+1",5,1],
+    [38,"Sr","Strontium","87.62","alkaline","[Kr]5s²","+2",5,2],
+    [39,"Y","Yttrium","88.906","transition","[Kr]4d¹5s²","+3",5,3],
+    [40,"Zr","Zirconium","91.224","transition","[Kr]4d²5s²","+4",5,4],
+    [41,"Nb","Niobium","92.906","transition","[Kr]4d⁴5s¹","+3, +5",5,5],
+    [42,"Mo","Molybdenum","95.95","transition","[Kr]4d⁵5s¹","+2, +3, +4, +6",5,6],
+    [43,"Tc","Technetium","98","transition","[Kr]4d⁵5s²","+4, +7",5,7],
+    [44,"Ru","Ruthenium","101.07","transition","[Kr]4d⁷5s¹","+2, +3, +4",5,8],
+    [45,"Rh","Rhodium","102.91","transition","[Kr]4d⁸5s¹","+3",5,9],
+    [46,"Pd","Palladium","106.42","transition","[Kr]4d¹⁰","+2, +4",5,10],
+    [47,"Ag","Silver","107.87","transition","[Kr]4d¹⁰5s¹","+1",5,11],
+    [48,"Cd","Cadmium","112.41","transition","[Kr]4d¹⁰5s²","+2",5,12],
+    [49,"In","Indium","114.82","post","[Kr]4d¹⁰5s²5p¹","+3",5,13],
+    [50,"Sn","Tin","118.71","post","[Kr]4d¹⁰5s²5p²","+2, +4",5,14],
+    [51,"Sb","Antimony","121.76","metalloid","[Kr]4d¹⁰5s²5p³","-3, +3, +5",5,15],
+    [52,"Te","Tellurium","127.60","metalloid","[Kr]4d¹⁰5s²5p⁴","-2, +4, +6",5,16],
+    [53,"I","Iodine","126.90","halogen","[Kr]4d¹⁰5s²5p⁵","-1, +1, +3, +5, +7",5,17],
+    [54,"Xe","Xenon","131.29","noble","[Kr]4d¹⁰5s²5p⁶","0",5,18],
+    [55,"Cs","Caesium","132.91","alkali","[Xe]6s¹","+1",6,1],
+    [56,"Ba","Barium","137.33","alkaline","[Xe]6s²","+2",6,2],
+    [72,"Hf","Hafnium","178.49","transition","[Xe]4f¹⁴5d²6s²","+4",6,4],
+    [73,"Ta","Tantalum","180.95","transition","[Xe]4f¹⁴5d³6s²","+5",6,5],
+    [74,"W","Tungsten","183.84","transition","[Xe]4f¹⁴5d⁴6s²","+2, +3, +4, +5, +6",6,6],
+    [75,"Re","Rhenium","186.21","transition","[Xe]4f¹⁴5d⁵6s²","+4, +7",6,7],
+    [76,"Os","Osmium","190.23","transition","[Xe]4f¹⁴5d⁶6s²","+3, +4, +6, +8",6,8],
+    [77,"Ir","Iridium","192.22","transition","[Xe]4f¹⁴5d⁷6s²","+3, +4",6,9],
+    [78,"Pt","Platinum","195.08","transition","[Xe]4f¹⁴5d⁹6s¹","+2, +4",6,10],
+    [79,"Au","Gold","196.97","transition","[Xe]4f¹⁴5d¹⁰6s¹","+1, +3",6,11],
+    [80,"Hg","Mercury","200.59","transition","[Xe]4f¹⁴5d¹⁰6s²","+1, +2",6,12],
+    [81,"Tl","Thallium","204.38","post","[Xe]4f¹⁴5d¹⁰6s²6p¹","+1, +3",6,13],
+    [82,"Pb","Lead","207.2","post","[Xe]4f¹⁴5d¹⁰6s²6p²","+2, +4",6,14],
+    [83,"Bi","Bismuth","208.98","post","[Xe]4f¹⁴5d¹⁰6s²6p³","+3, +5",6,15],
+    [84,"Po","Polonium","209","post","[Xe]4f¹⁴5d¹⁰6s²6p⁴","+2, +4",6,16],
+    [85,"At","Astatine","210","halogen","[Xe]4f¹⁴5d¹⁰6s²6p⁵","-1, +1",6,17],
+    [86,"Rn","Radon","222","noble","[Xe]4f¹⁴5d¹⁰6s²6p⁶","0",6,18],
+    [87,"Fr","Francium","223","alkali","[Rn]7s¹","+1",7,1],
+    [88,"Ra","Radium","226","alkaline","[Rn]7s²","+2",7,2],
+    [104,"Rf","Rutherfordium","267","transition","[Rn]5f¹⁴6d²7s²","+4",7,4],
+    [105,"Db","Dubnium","268","transition","[Rn]5f¹⁴6d³7s²","+5",7,5],
+    [106,"Sg","Seaborgium","269","transition","[Rn]5f¹⁴6d⁴7s²","+6",7,6],
+    [107,"Bh","Bohrium","270","transition","[Rn]5f¹⁴6d⁵7s²","+7",7,7],
+    [108,"Hs","Hassium","269","transition","[Rn]5f¹⁴6d⁶7s²","+8",7,8],
+    [109,"Mt","Meitnerium","278","transition","[Rn]5f¹⁴6d⁷7s²","—",7,9],
+    [110,"Ds","Darmstadtium","281","transition","[Rn]5f¹⁴6d⁸7s²","—",7,10],
+    [111,"Rg","Roentgenium","282","transition","[Rn]5f¹⁴6d⁹7s²","—",7,11],
+    [112,"Cn","Copernicium","285","transition","[Rn]5f¹⁴6d¹⁰7s²","+2",7,12],
+    [113,"Nh","Nihonium","286","post","[Rn]5f¹⁴6d¹⁰7s²7p¹","—",7,13],
+    [114,"Fl","Flerovium","289","post","[Rn]5f¹⁴6d¹⁰7s²7p²","—",7,14],
+    [115,"Mc","Moscovium","290","post","[Rn]5f¹⁴6d¹⁰7s²7p³","—",7,15],
+    [116,"Lv","Livermorium","293","post","[Rn]5f¹⁴6d¹⁰7s²7p⁴","—",7,16],
+    [117,"Ts","Tennessine","294","halogen","[Rn]5f¹⁴6d¹⁰7s²7p⁵","—",7,17],
+    [118,"Og","Oganesson","294","noble","[Rn]5f¹⁴6d¹⁰7s²7p⁶","—",7,18],
+    [57,"La","Lanthanum","138.91","lanthanide","[Xe]5d¹6s²","+3",8,3],
+    [58,"Ce","Cerium","140.12","lanthanide","[Xe]4f¹5d¹6s²","+3, +4",8,4],
+    [59,"Pr","Praseodymium","140.91","lanthanide","[Xe]4f³6s²","+3",8,5],
+    [60,"Nd","Neodymium","144.24","lanthanide","[Xe]4f⁴6s²","+3",8,6],
+    [61,"Pm","Promethium","145","lanthanide","[Xe]4f⁵6s²","+3",8,7],
+    [62,"Sm","Samarium","150.36","lanthanide","[Xe]4f⁶6s²","+2, +3",8,8],
+    [63,"Eu","Europium","151.96","lanthanide","[Xe]4f⁷6s²","+2, +3",8,9],
+    [64,"Gd","Gadolinium","157.25","lanthanide","[Xe]4f⁷5d¹6s²","+3",8,10],
+    [65,"Tb","Terbium","158.93","lanthanide","[Xe]4f⁹6s²","+3, +4",8,11],
+    [66,"Dy","Dysprosium","162.50","lanthanide","[Xe]4f¹⁰6s²","+3",8,12],
+    [67,"Ho","Holmium","164.93","lanthanide","[Xe]4f¹¹6s²","+3",8,13],
+    [68,"Er","Erbium","167.26","lanthanide","[Xe]4f¹²6s²","+3",8,14],
+    [69,"Tm","Thulium","168.93","lanthanide","[Xe]4f¹³6s²","+3",8,15],
+    [70,"Yb","Ytterbium","173.05","lanthanide","[Xe]4f¹⁴6s²","+2, +3",8,16],
+    [71,"Lu","Lutetium","174.97","lanthanide","[Xe]4f¹⁴5d¹6s²","+3",8,17],
+    [89,"Ac","Actinium","227","actinide","[Rn]6d¹7s²","+3",9,3],
+    [90,"Th","Thorium","232.04","actinide","[Rn]6d²7s²","+4",9,4],
+    [91,"Pa","Protactinium","231.04","actinide","[Rn]5f²6d¹7s²","+4, +5",9,5],
+    [92,"U","Uranium","238.03","actinide","[Rn]5f³6d¹7s²","+3, +4, +5, +6",9,6],
+    [93,"Np","Neptunium","237","actinide","[Rn]5f⁴6d¹7s²","+3, +4, +5, +6, +7",9,7],
+    [94,"Pu","Plutonium","244","actinide","[Rn]5f⁶7s²","+3, +4, +5, +6",9,8],
+    [95,"Am","Americium","243","actinide","[Rn]5f⁷7s²","+3, +4, +5, +6",9,9],
+    [96,"Cm","Curium","247","actinide","[Rn]5f⁷6d¹7s²","+3",9,10],
+    [97,"Bk","Berkelium","247","actinide","[Rn]5f⁹7s²","+3, +4",9,11],
+    [98,"Cf","Californium","251","actinide","[Rn]5f¹⁰7s²","+3",9,12],
+    [99,"Es","Einsteinium","252","actinide","[Rn]5f¹¹7s²","+3",9,13],
+    [100,"Fm","Fermium","257","actinide","[Rn]5f¹²7s²","+3",9,14],
+    [101,"Md","Mendelevium","258","actinide","[Rn]5f¹³7s²","+2, +3",9,15],
+    [102,"No","Nobelium","259","actinide","[Rn]5f¹⁴7s²","+2, +3",9,16],
+    [103,"Lr","Lawrencium","266","actinide","[Rn]5f¹⁴7s²7p¹","+3",9,17]
   ];
 
-  function esc2(s){ return String(s); }
-
-  function renderLegend(){
-    var el = document.getElementById("ptLegend");
+  // 在给定元素里构建一套周期表（图例 + 网格 + 详情）
+  function buildPT(legendEl, gridEl, detailEl){
+    if (!legendEl || !gridEl) return;
+    var lh = "";
+    for (var k in CAT) lh += '<span style="background:' + CAT[k][1] + '">' + CAT[k][0] + "</span>";
+    legendEl.innerHTML = lh;
     var h = "";
-    for (var k in CAT){
-      h += '<span style="background:' + CAT[k][1] + '">' + CAT[k][0] + "</span>";
-    }
-    el.innerHTML = h;
-  }
-
-  function renderGrid(){
-    var el = document.getElementById("ptGrid");
-    var h = "";
-    // 镧系/锕系占位
     h += '<div class="pt-cell ph" style="grid-row:6;grid-column:3">57–71</div>';
     h += '<div class="pt-cell ph" style="grid-row:7;grid-column:3">89–103</div>';
     for (var i = 0; i < PTE.length; i++){
@@ -13660,42 +13722,245 @@ drawQuantum();
            '<span class="pt-m">' + e[3] + "</span>" +
            "</div>";
     }
+    gridEl.innerHTML = h;
+    function showDetail(z){
+      var e = null;
+      for (var i = 0; i < PTE.length; i++) if (PTE[i][0] === z) { e = PTE[i]; break; }
+      if (!detailEl) return;
+      if (!e){ detailEl.className = "pt-detail"; return; }
+      detailEl.className = "pt-detail show";
+      detailEl.innerHTML =
+        "<h4>" + e[1] + "　" + e[2] + "<span class='ptd-cat' style='background:" + CAT[e[4]][1] + "'>" + CAT[e[4]][0] + "</span></h4>" +
+        '<div class="ptd-row"><span><b>Atomic number</b> ' + e[0] + "</span>" +
+        "<span><b>Atomic mass</b> " + e[3] + "</span></div>" +
+        '<div class="ptd-row"><span><b>Electron configuration</b> ' + e[5] + "</span></div>" +
+        '<div class="ptd-row"><span><b>Common oxidation states</b> ' + e[6] + "</span></div>";
+    }
+    gridEl.addEventListener("click", function(ev){
+      var c = ev.target.closest(".pt-cell");
+      if (!c) return;
+      var z = +c.dataset.z;
+      if (!z) return;
+      Array.prototype.forEach.call(gridEl.querySelectorAll(".pt-cell"), function(x){ x.classList.remove("pt-on"); });
+      c.classList.add("pt-on");
+      showDetail(z);
+    });
+  }
+
+  // 暴露给「公式表」复用
+  window.__pt = { PTE: PTE, CAT: CAT, build: buildPT };
+
+  // 左上角「元素周期表」按钮 → 弹窗
+  var btnPT = document.getElementById("btnPT"), modalPT = document.getElementById("modalPT");
+  if (btnPT && modalPT){
+    buildPT(document.getElementById("ptLegend"), document.getElementById("ptGrid"), document.getElementById("ptDetail"));
+    btnPT.addEventListener("click", function(){ modalPT.classList.remove("hide"); });
+    var closeBtn = modalPT.querySelector(".modal-close");
+    if (closeBtn) closeBtn.addEventListener("click", function(){ modalPT.classList.add("hide"); });
+    modalPT.addEventListener("click", function(e){ if (e.target === modalPT) modalPT.classList.add("hide"); });
+    document.addEventListener("keydown", function(e){ if (e.key === "Escape") modalPT.classList.add("hide"); });
+  }
+})();
+
+/* ==================== 公式表（AP 化学公式速查 + 元素周期表） ==================== */
+(function(){
+  var btnFormula = document.getElementById("btnFormula"), modalFormula = document.getElementById("modalFormula");
+  if (!btnFormula || !modalFormula) return;
+
+  // [分类, [[公式, 说明], ...]]
+  var SECTIONS = [
+    ["原子结构与光", [
+      ["E = hν = hc/λ", "光子能量（h 普朗克常数，c 光速，ν 频率，λ 波长）"],
+      ["c = λν", "光速 = 波长 × 频率"],
+      ["λ = h / (mv)", "德布罗意波长（m 质量，v 速度）"],
+      ["Eₙ = −R_H / n²", "氢原子能级（R_H = 2.18×10⁻¹⁸ J，n 主量子数）"],
+      ["ΔE = hν", "电子跃迁吸收或放出的能量"],
+    ]],
+    ["化学计量与气体", [
+      ["n = m / M", "物质的量 = 质量 ÷ 摩尔质量"],
+      ["N = n × N_A", "粒子数 = 物质的量 × 阿伏加德罗常数"],
+      ["PV = nRT", "理想气体定律（nRT：R = 0.08206 L·atm/(mol·K)）"],
+      ["d = PM / (RT)", "由气体密度求摩尔质量"],
+      ["P₁V₁/T₁ = P₂V₂/T₂", "联合气体定律（含查理/波义耳/盖-吕萨克）"],
+      ["P_total = ΣPᵢ，Pᵢ = Xᵢ·P_total", "道尔顿分压定律（Xᵢ 摩尔分数）"],
+      ["M = n / V，M₁V₁ = M₂V₂", "摩尔浓度与稀释公式"],
+      ["A = abc", "比尔定律（A 吸光度，a 摩尔吸光系数，b 光程，c 浓度）"],
+    ]],
+    ["热化学与热力学", [
+      ["q = mcΔT", "热量 = 质量 × 比热容 × 温度变化"],
+      ["ΔH°rxn = ΣΔH°f(产物) − ΣΔH°f(反应物)", "由标准生成焓求反应焓"],
+      ["ΔS°rxn = ΣS°(产物) − ΣS°(反应物)", "标准反应熵变"],
+      ["ΔG = ΔH − TΔS", "吉布斯自由能（T 绝对温度）"],
+      ["ΔG° = −RT ln K", "标准自由能与平衡常数"],
+      ["ΔG = ΔG° + RT ln Q", "任意状态自由能（Q 反应商）"],
+      ["ΔG° = −nFE°", "自由能与电池标准电动势"],
+    ]],
+    ["化学平衡", [
+      ["K = [产物]^系数 / [反应物]^系数", "平衡常数（浓度表示）"],
+      ["Kp = Kc(RT)^Δn", "分压与浓度平衡常数换算（Δn 气相摩尔数差）"],
+      ["Q vs K", "Q<K 正向进行；Q>K 逆向进行；Q=K 已达平衡"],
+      ["Ksp", "难溶电解质的溶度积常数"],
+      ["Ka × Kb = Kw", "共轭酸碱对的常数关系"],
+    ]],
+    ["酸碱平衡", [
+      ["pH = −log[H⁺]，pOH = −log[OH⁻]", "pH 与 pOH 的定义"],
+      ["pH + pOH = 14（25°C）", "酸碱度之和"],
+      ["Kw = [H⁺][OH⁻] = 1.0×10⁻¹⁴", "25°C 水的离子积"],
+      ["pKa = −log Ka", "酸常数 Ka 的负对数"],
+      ["pH = pKa + log([A⁻]/[HA])", "Henderson–Hasselbalch（缓冲溶液）"],
+    ]],
+    ["化学动力学", [
+      ["rate = k[A]^m[B]^n", "速率方程（k 速率常数，m、n 反应级数）"],
+      ["零级：[A] = −kt + [A]₀，t½ = [A]₀ / 2k", "零级积分速率式与半衰期"],
+      ["一级：ln[A] = −kt + ln[A]₀，t½ = 0.693 / k", "一级积分速率式与半衰期"],
+      ["二级：1/[A] = kt + 1/[A]₀，t½ = 1 / (k[A]₀)", "二级积分速率式与半衰期"],
+      ["k = A·e^(−Ea/RT)", "Arrhenius 方程（Ea 活化能，A 频率因子）"],
+      ["ln(k₂/k₁) = −(Ea/R)(1/T₂ − 1/T₁)", "两点式 Arrhenius"],
+    ]],
+    ["电化学", [
+      ["E°cell = E°cathode − E°anode", "标准电池电动势（用标准还原电位）"],
+      ["ΔG° = −nFE°", "自由能与电动势（n 电子数，F 法拉第常数）"],
+      ["E = E° − (0.0592 / n)·log Q", "Nernst 方程（25°C）"],
+      ["E° = (0.0592 / n)·log K", "标准电动势与平衡常数"],
+      ["mol e⁻ = It / F", "法拉第电解定律（I 电流，t 时间）"],
+    ]],
+    ["常用常数", [
+      ["R = 8.314 J/(mol·K)", "理想气体常数（能量形式）"],
+      ["R = 0.08206 L·atm/(mol·K)", "理想气体常数（压力–体积形式）"],
+      ["F = 96485 C/mol", "法拉第常数"],
+      ["N_A = 6.022×10²³ /mol", "阿伏加德罗常数"],
+      ["h = 6.626×10⁻³⁴ J·s", "普朗克常数"],
+      ["c = 3.00×10⁸ m/s", "真空光速"],
+      ["k_B = 1.38×10⁻²³ J/K", "玻尔兹曼常数"],
+      ["Kw = 1.0×10⁻¹⁴（25°C）", "水的离子积"],
+      ["0°C = 273.15 K", "摄氏–开尔文换算"],
+    ]],
+  ];
+
+  function renderFormula(){
+    var el = document.getElementById("ftPaneFormula");
+    var h = '<p class="ft-lead">AP 化学常用公式与常数速查，按主题分类；元素周期表见上方标签页。</p>';
+    for (var s = 0; s < SECTIONS.length; s++){
+      h += '<div class="ft-sec"><h4>' + SECTIONS[s][0] + "</h4>";
+      var rows = SECTIONS[s][1];
+      for (var r = 0; r < rows.length; r++){
+        h += '<div class="ft-row"><span class="ft-fx">' + rows[r][0] + '</span><span class="ft-note">' + rows[r][1] + "</span></div>";
+      }
+      h += "</div>";
+    }
     el.innerHTML = h;
   }
+  renderFormula();
 
-  function showDetail(z){
-    var e = null;
-    for (var i = 0; i < PTE.length; i++) if (PTE[i][0] === z) { e = PTE[i]; break; }
-    var el = document.getElementById("ptDetail");
-    if (!e){ el.className = "pt-detail"; return; }
-    var catCn = CAT[e[4]][0];
-    el.className = "pt-detail show";
-    el.innerHTML =
-      "<h4>" + e[1] + "　" + e[2] + "<span class='ptd-cat' style='background:" + CAT[e[4]][1] + "'>" + catCn + "</span></h4>" +
-      '<div class="ptd-row"><span><b>原子序数</b> ' + e[0] + "</span>" +
-      "<span><b>相对原子质量</b> " + e[3] + "</span></div>" +
-      '<div class="ptd-row"><span><b>电子排布</b> ' + e[5] + "</span></div>" +
-      '<div class="ptd-row"><span><b>常见化合价</b> ' + e[6] + "</span></div>";
+  // ===== 首页公式表区块（含变量说明与单位）=====
+  var FORMULAS = [
+    ["原子结构与光", [
+      ["E = hν = hc/λ", "E 光子能量 (J)；h 普朗克常数 6.626×10⁻³⁴ J·s；ν 频率 (s⁻¹)；λ 波长 (m)；c 光速 3.00×10⁸ m/s"],
+      ["c = λν", "c 光速 (m/s)；λ 波长 (m)；ν 频率 (s⁻¹)"],
+      ["λ = h / (mv)", "λ 德布罗意波长 (m)；m 质量 (kg)；v 速度 (m/s)"],
+      ["Eₙ = −R_H / n²", "Eₙ 电子能级能量 (J)；R_H 里德伯常数 2.18×10⁻¹⁸ J；n 主量子数"],
+      ["ΔE = hν", "ΔE 能级差/光子能量 (J)；ν 频率 (s⁻¹)"],
+    ]],
+    ["化学计量与气体", [
+      ["n = m / M", "n 物质的量 (mol)；m 质量 (g)；M 摩尔质量 (g/mol)"],
+      ["N = n × N_A", "N 粒子数；n 物质的量 (mol)；N_A 阿伏加德罗常数 6.022×10²³ /mol"],
+      ["M = n / V", "M 摩尔浓度 (mol/L)；n 溶质物质的量 (mol)；V 溶液体积 (L)"],
+      ["M₁V₁ = M₂V₂", "稀释公式；M 浓度 (mol/L)；V 体积 (L)"],
+      ["PV = nRT", "P 压强 (atm)；V 体积 (L)；n 物质的量 (mol)；R = 0.08206 L·atm/(mol·K)；T 温度 (K)"],
+      ["d = PM / (RT)", "d 密度 (g/L)；M 摩尔质量 (g/mol)；R = 0.08206 L·atm/(mol·K)"],
+      ["P₁V₁/T₁ = P₂V₂/T₂", "联合气体定律；P 压强；V 体积；T 温度 (K)"],
+      ["Pᵢ = Xᵢ·P_total", "Pᵢ 分压 (atm)；Xᵢ 摩尔分数；P_total 总压 (atm)"],
+      ["A = abc", "A 吸光度；a 摩尔吸光系数 (L·mol⁻¹·cm⁻¹)；b 光程 (cm)；c 浓度 (mol/L)"],
+    ]],
+    ["热化学与热力学", [
+      ["q = mcΔT", "q 热量 (J)；m 质量 (g)；c 比热容 (J·g⁻¹·K⁻¹)；ΔT 温度变化 (K)"],
+      ["ΔH°rxn = ΣΔH°f(产物) − ΣΔH°f(反应物)", "ΔH° 标准焓变 (kJ/mol)；ΔH°f 标准生成焓 (kJ/mol)"],
+      ["ΔS°rxn = ΣS°(产物) − ΣS°(反应物)", "ΔS° 标准熵变 (J·mol⁻¹·K⁻¹)；S° 标准摩尔熵"],
+      ["ΔG = ΔH − TΔS", "ΔG 吉布斯自由能 (kJ/mol)；T 温度 (K)"],
+      ["ΔG° = −RT ln K", "R = 8.314 J/(mol·K)；T 温度 (K)；K 平衡常数"],
+      ["ΔG = ΔG° + RT ln Q", "Q 反应商；其余符号同上"],
+      ["ΔG° = −nFE°", "n 转移电子数 (mol)；F 法拉第常数 96485 C/mol；E° 标准电动势 (V)"],
+    ]],
+    ["化学平衡", [
+      ["K = [产物]^系数 / [反应物]^系数", "K 平衡常数（浓度表示）"],
+      ["Kp = Kc(RT)^Δn", "Kp 分压平衡常数；Kc 浓度平衡常数；Δn 气相摩尔数差"],
+      ["Q vs K", "Q<K 正向；Q>K 逆向；Q=K 达平衡"],
+      ["Ksp", "溶度积常数；浓度为平衡浓度 (mol/L)"],
+      ["Ka × Kb = Kw", "Ka 酸常数；Kb 碱常数；Kw = 1.0×10⁻¹⁴ (25°C)"],
+    ]],
+    ["酸碱平衡", [
+      ["pH = −log[H⁺]", "pH；[H⁺] 氢离子浓度 (mol/L)"],
+      ["pOH = −log[OH⁻]", "pOH；[OH⁻] 氢氧根浓度 (mol/L)"],
+      ["pH + pOH = 14", "25°C 水溶液中"],
+      ["Kw = [H⁺][OH⁻] = 1.0×10⁻¹⁴", "Kw 水的离子积 (25°C)；浓度单位 mol/L"],
+      ["pH = pKa + log([A⁻]/[HA])", "Henderson–Hasselbalch；[A⁻] 共轭碱浓度；[HA] 酸浓度 (mol/L)"],
+    ]],
+    ["化学动力学", [
+      ["rate = k[A]^m[B]^n", "rate 反应速率 (mol·L⁻¹·s⁻¹)；k 速率常数；m、n 反应级数"],
+      ["零级：[A] = −kt + [A]₀（t½ = [A]₀/2k）", "[A]₀ 初始浓度 (mol/L)；k 单位 mol·L⁻¹·s⁻¹；t 时间 (s)"],
+      ["一级：ln[A] = −kt + ln[A]₀（t½ = 0.693/k）", "k 单位 s⁻¹；t 时间 (s)"],
+      ["二级：1/[A] = kt + 1/[A]₀（t½ = 1/(k[A]₀)）", "k 单位 L·mol⁻¹·s⁻¹"],
+      ["k = A·e^(−Ea/RT)", "Arrhenius；Ea 活化能 (J/mol)；A 频率因子；R = 8.314；T (K)"],
+      ["ln(k₂/k₁) = −(Ea/R)(1/T₂ − 1/T₁)", "两点式 Arrhenius；T (K)；Ea (J/mol)"],
+    ]],
+    ["电化学", [
+      ["E°cell = E°cathode − E°anode", "E°cell 标准电池电动势 (V)；E° 标准还原电位 (V)"],
+      ["E = E° − (0.0592 / n)·log Q", "Nernst 方程 (25°C)；n 电子数；Q 反应商；E (V)"],
+      ["E° = (0.0592 / n)·log K", "标准电动势与平衡常数关系 (25°C)"],
+      ["mol e⁻ = It / F", "法拉第定律；I 电流 (A)；t 时间 (s)；F = 96485 C/mol"],
+    ]],
+    ["常用常数", [
+      ["R = 8.314 J/(mol·K)", "理想气体常数（能量形式）"],
+      ["R = 0.08206 L·atm/(mol·K)", "理想气体常数（压力–体积形式）"],
+      ["F = 96485 C/mol", "法拉第常数"],
+      ["N_A = 6.022×10²³ /mol", "阿伏加德罗常数"],
+      ["h = 6.626×10⁻³⁴ J·s", "普朗克常数"],
+      ["c = 3.00×10⁸ m/s", "真空光速"],
+      ["Kw = 1.0×10⁻¹⁴（25°C）", "水的离子积"],
+      ["0°C = 273.15 K", "摄氏–开尔文换算"],
+    ]],
+  ];
+
+  (function renderHomeFormula(){
+    var el = document.getElementById("formulaGrid");
+    if (!el) return;
+    var h = "";
+    for (var s = 0; s < FORMULAS.length; s++){
+      h += '<div class="fs-cat"><h3>' + FORMULAS[s][0] + "</h3>";
+      var rows = FORMULAS[s][1];
+      for (var r = 0; r < rows.length; r++){
+        h += '<div class="fs-item"><span class="fs-fx">' + rows[r][0] + '</span><span class="fs-vars">' + rows[r][1] + "</span></div>";
+      }
+      h += "</div>";
+    }
+    el.innerHTML = h;
+  })();
+
+  // 周期表标签页：复用左上角的周期表构建函数
+  var ptBuilt = false;
+  function buildPtable(){
+    if (ptBuilt) return;
+    if (window.__pt && window.__pt.build){
+      window.__pt.build(document.getElementById("ftPtLegend"), document.getElementById("ftPtGrid"), document.getElementById("ftPtDetail"));
+      ptBuilt = true;
+    }
   }
 
-  renderLegend();
-  renderGrid();
-  var grid = document.getElementById("ptGrid");
-  grid.addEventListener("click", function(ev){
-    var c = ev.target.closest(".pt-cell");
-    if (!c) return;
-    var z = +c.dataset.z;
-    if (!z) return;
-    Array.prototype.forEach.call(grid.querySelectorAll(".pt-cell"), function(x){ x.classList.remove("pt-on"); });
-    c.classList.add("pt-on");
-    showDetail(z);
+  var tabs = document.getElementById("ftTabs");
+  tabs.addEventListener("click", function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    Array.prototype.forEach.call(tabs.querySelectorAll("button"), function(x){ x.classList.toggle("on", x === b); });
+    var key = b.dataset.ft;
+    document.getElementById("ftPaneFormula").classList.toggle("on", key === "formula");
+    document.getElementById("ftPanePtable").classList.toggle("on", key === "ptable");
+    if (key === "ptable") buildPtable();
   });
 
-  btnPT.addEventListener("click", function(){ modalPT.classList.remove("hide"); });
-  var closeBtn = modalPT.querySelector(".modal-close");
-  if (closeBtn) closeBtn.addEventListener("click", function(){ modalPT.classList.add("hide"); });
-  modalPT.addEventListener("click", function(e){ if (e.target === modalPT) modalPT.classList.add("hide"); });
-  document.addEventListener("keydown", function(e){ if (e.key === "Escape") modalPT.classList.add("hide"); });
+  btnFormula.addEventListener("click", function(){ modalFormula.classList.remove("hide"); });
+  var closeBtn = modalFormula.querySelector(".modal-close");
+  if (closeBtn) closeBtn.addEventListener("click", function(){ modalFormula.classList.add("hide"); });
+  modalFormula.addEventListener("click", function(e){ if (e.target === modalFormula) modalFormula.classList.add("hide"); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") modalFormula.classList.add("hide"); });
 })();
 
 /* ==================== 账号入口（登录 / 注册 / 个人中心 / 云端同步） ==================== */
