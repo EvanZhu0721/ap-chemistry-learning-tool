@@ -140,6 +140,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
   <div class="topbar">
     <div class="brand"><span class="logo">AP</span> AP Chemistry 学习工具</div>
+    <button class="btn" id="btnPT" title="查看元素周期表">元素周期表</button>
     <span class="crumb" id="crumb">首页</span>
     <span class="spacer"></span>
     <button class="btn" id="btnGap">查缺补漏</button>
@@ -590,6 +591,19 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
         <p class="lead">形式电荷 FC = 价电子数 − 孤对电子数 − ½ 成键电子数。</p>
         <div class="readout" id="fcCalc"></div>
         <div class="hint">最优路易斯结构：形式电荷尽量接近 0，负电荷落在电负性更大的原子上。</div>
+      </div>
+      <div class="card">
+        <h3>超过八隅体结构（扩展八隅体）<span class="badge warn" style="margin-left:8px">八隅体例外</span></h3>
+        <p class="lead">八隅体规则对<b>第二周期</b>（C、N、O、F）严格成立；但<b>第三周期及以后</b>的中心原子（P、S 等）有空的 3d 轨道，可容纳<b>超过 8 个电子</b>。</p>
+        <div class="anim-detail">
+          <ul>
+            <li><b>SO₂（二氧化硫）</b>：S 有 6 个价电子，形成 2 个 S=O 双键 + 1 对孤对 → S 周围 <b>10 e⁻</b>。3 个电子域 → 角形，键角约 <b>119°</b>。按单双键画有 2 个等价共振式，S–O 键级 1.5。</li>
+            <li><b>SO₃（三氧化硫）</b>：S 有 6 个价电子，3 个 S=O 双键 → S 周围 <b>12 e⁻</b>，无孤对。平面三角形 <b>120°</b>。按单双键画有 3 个等价共振式，S–O 键级 4/3。</li>
+            <li><b>PCl₅（五氯化磷）</b>：P 有 5 个价电子，5 个 P–Cl 单键 → P 周围 <b>10 e⁻</b>，无孤对。三角双锥，键角 <b>90° 和 120°</b>，无共振。</li>
+            <li><b>SF₆（六氟化硫）</b>：S 有 6 个价电子，6 个 S–F 单键 → S 周围 <b>12 e⁻</b>，无孤对。正八面体，键角 <b>90°</b>，无共振。</li>
+          </ul>
+        </div>
+        <div class="hint"><b>对照八隅体</b>：常规八隅体（H₂O、CH₄、CO₂，中心原子 8 e⁻）｜缺电子（BF₃ 的 B 仅 6 e⁻）｜超八隅体（PCl₅ = 10 e⁻、SF₆ = 12 e⁻）。超八隅体只出现在<b>第三周期及以后、半径较大</b>的中心原子上。</div>
       </div>
       <div class="practice" data-practice="u2-lewis"></div>
     </section>
@@ -2366,6 +2380,18 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   <div class="modal-box">
     <div class="modal-head"><h3>大纲</h3><button class="btn modal-close">关闭</button></div>
     <div class="modal-body" id="pdfBody"></div>
+  </div>
+</div>
+
+<!-- ===== ★ [新增] 元素周期表 ===== -->
+<div class="modal hide" id="modalPT">
+  <div class="modal-box pt-box">
+    <div class="modal-head"><h3>元素周期表</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body pt-body">
+      <div class="pt-legend" id="ptLegend"></div>
+      <div class="pt-scroll"><div class="pt-grid" id="ptGrid"></div></div>
+      <div class="pt-detail" id="ptDetail"></div>
+    </div>
   </div>
 </div>
 

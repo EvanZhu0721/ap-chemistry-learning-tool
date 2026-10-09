@@ -282,6 +282,15 @@ select{
 .pz-block>b{display:block;font-size:12.5px;color:#5a6b86;margin-bottom:5px;letter-spacing:.3px}
 .pz-block p{margin:0;color:#33415c}
 .kp-wrap{display:flex;flex-wrap:wrap;gap:6px}
+/* ---- 答案/解析可折叠「活页」（答错时折叠，学生自行展开核对） ---- */
+.pz-hint{font-size:12px;font-weight:400;color:var(--muted)}
+.pz-fold{margin-top:10px;border:1px dashed var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.pz-fold summary{cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:var(--phy);list-style:none;user-select:none;background:rgba(43,109,233,.06)}
+.pz-fold summary::-webkit-details-marker{display:none}
+.pz-fold summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+.pz-fold[open] summary::before{transform:rotate(90deg)}
+.pz-fold-body{padding:12px 14px 6px}
+.pz-ansrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 /* ---- 「相关知识」入口 UI（点击跳转学习模块对应知识点讲解页） ---- */
 .pz-rel{margin-top:12px;padding:11px 12px;border:1px dashed var(--line);border-radius:12px;background:rgba(43,109,233,.045)}
 .rel-wrap{display:flex;flex-direction:column;gap:9px}
@@ -325,6 +334,43 @@ select{
 .pn-body span{color:var(--muted)}
 .pn-go{flex:0 0 auto;font-size:12px;color:var(--phy);white-space:nowrap;margin-top:1px}
 .pn-sum{margin-top:18px;padding:12px 15px;border-radius:11px;background:#f6f9ff;border:1px solid #dbe6f7;font-size:13px;line-height:1.7;color:#33415c}
+
+/* ===== ★ 元素周期表 ===== */
+.pt-box{max-width:1020px}
+.pt-body{padding:16px 18px 20px;overflow-y:auto;overflow-x:hidden}
+.pt-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pt-legend span{font-size:11px;padding:2px 9px;border-radius:99px;color:#26324a;font-weight:500}
+.pt-scroll{overflow-x:auto}
+.pt-grid{display:grid;grid-template-columns:repeat(18, minmax(0, 1fr));gap:3px;min-width:680px}
+.pt-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  padding:4px 1px;border-radius:6px;cursor:pointer;min-height:52px;position:relative;
+  font-size:9px;line-height:1.2;color:#1a2333;transition:transform .12s,box-shadow .12s;border:1px solid transparent}
+.pt-cell:hover{transform:scale(1.16);z-index:6;box-shadow:0 3px 12px rgba(20,35,65,.22);border-color:rgba(20,35,65,.18)}
+.pt-cell .pt-s{font-weight:700;font-size:13px;letter-spacing:.2px}
+.pt-cell .pt-z{font-size:8.5px;opacity:.72}
+.pt-cell .pt-cn{font-size:9.5px}
+.pt-cell .pt-m{font-size:8px;opacity:.82}
+.pt-cell.ph{background:#e8edf6;color:#8492ad;cursor:default;min-height:46px;font-size:10.5px;font-weight:600}
+.pt-cell.ph:hover{transform:none;box-shadow:none}
+.pt-cell.alkali{background:#f2c3c3}
+.pt-cell.alkaline{background:#f6d9b1}
+.pt-cell.transition{background:#f4e3a4}
+.pt-cell.post{background:#b6e0d1}
+.pt-cell.metalloid{background:#c2e5c1}
+.pt-cell.nonmetal{background:#b6ddf0}
+.pt-cell.halogen{background:#bccff0}
+.pt-cell.noble{background:#d6c8f0}
+.pt-cell.lanthanide{background:#f6cde2}
+.pt-cell.actinide{background:#e4c7ed}
+.pt-detail{display:none;margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13px;line-height:1.8}
+.pt-detail.show{display:block}
+.pt-detail h4{margin:0 0 8px;font-size:16px}
+.pt-detail .ptd-cat{display:inline-block;font-size:11.5px;padding:2px 10px;border-radius:99px;color:#1a2333;margin-left:8px;vertical-align:2px}
+.pt-detail .ptd-row{display:flex;flex-wrap:wrap;gap:4px 22px;color:#33415c}
+.pt-detail .ptd-row b{color:#5a6b86;font-weight:600}
+[data-theme="dark"] .pt-detail .ptd-row{color:var(--ink)}
+[data-theme="dark"] .pt-detail .ptd-row b{color:var(--muted)}
+@media (max-width:720px){.pt-box{max-width:100%;margin:0 6px}.pt-body{padding:12px 10px 16px}}
 .c-ok{color:#0f7a45}.c-new{color:#2b5cb8}.c-fix{color:#6a35c0}.c-miss{color:#b33b3b}
 .pn-group{margin:10px 0 14px;padding-left:12px;border-left:2px solid #e3eaf6}
 .pn-gk{font-size:13px;font-weight:600;color:#2b5cb8;margin-bottom:7px}
@@ -1996,6 +2042,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
   <div class="topbar">
     <div class="brand"><span class="logo">AP</span> AP Chemistry 学习工具</div>
+    <button class="btn" id="btnPT" title="查看元素周期表">元素周期表</button>
     <span class="crumb" id="crumb">首页</span>
     <span class="spacer"></span>
     <button class="btn" id="btnGap">查缺补漏</button>
@@ -2446,6 +2493,19 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
         <p class="lead">形式电荷 FC = 价电子数 − 孤对电子数 − ½ 成键电子数。</p>
         <div class="readout" id="fcCalc"></div>
         <div class="hint">最优路易斯结构：形式电荷尽量接近 0，负电荷落在电负性更大的原子上。</div>
+      </div>
+      <div class="card">
+        <h3>超过八隅体结构（扩展八隅体）<span class="badge warn" style="margin-left:8px">八隅体例外</span></h3>
+        <p class="lead">八隅体规则对<b>第二周期</b>（C、N、O、F）严格成立；但<b>第三周期及以后</b>的中心原子（P、S 等）有空的 3d 轨道，可容纳<b>超过 8 个电子</b>。</p>
+        <div class="anim-detail">
+          <ul>
+            <li><b>SO₂（二氧化硫）</b>：S 有 6 个价电子，形成 2 个 S=O 双键 + 1 对孤对 → S 周围 <b>10 e⁻</b>。3 个电子域 → 角形，键角约 <b>119°</b>。按单双键画有 2 个等价共振式，S–O 键级 1.5。</li>
+            <li><b>SO₃（三氧化硫）</b>：S 有 6 个价电子，3 个 S=O 双键 → S 周围 <b>12 e⁻</b>，无孤对。平面三角形 <b>120°</b>。按单双键画有 3 个等价共振式，S–O 键级 4/3。</li>
+            <li><b>PCl₅（五氯化磷）</b>：P 有 5 个价电子，5 个 P–Cl 单键 → P 周围 <b>10 e⁻</b>，无孤对。三角双锥，键角 <b>90° 和 120°</b>，无共振。</li>
+            <li><b>SF₆（六氟化硫）</b>：S 有 6 个价电子，6 个 S–F 单键 → S 周围 <b>12 e⁻</b>，无孤对。正八面体，键角 <b>90°</b>，无共振。</li>
+          </ul>
+        </div>
+        <div class="hint"><b>对照八隅体</b>：常规八隅体（H₂O、CH₄、CO₂，中心原子 8 e⁻）｜缺电子（BF₃ 的 B 仅 6 e⁻）｜超八隅体（PCl₅ = 10 e⁻、SF₆ = 12 e⁻）。超八隅体只出现在<b>第三周期及以后、半径较大</b>的中心原子上。</div>
       </div>
       <div class="practice" data-practice="u2-lewis"></div>
     </section>
@@ -4225,6 +4285,18 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   </div>
 </div>
 
+<!-- ===== ★ [新增] 元素周期表 ===== -->
+<div class="modal hide" id="modalPT">
+  <div class="modal-box pt-box">
+    <div class="modal-head"><h3>元素周期表</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-body pt-body">
+      <div class="pt-legend" id="ptLegend"></div>
+      <div class="pt-scroll"><div class="pt-grid" id="ptGrid"></div></div>
+      <div class="pt-detail" id="ptDetail"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== ★ [新增] 面板：设置（深浅 / 字号 / 水印 / 区老师） ===== -->
 <div class="modal hide" id="modalSettings">
   <div class="modal-box settings-box">
@@ -4412,7 +4484,24 @@ const LEWIS = [
     fc:["C：4 − 0 − ½·8 = 0","每个 O：6 − 4 − ½·4 = 0","总形式电荷 = 0"] },
   { id:"bf3", name:"BF₃", angle:"120°",
     svg:'<svg viewBox="0 0 300 180" width="280"><circle cx="150" cy="92" r="14" fill="#7c3aed"/><circle cx="150" cy="50" r="12" fill="#0ea5e9"/><circle cx="196" cy="136" r="12" fill="#0ea5e9"/><circle cx="104" cy="136" r="12" fill="#0ea5e9"/><line x1="150" y1="92" x2="150" y2="62" stroke="#94a3b8" stroke-width="2"/><line x1="150" y1="92" x2="184" y2="126" stroke="#94a3b8" stroke-width="2"/><line x1="150" y1="92" x2="116" y2="126" stroke="#94a3b8" stroke-width="2"/><circle cx="150" cy="40" r="3" fill="#e07b00"/><circle cx="206" cy="144" r="3" fill="#e07b00"/><circle cx="94" cy="144" r="3" fill="#e07b00"/><text x="150" y="96" text-anchor="middle" font-size="11" fill="#fff">B</text></svg>',
-    fc:["B：3 − 0 − ½·6 = 0","每个 F：7 − 6 − ½·2 = 0","总形式电荷 = 0"] }
+    fc:["B：3 − 0 − ½·6 = 0","每个 F：7 − 6 − ½·2 = 0","总形式电荷 = 0"],
+    valence:"B：3 个价电子", bond:"3 个 B–F 单键（仅 6 e⁻）", resonance:"无", octet:"缺电子（<8）" },
+  { id:"so2", name:"SO₂", angle:"约 119°",
+    svg:'<svg viewBox="0 0 300 180" width="280"><circle cx="150" cy="80" r="14" fill="#7c3aed"/><circle cx="138" cy="58" r="3.2" fill="#e07b00"/><circle cx="162" cy="58" r="3.2" fill="#e07b00"/><circle cx="108" cy="126" r="12" fill="#0ea5e9"/><circle cx="192" cy="126" r="12" fill="#0ea5e9"/><line x1="138" y1="90" x2="118" y2="116" stroke="#94a3b8" stroke-width="2"/><line x1="144" y1="94" x2="124" y2="120" stroke="#94a3b8" stroke-width="2"/><line x1="162" y1="90" x2="182" y2="116" stroke="#94a3b8" stroke-width="2"/><line x1="156" y1="94" x2="176" y2="120" stroke="#94a3b8" stroke-width="2"/><circle cx="98" cy="112" r="3" fill="#e07b00"/><circle cx="116" cy="104" r="3" fill="#e07b00"/><circle cx="202" cy="112" r="3" fill="#e07b00"/><circle cx="184" cy="104" r="3" fill="#e07b00"/><text x="150" y="84" text-anchor="middle" font-size="11" fill="#fff">S</text></svg>',
+    fc:["S：6 − 2 − ½·8 = 0","每个 O：6 − 4 − ½·4 = 0","总形式电荷 = 0"],
+    valence:"S：6 个价电子", bond:"2 个 S=O 双键 + 1 对孤对（10 e⁻）", resonance:"有：按单双键画 → 2 个等价共振式（键级 1.5）", octet:"超八隅体（10 e⁻）" },
+  { id:"so3", name:"SO₃", angle:"120°",
+    svg:'<svg viewBox="0 0 300 180" width="280"><circle cx="150" cy="92" r="14" fill="#7c3aed"/><circle cx="150" cy="40" r="12" fill="#0ea5e9"/><circle cx="104" cy="140" r="12" fill="#0ea5e9"/><circle cx="196" cy="140" r="12" fill="#0ea5e9"/><line x1="150" y1="80" x2="150" y2="52" stroke="#94a3b8" stroke-width="2"/><line x1="143" y1="80" x2="143" y2="52" stroke="#94a3b8" stroke-width="2"/><line x1="140" y1="102" x2="114" y2="130" stroke="#94a3b8" stroke-width="2"/><line x1="146" y1="106" x2="120" y2="134" stroke="#94a3b8" stroke-width="2"/><line x1="160" y1="102" x2="186" y2="130" stroke="#94a3b8" stroke-width="2"/><line x1="154" y1="106" x2="180" y2="134" stroke="#94a3b8" stroke-width="2"/><text x="150" y="96" text-anchor="middle" font-size="11" fill="#fff">S</text></svg>',
+    fc:["S：6 − 0 − ½·12 = 0","每个 O：6 − 4 − ½·4 = 0","总形式电荷 = 0"],
+    valence:"S：6 个价电子", bond:"3 个 S=O 双键（12 e⁻）", resonance:"有：按单双键画 → 3 个等价共振式（键级 4/3）", octet:"超八隅体（12 e⁻）" },
+  { id:"pcl5", name:"PCl₅", angle:"90° 和 120°",
+    svg:'<svg viewBox="0 0 300 180" width="280"><circle cx="150" cy="90" r="14" fill="#7c3aed"/><circle cx="150" cy="36" r="11" fill="#0ea5e9"/><circle cx="150" cy="144" r="11" fill="#0ea5e9"/><circle cx="88" cy="90" r="11" fill="#0ea5e9"/><circle cx="196" cy="62" r="11" fill="#0ea5e9"/><circle cx="196" cy="118" r="11" fill="#0ea5e9"/><line x1="150" y1="78" x2="150" y2="46" stroke="#94a3b8" stroke-width="2"/><line x1="150" y1="102" x2="150" y2="134" stroke="#94a3b8" stroke-width="2"/><line x1="138" y1="90" x2="98" y2="90" stroke="#94a3b8" stroke-width="2"/><line x1="160" y1="84" x2="188" y2="66" stroke="#94a3b8" stroke-width="2"/><line x1="160" y1="96" x2="188" y2="114" stroke="#94a3b8" stroke-width="2"/><text x="150" y="94" text-anchor="middle" font-size="11" fill="#fff">P</text></svg>',
+    fc:["P：5 − 0 − ½·10 = 0","每个 Cl：7 − 6 − ½·2 = 0","总形式电荷 = 0"],
+    valence:"P：5 个价电子", bond:"5 个 P–Cl 单键（10 e⁻）", resonance:"无", octet:"超八隅体（10 e⁻）" },
+  { id:"sf6", name:"SF₆", angle:"90°",
+    svg:'<svg viewBox="0 0 300 180" width="280"><circle cx="150" cy="90" r="14" fill="#7c3aed"/><circle cx="150" cy="34" r="11" fill="#0ea5e9"/><circle cx="150" cy="146" r="11" fill="#0ea5e9"/><circle cx="86" cy="90" r="11" fill="#0ea5e9"/><circle cx="214" cy="90" r="11" fill="#0ea5e9"/><circle cx="196" cy="58" r="11" fill="#0ea5e9"/><circle cx="196" cy="122" r="11" fill="#0ea5e9"/><line x1="150" y1="76" x2="150" y2="44" stroke="#94a3b8" stroke-width="2"/><line x1="150" y1="104" x2="150" y2="136" stroke="#94a3b8" stroke-width="2"/><line x1="136" y1="90" x2="96" y2="90" stroke="#94a3b8" stroke-width="2"/><line x1="164" y1="90" x2="204" y2="90" stroke="#94a3b8" stroke-width="2"/><line x1="160" y1="82" x2="188" y2="62" stroke="#94a3b8" stroke-width="2"/><line x1="160" y1="98" x2="188" y2="114" stroke="#94a3b8" stroke-width="2"/><text x="150" y="94" text-anchor="middle" font-size="11" fill="#fff">S</text></svg>',
+    fc:["S：6 − 0 − ½·12 = 0","每个 F：7 − 6 − ½·2 = 0","总形式电荷 = 0"],
+    valence:"S：6 个价电子", bond:"6 个 S–F 单键（12 e⁻）", resonance:"无", octet:"超八隅体（12 e⁻）" }
 ];
 
 /* 电子排布：能级顺序 */
@@ -4789,8 +4878,17 @@ LEWIS.forEach(l => {
 function showLewis(id){
   const l = LEWIS.find(x => x.id === id);
   $("lewisFig").innerHTML = l.svg;
-  $("lewisDesc").innerHTML = "<b>" + l.name + "</b>　键角 <b>" + l.angle + "</b>";
-  $("fcCalc").innerHTML = l.fc.map(f => "· " + f).join("<br>");
+  let octetBadge = "";
+  if (l.octet){
+    const warn = l.octet.indexOf("超八隅体") === 0 || l.octet.indexOf("缺电子") === 0;
+    octetBadge = "　<span class='badge " + (warn ? "warn" : "good") + "'>" + l.octet + "</span>";
+  }
+  $("lewisDesc").innerHTML = "<b>" + l.name + "</b>　键角 <b>" + l.angle + "</b>" + octetBadge;
+  let html = l.fc.map(f => "· " + f).join("<br>");
+  if (l.valence) html += "<br><b>中心原子</b>　" + l.valence;
+  if (l.bond) html += "<br><b>成键</b>　" + l.bond;
+  if (l.resonance) html += "<br><b>共振</b>　" + l.resonance;
+  $("fcCalc").innerHTML = html;
 }
 lewisRow.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
@@ -14373,14 +14471,25 @@ drawQuantum();
         submit.style.display = "none";
         reset.style.display = "";
         fb.className = "pz-fb show " + (ok ? "ok" : "no");
-        fb.innerHTML =
-          '<div class="pz-verdict">' + (ok ? "✓ Correct" : "✗ Incorrect") +
-            '<span class="pz-ans">Answer: ' + LET[it.ans] + "</span>" +
-            (it.r ? '<span class="pz-ans">' + it.r + "</span>" : "") + "</div>" +
+        var ansChip = '<span class="pz-ans">Answer: ' + LET[it.ans] + "</span>";
+        var rangeChip = (it.r ? '<span class="pz-ans">' + it.r + "</span>" : "");
+        var explainBody =
           '<div class="pz-block"><b>Why this answer is correct</b><p>' + wrapWords(it.why) + "</p></div>" +
           (it.cn ? '<div class="pz-block pz-cn"><b>中文解析</b><p>' + it.cn + "</p></div>" : "") +
           '<div class="pz-block"><b>Knowledge points used ｜ 用到的知识点</b><div class="kp-wrap">' + kpTags(it.kp) + "</div></div>" +
           relBlock(it);
+        if (ok){
+          // 答对：自动展开答案与解析，便于即时核对
+          fb.innerHTML = '<div class="pz-verdict">✓ Correct' + ansChip + rangeChip + "</div>" + explainBody;
+        } else {
+          // 答错：先保留思考空间，答案与解析折叠为「活页」，学生自行点击展开
+          fb.innerHTML =
+            '<div class="pz-verdict">✗ Incorrect<span class="pz-hint">先想想哪里错了，再点开核对</span></div>' +
+            '<details class="pz-fold"><summary>查看答案与解析</summary><div class="pz-fold-body">' +
+            '<div class="pz-ansrow">' + ansChip + rangeChip + "</div>" +
+            explainBody +
+            "</div></details>";
+        }
         recordAnswer(it.id, ok);
         if (typeof opts.onAnswer === "function") opts.onAnswer(ok, it);
       });
@@ -17804,6 +17913,211 @@ drawQuantum();
     (function(t){ t.addEventListener("click", function(){ show(+t.dataset.i); }); })(ts2[k]);
   }
   show(0);
+})();
+
+/* ==================== 元素周期表 ==================== */
+(function(){
+  var btnPT = document.getElementById("btnPT"), modalPT = document.getElementById("modalPT");
+  if (!btnPT || !modalPT) return;
+
+  // 元素分类：key → 中文名 + 图例色（与 .pt-cell 类别 class 对应）
+  var CAT = {
+    alkali:     ["碱金属", "#f2c3c3"],
+    alkaline:   ["碱土金属", "#f6d9b1"],
+    transition: ["过渡金属", "#f4e3a4"],
+    post:       ["后过渡金属", "#b6e0d1"],
+    metalloid:  ["准金属", "#c2e5c1"],
+    nonmetal:   ["非金属", "#b6ddf0"],
+    halogen:    ["卤素", "#bccff0"],
+    noble:      ["稀有气体", "#d6c8f0"],
+    lanthanide: ["镧系", "#f6cde2"],
+    actinide:   ["锕系", "#e4c7ed"]
+  };
+
+  // 完整 118 元素：[z, s, cn, m(相对原子质量), cat, ec(电子排布), ox(常见化合价), r(行), c(列)]
+  var PTE = [
+    [1,"H","氢","1.008","nonmetal","1s¹","+1, -1",1,1],
+    [2,"He","氦","4.0026","noble","1s²","0",1,18],
+    [3,"Li","锂","6.94","alkali","[He]2s¹","+1",2,1],
+    [4,"Be","铍","9.0122","alkaline","[He]2s²","+2",2,2],
+    [5,"B","硼","10.81","metalloid","[He]2s²2p¹","+3",2,13],
+    [6,"C","碳","12.011","nonmetal","[He]2s²2p²","-4, +2, +4",2,14],
+    [7,"N","氮","14.007","nonmetal","[He]2s²2p³","-3, +3, +5",2,15],
+    [8,"O","氧","15.999","nonmetal","[He]2s²2p⁴","-2",2,16],
+    [9,"F","氟","18.998","halogen","[He]2s²2p⁵","-1",2,17],
+    [10,"Ne","氖","20.180","noble","[He]2s²2p⁶","0",2,18],
+    [11,"Na","钠","22.990","alkali","[Ne]3s¹","+1",3,1],
+    [12,"Mg","镁","24.305","alkaline","[Ne]3s²","+2",3,2],
+    [13,"Al","铝","26.982","post","[Ne]3s²3p¹","+3",3,13],
+    [14,"Si","硅","28.085","metalloid","[Ne]3s²3p²","-4, +2, +4",3,14],
+    [15,"P","磷","30.974","nonmetal","[Ne]3s²3p³","-3, +3, +5",3,15],
+    [16,"S","硫","32.06","nonmetal","[Ne]3s²3p⁴","-2, +4, +6",3,16],
+    [17,"Cl","氯","35.45","halogen","[Ne]3s²3p⁵","-1, +1, +3, +5, +7",3,17],
+    [18,"Ar","氩","39.948","noble","[Ne]3s²3p⁶","0",3,18],
+    [19,"K","钾","39.098","alkali","[Ar]4s¹","+1",4,1],
+    [20,"Ca","钙","40.078","alkaline","[Ar]4s²","+2",4,2],
+    [21,"Sc","钪","44.956","transition","[Ar]3d¹4s²","+3",4,3],
+    [22,"Ti","钛","47.867","transition","[Ar]3d²4s²","+2, +3, +4",4,4],
+    [23,"V","钒","50.942","transition","[Ar]3d³4s²","+2, +3, +4, +5",4,5],
+    [24,"Cr","铬","51.996","transition","[Ar]3d⁵4s¹","+2, +3, +6",4,6],
+    [25,"Mn","锰","54.938","transition","[Ar]3d⁵4s²","+2, +3, +4, +6, +7",4,7],
+    [26,"Fe","铁","55.845","transition","[Ar]3d⁶4s²","+2, +3",4,8],
+    [27,"Co","钴","58.933","transition","[Ar]3d⁷4s²","+2, +3",4,9],
+    [28,"Ni","镍","58.693","transition","[Ar]3d⁸4s²","+2",4,10],
+    [29,"Cu","铜","63.546","transition","[Ar]3d¹⁰4s¹","+1, +2",4,11],
+    [30,"Zn","锌","65.38","transition","[Ar]3d¹⁰4s²","+2",4,12],
+    [31,"Ga","镓","69.723","post","[Ar]3d¹⁰4s²4p¹","+3",4,13],
+    [32,"Ge","锗","72.630","metalloid","[Ar]3d¹⁰4s²4p²","-4, +2, +4",4,14],
+    [33,"As","砷","74.922","metalloid","[Ar]3d¹⁰4s²4p³","-3, +3, +5",4,15],
+    [34,"Se","硒","78.971","nonmetal","[Ar]3d¹⁰4s²4p⁴","-2, +4, +6",4,16],
+    [35,"Br","溴","79.904","halogen","[Ar]3d¹⁰4s²4p⁵","-1, +1, +3, +5",4,17],
+    [36,"Kr","氪","83.798","noble","[Ar]3d¹⁰4s²4p⁶","0",4,18],
+    [37,"Rb","铷","85.468","alkali","[Kr]5s¹","+1",5,1],
+    [38,"Sr","锶","87.62","alkaline","[Kr]5s²","+2",5,2],
+    [39,"Y","钇","88.906","transition","[Kr]4d¹5s²","+3",5,3],
+    [40,"Zr","锆","91.224","transition","[Kr]4d²5s²","+4",5,4],
+    [41,"Nb","铌","92.906","transition","[Kr]4d⁴5s¹","+3, +5",5,5],
+    [42,"Mo","钼","95.95","transition","[Kr]4d⁵5s¹","+2, +3, +4, +6",5,6],
+    [43,"Tc","锝","98","transition","[Kr]4d⁵5s²","+4, +7",5,7],
+    [44,"Ru","钌","101.07","transition","[Kr]4d⁷5s¹","+2, +3, +4",5,8],
+    [45,"Rh","铑","102.91","transition","[Kr]4d⁸5s¹","+3",5,9],
+    [46,"Pd","钯","106.42","transition","[Kr]4d¹⁰","+2, +4",5,10],
+    [47,"Ag","银","107.87","transition","[Kr]4d¹⁰5s¹","+1",5,11],
+    [48,"Cd","镉","112.41","transition","[Kr]4d¹⁰5s²","+2",5,12],
+    [49,"In","铟","114.82","post","[Kr]4d¹⁰5s²5p¹","+3",5,13],
+    [50,"Sn","锡","118.71","post","[Kr]4d¹⁰5s²5p²","+2, +4",5,14],
+    [51,"Sb","锑","121.76","metalloid","[Kr]4d¹⁰5s²5p³","-3, +3, +5",5,15],
+    [52,"Te","碲","127.60","metalloid","[Kr]4d¹⁰5s²5p⁴","-2, +4, +6",5,16],
+    [53,"I","碘","126.90","halogen","[Kr]4d¹⁰5s²5p⁵","-1, +1, +3, +5, +7",5,17],
+    [54,"Xe","氙","131.29","noble","[Kr]4d¹⁰5s²5p⁶","0",5,18],
+    [55,"Cs","铯","132.91","alkali","[Xe]6s¹","+1",6,1],
+    [56,"Ba","钡","137.33","alkaline","[Xe]6s²","+2",6,2],
+    [72,"Hf","铪","178.49","transition","[Xe]4f¹⁴5d²6s²","+4",6,4],
+    [73,"Ta","钽","180.95","transition","[Xe]4f¹⁴5d³6s²","+5",6,5],
+    [74,"W","钨","183.84","transition","[Xe]4f¹⁴5d⁴6s²","+2, +3, +4, +5, +6",6,6],
+    [75,"Re","铼","186.21","transition","[Xe]4f¹⁴5d⁵6s²","+4, +7",6,7],
+    [76,"Os","锇","190.23","transition","[Xe]4f¹⁴5d⁶6s²","+3, +4, +6, +8",6,8],
+    [77,"Ir","铱","192.22","transition","[Xe]4f¹⁴5d⁷6s²","+3, +4",6,9],
+    [78,"Pt","铂","195.08","transition","[Xe]4f¹⁴5d⁹6s¹","+2, +4",6,10],
+    [79,"Au","金","196.97","transition","[Xe]4f¹⁴5d¹⁰6s¹","+1, +3",6,11],
+    [80,"Hg","汞","200.59","transition","[Xe]4f¹⁴5d¹⁰6s²","+1, +2",6,12],
+    [81,"Tl","铊","204.38","post","[Xe]4f¹⁴5d¹⁰6s²6p¹","+1, +3",6,13],
+    [82,"Pb","铅","207.2","post","[Xe]4f¹⁴5d¹⁰6s²6p²","+2, +4",6,14],
+    [83,"Bi","铋","208.98","post","[Xe]4f¹⁴5d¹⁰6s²6p³","+3, +5",6,15],
+    [84,"Po","钋","209","post","[Xe]4f¹⁴5d¹⁰6s²6p⁴","+2, +4",6,16],
+    [85,"At","砹","210","halogen","[Xe]4f¹⁴5d¹⁰6s²6p⁵","-1, +1",6,17],
+    [86,"Rn","氡","222","noble","[Xe]4f¹⁴5d¹⁰6s²6p⁶","0",6,18],
+    [87,"Fr","钫","223","alkali","[Rn]7s¹","+1",7,1],
+    [88,"Ra","镭","226","alkaline","[Rn]7s²","+2",7,2],
+    [104,"Rf","鑪","267","transition","[Rn]5f¹⁴6d²7s²","+4",7,4],
+    [105,"Db","𨧀","268","transition","[Rn]5f¹⁴6d³7s²","+5",7,5],
+    [106,"Sg","𨭎","269","transition","[Rn]5f¹⁴6d⁴7s²","+6",7,6],
+    [107,"Bh","𨨏","270","transition","[Rn]5f¹⁴6d⁵7s²","+7",7,7],
+    [108,"Hs","𨭆","269","transition","[Rn]5f¹⁴6d⁶7s²","+8",7,8],
+    [109,"Mt","鿏","278","transition","[Rn]5f¹⁴6d⁷7s²","—",7,9],
+    [110,"Ds","𫟼","281","transition","[Rn]5f¹⁴6d⁸7s²","—",7,10],
+    [111,"Rg","𬬭","282","transition","[Rn]5f¹⁴6d⁹7s²","—",7,11],
+    [112,"Cn","鿔","285","transition","[Rn]5f¹⁴6d¹⁰7s²","+2",7,12],
+    [113,"Nh","鿭","286","post","[Rn]5f¹⁴6d¹⁰7s²7p¹","—",7,13],
+    [114,"Fl","𫓧","289","post","[Rn]5f¹⁴6d¹⁰7s²7p²","—",7,14],
+    [115,"Mc","镆","290","post","[Rn]5f¹⁴6d¹⁰7s²7p³","—",7,15],
+    [116,"Lv","𫟷","293","post","[Rn]5f¹⁴6d¹⁰7s²7p⁴","—",7,16],
+    [117,"Ts","鿬","294","halogen","[Rn]5f¹⁴6d¹⁰7s²7p⁵","—",7,17],
+    [118,"Og","鿫","294","noble","[Rn]5f¹⁴6d¹⁰7s²7p⁶","—",7,18],
+    [57,"La","镧","138.91","lanthanide","[Xe]5d¹6s²","+3",8,3],
+    [58,"Ce","铈","140.12","lanthanide","[Xe]4f¹5d¹6s²","+3, +4",8,4],
+    [59,"Pr","镨","140.91","lanthanide","[Xe]4f³6s²","+3",8,5],
+    [60,"Nd","钕","144.24","lanthanide","[Xe]4f⁴6s²","+3",8,6],
+    [61,"Pm","钷","145","lanthanide","[Xe]4f⁵6s²","+3",8,7],
+    [62,"Sm","钐","150.36","lanthanide","[Xe]4f⁶6s²","+2, +3",8,8],
+    [63,"Eu","铕","151.96","lanthanide","[Xe]4f⁷6s²","+2, +3",8,9],
+    [64,"Gd","钆","157.25","lanthanide","[Xe]4f⁷5d¹6s²","+3",8,10],
+    [65,"Tb","铽","158.93","lanthanide","[Xe]4f⁹6s²","+3, +4",8,11],
+    [66,"Dy","镝","162.50","lanthanide","[Xe]4f¹⁰6s²","+3",8,12],
+    [67,"Ho","钬","164.93","lanthanide","[Xe]4f¹¹6s²","+3",8,13],
+    [68,"Er","铒","167.26","lanthanide","[Xe]4f¹²6s²","+3",8,14],
+    [69,"Tm","铥","168.93","lanthanide","[Xe]4f¹³6s²","+3",8,15],
+    [70,"Yb","镱","173.05","lanthanide","[Xe]4f¹⁴6s²","+2, +3",8,16],
+    [71,"Lu","镥","174.97","lanthanide","[Xe]4f¹⁴5d¹6s²","+3",8,17],
+    [89,"Ac","锕","227","actinide","[Rn]6d¹7s²","+3",9,3],
+    [90,"Th","钍","232.04","actinide","[Rn]6d²7s²","+4",9,4],
+    [91,"Pa","镤","231.04","actinide","[Rn]5f²6d¹7s²","+4, +5",9,5],
+    [92,"U","铀","238.03","actinide","[Rn]5f³6d¹7s²","+3, +4, +5, +6",9,6],
+    [93,"Np","镎","237","actinide","[Rn]5f⁴6d¹7s²","+3, +4, +5, +6, +7",9,7],
+    [94,"Pu","钚","244","actinide","[Rn]5f⁶7s²","+3, +4, +5, +6",9,8],
+    [95,"Am","镅","243","actinide","[Rn]5f⁷7s²","+3, +4, +5, +6",9,9],
+    [96,"Cm","锔","247","actinide","[Rn]5f⁷6d¹7s²","+3",9,10],
+    [97,"Bk","锫","247","actinide","[Rn]5f⁹7s²","+3, +4",9,11],
+    [98,"Cf","锎","251","actinide","[Rn]5f¹⁰7s²","+3",9,12],
+    [99,"Es","锿","252","actinide","[Rn]5f¹¹7s²","+3",9,13],
+    [100,"Fm","镄","257","actinide","[Rn]5f¹²7s²","+3",9,14],
+    [101,"Md","钔","258","actinide","[Rn]5f¹³7s²","+2, +3",9,15],
+    [102,"No","锘","259","actinide","[Rn]5f¹⁴7s²","+2, +3",9,16],
+    [103,"Lr","铹","266","actinide","[Rn]5f¹⁴7s²7p¹","+3",9,17]
+  ];
+
+  function esc2(s){ return String(s); }
+
+  function renderLegend(){
+    var el = document.getElementById("ptLegend");
+    var h = "";
+    for (var k in CAT){
+      h += '<span style="background:' + CAT[k][1] + '">' + CAT[k][0] + "</span>";
+    }
+    el.innerHTML = h;
+  }
+
+  function renderGrid(){
+    var el = document.getElementById("ptGrid");
+    var h = "";
+    // 镧系/锕系占位
+    h += '<div class="pt-cell ph" style="grid-row:6;grid-column:3">57–71</div>';
+    h += '<div class="pt-cell ph" style="grid-row:7;grid-column:3">89–103</div>';
+    for (var i = 0; i < PTE.length; i++){
+      var e = PTE[i];
+      h += '<div class="pt-cell ' + e[4] + '" data-z="' + e[0] + '" style="grid-row:' + e[7] + ';grid-column:' + e[8] + '">' +
+           '<span class="pt-z">' + e[0] + "</span>" +
+           '<span class="pt-s">' + e[1] + "</span>" +
+           '<span class="pt-cn">' + e[2] + "</span>" +
+           '<span class="pt-m">' + e[3] + "</span>" +
+           "</div>";
+    }
+    el.innerHTML = h;
+  }
+
+  function showDetail(z){
+    var e = null;
+    for (var i = 0; i < PTE.length; i++) if (PTE[i][0] === z) { e = PTE[i]; break; }
+    var el = document.getElementById("ptDetail");
+    if (!e){ el.className = "pt-detail"; return; }
+    var catCn = CAT[e[4]][0];
+    el.className = "pt-detail show";
+    el.innerHTML =
+      "<h4>" + e[1] + "　" + e[2] + "<span class='ptd-cat' style='background:" + CAT[e[4]][1] + "'>" + catCn + "</span></h4>" +
+      '<div class="ptd-row"><span><b>原子序数</b> ' + e[0] + "</span>" +
+      "<span><b>相对原子质量</b> " + e[3] + "</span></div>" +
+      '<div class="ptd-row"><span><b>电子排布</b> ' + e[5] + "</span></div>" +
+      '<div class="ptd-row"><span><b>常见化合价</b> ' + e[6] + "</span></div>";
+  }
+
+  renderLegend();
+  renderGrid();
+  var grid = document.getElementById("ptGrid");
+  grid.addEventListener("click", function(ev){
+    var c = ev.target.closest(".pt-cell");
+    if (!c) return;
+    var z = +c.dataset.z;
+    if (!z) return;
+    Array.prototype.forEach.call(grid.querySelectorAll(".pt-cell"), function(x){ x.classList.remove("pt-on"); });
+    c.classList.add("pt-on");
+    showDetail(z);
+  });
+
+  btnPT.addEventListener("click", function(){ modalPT.classList.remove("hide"); });
+  var closeBtn = modalPT.querySelector(".modal-close");
+  if (closeBtn) closeBtn.addEventListener("click", function(){ modalPT.classList.add("hide"); });
+  modalPT.addEventListener("click", function(e){ if (e.target === modalPT) modalPT.classList.add("hide"); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") modalPT.classList.add("hide"); });
 })();
 
 /* ==================== 账号入口（登录 / 注册 / 个人中心 / 云端同步） ==================== */

@@ -273,6 +273,15 @@ select{
 .pz-block>b{display:block;font-size:12.5px;color:#5a6b86;margin-bottom:5px;letter-spacing:.3px}
 .pz-block p{margin:0;color:#33415c}
 .kp-wrap{display:flex;flex-wrap:wrap;gap:6px}
+/* ---- 答案/解析可折叠「活页」（答错时折叠，学生自行展开核对） ---- */
+.pz-hint{font-size:12px;font-weight:400;color:var(--muted)}
+.pz-fold{margin-top:10px;border:1px dashed var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.pz-fold summary{cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:var(--phy);list-style:none;user-select:none;background:rgba(43,109,233,.06)}
+.pz-fold summary::-webkit-details-marker{display:none}
+.pz-fold summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+.pz-fold[open] summary::before{transform:rotate(90deg)}
+.pz-fold-body{padding:12px 14px 6px}
+.pz-ansrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 /* ---- 「相关知识」入口 UI（点击跳转学习模块对应知识点讲解页） ---- */
 .pz-rel{margin-top:12px;padding:11px 12px;border:1px dashed var(--line);border-radius:12px;background:rgba(43,109,233,.045)}
 .rel-wrap{display:flex;flex-direction:column;gap:9px}
@@ -316,6 +325,43 @@ select{
 .pn-body span{color:var(--muted)}
 .pn-go{flex:0 0 auto;font-size:12px;color:var(--phy);white-space:nowrap;margin-top:1px}
 .pn-sum{margin-top:18px;padding:12px 15px;border-radius:11px;background:#f6f9ff;border:1px solid #dbe6f7;font-size:13px;line-height:1.7;color:#33415c}
+
+/* ===== ★ 元素周期表 ===== */
+.pt-box{max-width:1020px}
+.pt-body{padding:16px 18px 20px;overflow-y:auto;overflow-x:hidden}
+.pt-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pt-legend span{font-size:11px;padding:2px 9px;border-radius:99px;color:#26324a;font-weight:500}
+.pt-scroll{overflow-x:auto}
+.pt-grid{display:grid;grid-template-columns:repeat(18, minmax(0, 1fr));gap:3px;min-width:680px}
+.pt-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  padding:4px 1px;border-radius:6px;cursor:pointer;min-height:52px;position:relative;
+  font-size:9px;line-height:1.2;color:#1a2333;transition:transform .12s,box-shadow .12s;border:1px solid transparent}
+.pt-cell:hover{transform:scale(1.16);z-index:6;box-shadow:0 3px 12px rgba(20,35,65,.22);border-color:rgba(20,35,65,.18)}
+.pt-cell .pt-s{font-weight:700;font-size:13px;letter-spacing:.2px}
+.pt-cell .pt-z{font-size:8.5px;opacity:.72}
+.pt-cell .pt-cn{font-size:9.5px}
+.pt-cell .pt-m{font-size:8px;opacity:.82}
+.pt-cell.ph{background:#e8edf6;color:#8492ad;cursor:default;min-height:46px;font-size:10.5px;font-weight:600}
+.pt-cell.ph:hover{transform:none;box-shadow:none}
+.pt-cell.alkali{background:#f2c3c3}
+.pt-cell.alkaline{background:#f6d9b1}
+.pt-cell.transition{background:#f4e3a4}
+.pt-cell.post{background:#b6e0d1}
+.pt-cell.metalloid{background:#c2e5c1}
+.pt-cell.nonmetal{background:#b6ddf0}
+.pt-cell.halogen{background:#bccff0}
+.pt-cell.noble{background:#d6c8f0}
+.pt-cell.lanthanide{background:#f6cde2}
+.pt-cell.actinide{background:#e4c7ed}
+.pt-detail{display:none;margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13px;line-height:1.8}
+.pt-detail.show{display:block}
+.pt-detail h4{margin:0 0 8px;font-size:16px}
+.pt-detail .ptd-cat{display:inline-block;font-size:11.5px;padding:2px 10px;border-radius:99px;color:#1a2333;margin-left:8px;vertical-align:2px}
+.pt-detail .ptd-row{display:flex;flex-wrap:wrap;gap:4px 22px;color:#33415c}
+.pt-detail .ptd-row b{color:#5a6b86;font-weight:600}
+[data-theme="dark"] .pt-detail .ptd-row{color:var(--ink)}
+[data-theme="dark"] .pt-detail .ptd-row b{color:var(--muted)}
+@media (max-width:720px){.pt-box{max-width:100%;margin:0 6px}.pt-body{padding:12px 10px 16px}}
 .c-ok{color:#0f7a45}.c-new{color:#2b5cb8}.c-fix{color:#6a35c0}.c-miss{color:#b33b3b}
 .pn-group{margin:10px 0 14px;padding-left:12px;border-left:2px solid #e3eaf6}
 .pn-gk{font-size:13px;font-weight:600;color:#2b5cb8;margin-bottom:7px}
