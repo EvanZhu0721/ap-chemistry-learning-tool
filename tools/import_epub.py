@@ -29,6 +29,7 @@ class Importer:
         self.z = archive
         self.output = output
         self.images = {}
+        self.image_names = {}
         self.warnings = []
 
     def clean(self, html, source):
@@ -61,8 +62,11 @@ class Importer:
                     t.decompose(); self.warnings.append(f'Blocked image: {src}'); continue
                 if path not in self.z.namelist() or Path(path).suffix.lower() not in {'.png','.jpg','.jpeg','.gif','.webp'}:
                     t.decompose(); self.warnings.append(f'Missing/unsupported image: {path}'); continue
-                name = Path(path).name
-                self.images[name] = path
+                if path not in self.image_names:
+                    name = f'image-{len(self.image_names)+1}{Path(path).suffix.lower()}'
+                    self.image_names[path] = name
+                    self.images[name] = path
+                name = self.image_names[path]
                 attrs = {'src': '__BOOK_ASSETS__/' + name, 'alt': str(t.get('alt', 'Book figure')),
                          'loading': 'lazy'}
             t.attrs = attrs
@@ -80,6 +84,7 @@ class Importer:
         context = []
         pending = ''
         carry = ''
+        context_range = None
         questions = {'mcq':{}, 'frq':{}}
         answers = {'mcq':{}, 'frq':{}}
         sheet = {'mcq':[], 'frq':[]}
@@ -92,6 +97,7 @@ class Importer:
                 if 'free-response' in text or text == 'section ii': typ = 'frq'
                 if 'multiple-choice' in text: typ = 'mcq'
                 context = []; pending = ''; carry = ''
+                context_range = None
                 continue
             if not stage: continue
             html = self.clean(x, source)
@@ -104,7 +110,8 @@ class Importer:
             items = [x] if is_parts else x.find_all('li', recursive=False)
             start = int(x.get('start', 1))
             for offset, li in enumerate(items):
-                number = 1 if is_parts else start + offset
+                records = answers[typ] if stage == 'a' else questions[typ]
+                number = max(records, default=0) + 1 if is_parts else start + offset
                 if stage == 'a':
                     answers[typ][number] = self.clean(li.decode_contents() if not is_parts else str(li), source)
                     continue
@@ -120,11 +127,21 @@ class Importer:
                     for s in following: s.extract()
                     opts.extract()
                 stem = self.clean(str(node) if is_parts else node.decode_contents(), source)
-                if pending: carry = pending
-                if context: carry = ''.join(context)
+                if pending or context:
+                    carry = ''.join(context) if context else pending
+                    text = BeautifulSoup(carry, 'html.parser').get_text(' ', strip=True)
+                    match = re.search(r'\bquestions?\s+(\d+)(?:\s*([-–—]|to|and)\s*(\d+))?\b', text, re.I)
+                    if match:
+                        first, last = int(match[1]), int(match[3] or match[1])
+                        context_range = {first, last} if (match[2] or '').lower() == 'and' else range(first, last+1)
+                    else:
+                        context_range = None
                 # Preserve shared passages for groups; do not attach unrelated earlier figures.
                 uses_context = bool(re.search(r'\b(above|following|table|diagram|graph|data|questions? \d+)\b', node.get_text(' ',strip=True), re.I))
-                shared = carry if (pending or context or uses_context) else ''
+                if context_range:
+                    shared = carry if number in context_range else ''
+                else:
+                    shared = carry if (pending or context or uses_context) else ''
                 questions[typ][number] = {'id':f'{name}-{typ}-{number}', 'type':typ, 'number':number,
                     'stem':stem, 'context':shared, 'options':choices, 'sourceFile':source}
                 pending = tail
