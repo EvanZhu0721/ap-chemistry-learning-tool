@@ -16,3 +16,7 @@ account-server/users.json
 .DS_Store
 Thumbs.db
 *.log
+
+# Imported personal EPUB content is local; keep code and book data separate.
+ap-chem-site/assets/book-local/
+__pycache__/

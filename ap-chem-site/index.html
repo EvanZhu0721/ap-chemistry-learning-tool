@@ -18,6 +18,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="assets/study.css">
 <noscript><style>
 /* ================= 无 JavaScript 兜底 v2 =================
    场景：iOS「文件」App 快速查看 / 微信文件预览 / 金山文档 / 网盘预览
@@ -2490,7 +2492,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
      ★ [新增 · 模块1] Chart.js（仅 PES 能谱图使用）
      加载失败（离线）时会自动降级为等效条形图，不影响其他模块
      ============================================================ -->
-<div class="wm" aria-hidden="true">指导:@Lyn             制作:@AAA零食批发<br>服务器提供:@EvanZhu0721       题库资源:@iris</div>
+<div class="wm" aria-hidden="true"><div class="wm-row"><span>指导:@Lyn</span><span>制作:@AAA零食批发</span></div><div class="wm-row"><span>服务器提供:@EvanZhu0721</span><span>题库资源:@iris、@T.C.</span></div></div>
 
 <!-- ★ [兼容] Chart.js 不再用 <script src> 阻塞式引入：
      微信 / 受限 WebView 里 CDN 常被拦截或超时，会卡住后面整段主脚本，
@@ -2534,5 +2536,13 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
 <!-- 主应用脚本（与单文件版逐字节一致） -->
 <script src="assets/app.js"></script>
+<script src="assets/vendor/katex/katex.min.js"></script>
+<script src="assets/vendor/katex/contrib/mhchem.min.js"></script>
+<script src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="assets/study-content.js"></script>
+<script src="assets/topic-notes.js"></script>
+<script src="assets/lesson-details.js"></script>
+<script src="assets/lecture-glossary.js"></script>
+<script src="assets/study-enhancements.js"></script>
 </body>
 </html>

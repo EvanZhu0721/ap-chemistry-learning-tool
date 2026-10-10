@@ -11459,8 +11459,8 @@ drawQuantum();
     return null;
   }
 
-  function addWord(word){
-    var r = lookup(word);
+  function addWord(word, definition){
+    var r = definition ? { key: normWord(word), e: definition } : lookup(word);
     if (!r) return null;
     var key = r.key;
     for (var i = 0; i < VOCAB.length; i++) if (VOCAB[i].w === key) return VOCAB[i];
@@ -11703,7 +11703,7 @@ drawQuantum();
   renderRecite();
 
   /* 暴露给外部（例如章节切换后刷新） */
-  window.__vocab = { add: addWord, lookup: lookup, list: VOCAB, translate: openTranslate };
+  window.__vocab = { add: addWord, addEntry: function(word, definition){ return addWord(String(word).replace(/\s+/g, "-"), definition); }, lookup: lookup, list: VOCAB, translate: openTranslate };
   window.__openTranslate = openTranslate;
 
 })();
