@@ -3,9 +3,11 @@
    用法：python sync-site.py
    以后单文件改完，跑一次这个脚本就能同步站点版。"""
 import io, os, re, sys
+from pathlib import Path
 
-SRC  = r'C:\Users\ASUS\Desktop\公式\AP化学学习工具.html'
-SITE = r'C:\Users\ASUS\Desktop\公式\ap-chem-site'
+ROOT = Path(__file__).resolve().parent
+SRC = ROOT / 'AP化学学习工具.html'
+SITE = ROOT / 'ap-chem-site'
 
 h = io.open(SRC, encoding='utf-8').read()
 
@@ -18,12 +20,13 @@ ns_s = h.find('<noscript><style>')
 ns_e = h.find('</style></noscript>', ns_s) + len('</style></noscript>')
 NOSCRIPT_STYLE = h[ns_s:ns_e]
 
-js_s = h.rfind('<script>') + len('<script>')
-js_e = h.rfind('</script>')
-JS = h[js_s:js_e]
+inline_scripts = list(re.finditer(r'<script>(.*?)</script>', h, re.S))
+assert inline_scripts, 'Missing inline application script'
+main_script = inline_scripts[-1]
+JS = main_script.group(1)
 
 body_s = h.find('<body>') + len('<body>')
-body_e = h.rfind('<script>')
+body_e = main_script.start()
 BODY = h[body_s:body_e]
 
 assert len(CSS) > 80000 and len(JS) > 1000000, (len(CSS), len(JS))
@@ -50,6 +53,8 @@ HEAD = '''<!DOCTYPE html>
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="assets/study.css">
 ''' + NOSCRIPT_STYLE + '''
 </head>
 <body>'''
@@ -57,6 +62,14 @@ HEAD = '''<!DOCTYPE html>
 TAIL = '''
 <!-- 主应用脚本（与单文件版逐字节一致） -->
 <script src="assets/app.js"></script>
+<script src="assets/vendor/katex/katex.min.js"></script>
+<script src="assets/vendor/katex/contrib/mhchem.min.js"></script>
+<script src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="assets/study-content.js"></script>
+<script src="assets/topic-notes.js"></script>
+<script src="assets/lesson-details.js"></script>
+<script src="assets/lecture-glossary.js"></script>
+<script src="assets/study-enhancements.js"></script>
 </body>
 </html>
 '''

@@ -2079,6 +2079,8 @@ input[type=color]{width:36px;height:27px;border:1px solid var(--line);border-rad
 [data-theme="dark"] #nu9:checked ~ .nojs-picker label[for="nu9"]{
   border-color:#4d7fe0;background:#1b2740}
 </style></noscript>
+<link rel="stylesheet" href="ap-chem-site/assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="ap-chem-site/assets/study.css">
 </head>
 <body>
 <script>
@@ -4455,7 +4457,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
      ★ [新增 · 模块1] Chart.js（仅 PES 能谱图使用）
      加载失败（离线）时会自动降级为等效条形图，不影响其他模块
      ============================================================ -->
-<div class="wm" aria-hidden="true">指导:@Lyn             制作:@AAA零食批发<br>服务器提供:@EvanZhu0721       题库资源:@iris</div>
+<div class="wm" aria-hidden="true"><div class="wm-row"><span>指导:@Lyn</span><span>制作:@AAA零食批发</span></div><div class="wm-row"><span>服务器提供:@EvanZhu0721</span><span>题库资源:@iris、@T.C.</span></div></div>
 
 <!-- ★ [兼容] Chart.js 不再用 <script src> 阻塞式引入：
      微信 / 受限 WebView 里 CDN 常被拦截或超时，会卡住后面整段主脚本，
@@ -15957,8 +15959,8 @@ drawQuantum();
     return null;
   }
 
-  function addWord(word){
-    var r = lookup(word);
+  function addWord(word, definition){
+    var r = definition ? { key: normWord(word), e: definition } : lookup(word);
     if (!r) return null;
     var key = r.key;
     for (var i = 0; i < VOCAB.length; i++) if (VOCAB[i].w === key) return VOCAB[i];
@@ -16201,7 +16203,7 @@ drawQuantum();
   renderRecite();
 
   /* 暴露给外部（例如章节切换后刷新） */
-  window.__vocab = { add: addWord, lookup: lookup, list: VOCAB, translate: openTranslate };
+  window.__vocab = { add: addWord, addEntry: function(word, definition){ return addWord(String(word).replace(/\s+/g, "-"), definition); }, lookup: lookup, list: VOCAB, translate: openTranslate };
   window.__openTranslate = openTranslate;
 
 })();
@@ -18599,5 +18601,13 @@ drawQuantum();
 })();
 </script>
 
+<script src="ap-chem-site/assets/vendor/katex/katex.min.js"></script>
+<script src="ap-chem-site/assets/vendor/katex/contrib/mhchem.min.js"></script>
+<script src="ap-chem-site/assets/vendor/katex/contrib/auto-render.min.js"></script>
+<script src="ap-chem-site/assets/study-content.js"></script>
+<script src="ap-chem-site/assets/topic-notes.js"></script>
+<script src="ap-chem-site/assets/lesson-details.js"></script>
+<script src="ap-chem-site/assets/lecture-glossary.js"></script>
+<script src="ap-chem-site/assets/study-enhancements.js"></script>
 </body>
 </html>
