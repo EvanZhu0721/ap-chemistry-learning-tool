@@ -2473,12 +2473,12 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
       <div class="set-row">
         <div class="set-info"><b>区老师颜色</b><span>毛毛虫身体圆圈的颜色</span></div>
         <div class="set-colors">
-          <span class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></span>
-          <span class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></span>
-          <span class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></span>
-          <span class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></span>
-          <span class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></span>
-          <input type="color" id="setPetColor" value="#5cb85c" aria-label="自定义区老师颜色">
+          <button type="button" class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></button>
+          <button type="button" class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></button>
+          <button type="button" class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></button>
+          <button type="button" class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></button>
+          <button type="button" class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></button>
+          <input type="text" id="setPetColor" value="#5cb85c" maxlength="7" pattern="#[0-9a-fA-F]{6}" spellcheck="false" autocomplete="off" aria-label="自定义区老师颜色 HEX">
         </div>
       </div>
       <div class="set-row set-row-last">

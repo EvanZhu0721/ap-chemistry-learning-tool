@@ -9,39 +9,39 @@
   const PALETTES = {
     blue: {
       id: 'blue',
-      label: '岩蓝',
-      chips: ['#eef2f6', '#3b5f82', '#141a22'],
-      surface: { light: '#f3f6f9', dark: '#11151a' }
+      label: '经典蓝',
+      chips: ['#d4e3ff', '#005fb0', '#0f141a'],
+      surface: { light: '#f8f9fd', dark: '#0f141a' }
     },
     green: {
       id: 'green',
-      label: '鼠尾草',
-      chips: ['#f2f5f1', '#41644a', '#141a15'],
-      surface: { light: '#f4f6f2', dark: '#111612' }
+      label: '翡翠绿',
+      chips: ['#cbf5d4', '#0c6d39', '#0f1511'],
+      surface: { light: '#f7faf5', dark: '#0f1511' }
     },
     purple: {
       id: 'purple',
-      label: '雾紫',
-      chips: ['#f6f3f8', '#63537a', '#17141b'],
-      surface: { light: '#f7f4f9', dark: '#141217' }
+      label: '鸢尾紫',
+      chips: ['#edd7ff', '#6b3ea3', '#131119'],
+      surface: { light: '#faf7fd', dark: '#131119' }
     },
     orange: {
       id: 'orange',
-      label: '砂岩',
-      chips: ['#f8f5f0', '#7a5433', '#1b1612'],
-      surface: { light: '#f9f6f2', dark: '#161310' }
+      label: '琥珀橙',
+      chips: ['#ffdcc0', '#924d00', '#16120e'],
+      surface: { light: '#fcf8f4', dark: '#16120e' }
     },
     rose: {
       id: 'rose',
-      label: '玫瑰灰',
-      chips: ['#f7f4f4', '#784d59', '#1a1416'],
-      surface: { light: '#f8f5f5', dark: '#151214' }
+      label: '蔷薇红',
+      chips: ['#ffd9e3', '#9b2756', '#161114'],
+      surface: { light: '#fdf7f8', dark: '#161114' }
     },
     gray: {
       id: 'gray',
-      label: '石墨',
-      chips: ['#f5f5f6', '#52565c', '#141416'],
-      surface: { light: '#f5f5f6', dark: '#131315' }
+      label: '石墨灰',
+      chips: ['#d8dee8', '#424953', '#121316'],
+      surface: { light: '#f6f6f8', dark: '#121316' }
     }
   };
 
@@ -236,7 +236,7 @@
     const legends=dialog.querySelectorAll('legend');legends[0].textContent=english?'Theme':'主题';legends[1].textContent=english?'Palette':'配色';
     const modes={light:'Light',dark:'Dark',system:'System'};
     dialog.querySelectorAll('.appearance-mode-label').forEach(label=>{const id=label.querySelector('input').value;label.querySelector('span').textContent=english?modes[id]:MODES.find(m=>m.id===id).label;});
-    const names={blue:'Slate blue',green:'Sage',purple:'Mauve',orange:'Sandstone',rose:'Dusty rose',gray:'Graphite'};
+    const names={blue:'Ocean blue',green:'Emerald',purple:'Iris',orange:'Amber',rose:'Vivid rose',gray:'Graphite'};
     dialog.querySelectorAll('.appearance-accent-item').forEach(label=>{const name=english?names[label.dataset.accent]:PALETTES[label.dataset.accent].label;label.title=name;label.querySelector('.appearance-accent-text').textContent=name;label.querySelector('input').setAttribute('aria-label',name);});
     dialog.querySelector('#appearance-more-settings').textContent=english?'More settings':'更多设置';
     dialog.querySelector('#close-appearance').setAttribute('aria-label',english?'Close':'关闭');

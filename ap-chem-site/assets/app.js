@@ -12289,6 +12289,7 @@ drawQuantum();
     if (!seg) return;
     Array.prototype.forEach.call(seg.querySelectorAll("button"), function(b){
       b.classList.toggle("on", b.dataset.v === String(v));
+      b.setAttribute("aria-pressed", b.dataset.v === String(v) ? "true" : "false");
     });
   }
   function wireSeg(seg, onPick){
@@ -12311,6 +12312,7 @@ drawQuantum();
   /* —— 字体大小（整体界面缩放） —— */
   function applyFont(v, save){
     v = parseFloat(v); if (!v || v < 0.8 || v > 1.5) v = 1;
+    root.style.setProperty("--ui-scale", v);
     if (Math.abs(v - 1) < 0.001) document.body.style.zoom = ""; else document.body.style.zoom = v;
     if (save !== false) LS.set("apchem.fontScale", v);
     segSync(document.getElementById("setFont"), v);
@@ -12384,12 +12386,21 @@ drawQuantum();
     c = c.toUpperCase();
     if (segEls) for (var i = 0; i < segEls.length; i++) segEls[i].style.background = c;
     if (save !== false) LS.set("apchem.petColor", c);
-    if (petColorInput) petColorInput.value = c;
+    if (petColorInput) { petColorInput.value = c; petColorInput.removeAttribute("aria-invalid"); }
     Array.prototype.forEach.call(document.querySelectorAll("#modalSettings .swatch"), function(sw){
       sw.classList.toggle("on", (sw.dataset.c || "").toUpperCase() === c);
+      sw.setAttribute("aria-pressed", sw.classList.contains("on") ? "true" : "false");
     });
   }
-  if (petColorInput) petColorInput.addEventListener("input", function(){ applyPetColor(petColorInput.value, true); });
+  if (petColorInput) {
+    petColorInput.addEventListener("input", function(){
+      petColorInput.removeAttribute("aria-invalid");
+      if (/^#[0-9a-fA-F]{6}$/.test(petColorInput.value)) applyPetColor(petColorInput.value, true);
+    });
+    petColorInput.addEventListener("change", function(){
+      petColorInput.setAttribute("aria-invalid", /^#[0-9a-fA-F]{6}$/.test(petColorInput.value) ? "false" : "true");
+    });
+  }
   Array.prototype.forEach.call(document.querySelectorAll("#modalSettings .swatch"), function(sw){
     sw.addEventListener("click", function(){ applyPetColor(sw.dataset.c, true); });
   });
@@ -12563,8 +12574,8 @@ drawQuantum();
     if (sn) sn.textContent = squashUses;
     if (bn) bn.textContent = boilUses;
     var sb = document.getElementById("itemSquash"), bb = document.getElementById("itemBoil");
-    if (sb) sb.classList.toggle("disabled", squashUses <= 0);
-    if (bb) bb.classList.toggle("disabled", boilUses <= 0);
+    if (sb) { sb.classList.toggle("disabled", squashUses <= 0); sb.disabled = squashUses <= 0; }
+    if (bb) { bb.classList.toggle("disabled", boilUses <= 0); bb.disabled = boilUses <= 0; }
   }
 
   function useSquash(){

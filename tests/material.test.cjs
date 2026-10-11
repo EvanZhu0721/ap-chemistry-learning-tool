@@ -174,3 +174,34 @@ test('mobile scaling applies to the interface and periodic table scrolls within 
   assert.equal(await page.locator('#ptFig').evaluate(n=>n.scrollWidth>n.clientWidth),true);
   assert.equal(await page.locator('#ptFig').evaluate(n=>{n.scrollLeft=100;return n.scrollLeft>0;}),true);
 });
+
+test('settings controls stay usable, pet tools stay in settings, and the sidebar fills the scaled viewport',async t=>{
+  const page=await open(t,1440,'/tools');
+  assert.equal(await page.locator('.m-brand').getAttribute('aria-label'),'AP Chem');
+  assert.equal(await page.locator('.m-sidebar-footer').innerText(),'学习设置');
+  for(const scale of ['0.9','1','1.25']){
+    await page.locator('.m-tool-row').filter({hasText:'学习设置'}).click();
+    await page.locator(`#setFont [data-v="${scale}"]`).click();await page.keyboard.press('Escape');
+    assert.ok(await page.locator('.m-sidebar').evaluate(n=>Math.abs(n.getBoundingClientRect().bottom-innerHeight)<1));
+  }
+  for(const width of [1440,390]){
+    await page.setViewportSize({width,height:900});
+    await page.locator('.m-tool-row').filter({hasText:'学习设置'}).click();
+    for(const id of ['setFont','setBankMode']){
+      assert.ok(await page.locator('#'+id).evaluate(n=>{const buttons=[...n.children].map(b=>b.getBoundingClientRect());return buttons.every(b=>Math.abs(b.top-buttons[0].top)<1)&&n.scrollWidth<=n.clientWidth+1;}));
+    }
+    await page.locator('#btnPetSettings').click();
+    assert.equal(await page.locator('#modalSettings .modal-head h3').textContent(),'区老师');
+    assert.equal(await page.locator('.set-sub-head').isVisible(),false);
+    assert.equal(await page.locator('#btnPetBack').evaluate(n=>n===document.activeElement),true);
+    await page.locator('#setPetColor').fill('#00D4FF');
+    assert.equal(await page.evaluate(()=>localStorage.getItem('apchem.petColor')),'#00D4FF');
+    await page.locator('.swatch[data-c="#4a7de0"]').focus();await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#setPetColor').inputValue(),'#4A7DE0');
+    assert.equal(await page.locator('#setPetPanel .pet-items').count(),1);
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.locator('#btnPetBack').click();
+    assert.equal(await page.locator('#btnPetSettings').evaluate(n=>n===document.activeElement),true);
+    await page.keyboard.press('Escape');assert.equal(await page.locator('.pet-items').isVisible(),false);
+  }
+});

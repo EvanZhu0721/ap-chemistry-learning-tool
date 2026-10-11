@@ -9,6 +9,7 @@
     '跳到正文':'Skip to content','学习':'Learn','练习':'Practice','复习':'Review','实验':'Labs','工具':'Tools','学习设置':'Settings','课程目录':'Chapters','关闭目录':'Close chapters','返回':'Back','外观':'Appearance','账号':'Account','课程':'Courses','搜索课程':'Search courses','未找到课程':'No courses found','继续阅读':'Continue reading','按知识点':'By topic','书本题库':'Book practice','错题':'Mistakes','书本错题':'Book mistakes','生词':'Vocabulary','讲义':'Reading','例题':'Examples','自测':'Checks','实验与知识点':'Labs and topics','打开单元':'Open unit','公式与周期表':'Reference','常用公式、符号与元素数据':'Formulas, symbols and elements','课程大纲':'Course outline','AP 单元与知识点':'AP units and topics','查缺补漏':'Topic coverage','按知识点检查掌握情况':'Coverage by topic','词典':'Dictionary','化学词汇与中文释义':'Chemistry terms and definitions','字号、题目呈现与数据备份':'Text size, practice view and backup','界面语言':'Interface language','讲义语言':'Reading language','中英对照':'Bilingual','题型':'Question type','知识点':'Topics','题量':'Questions','界面缩放':'Interface scale','主导航':'Main navigation','底部导航':'Bottom navigation','章节目录':'Chapters','练习来源':'Practice source','复习内容':'Review source'
   }));
   const uiOriginal=new WeakMap();
+  Object.entries({'显示桌宠':'Show pet','尺寸':'Size','颜色':'Color','移动':'Movement','桌宠':'Pet','设置保存在此设备。':'Saved on this device.','页脚署名的字号':'Footer credit size','自定义区老师颜色 HEX':'Custom pet color HEX'}).forEach(([zh,en])=>uiText.set(zh,en));
   const isEnglish=()=>window.AP_LEARNING.language==='en';
   function localize(root){
     const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
@@ -45,7 +46,7 @@
   let last = read('apchem.reader.last.v1',null);
   const shell = node('div','m-shell');
   shell.innerHTML = `<a class="m-skip" href="#main-content">跳到正文</a>
-    <aside class="m-sidebar"><a class="m-brand" href="#/learn">${icon('lab')}<span>Chemistry</span></a><nav class="m-navigation" aria-label="主导航">${navMarkup()}</nav><div id="directory-slot"></div><div class="m-sidebar-footer"><button id="m-settings" type="button">学习设置</button><span>AP Chemistry</span></div></aside>
+    <aside class="m-sidebar"><a class="m-brand" href="#/learn" aria-label="AP Chem"><span class="m-wordmark-ap">AP</span><span class="m-wordmark-chem">Chem</span></a><nav class="m-navigation" aria-label="主导航">${navMarkup()}</nav><div id="directory-slot"></div><div class="m-sidebar-footer"><button id="m-settings" type="button">学习设置</button></div></aside>
     <div class="m-workspace"><header class="m-appbar"><div class="m-appbar-left"><button id="m-back" class="m-icon-button" type="button" aria-label="返回">${icon('back')}</button><button id="m-directory" class="m-icon-button" type="button" aria-label="课程目录" aria-haspopup="dialog" aria-expanded="false" aria-controls="directory-dialog">${icon('menu')}</button><span id="m-location">课程</span></div><div class="m-appbar-actions"><button id="appearance" class="m-icon-button" type="button" aria-label="外观" title="外观">${icon('palette')}</button><div id="account-slot"></div></div></header><main id="main-content" class="m-content" tabindex="-1"></main></div><nav class="m-bottom-nav" aria-label="底部导航">${navMarkup()}</nav>`;
   document.body.prepend(shell);
   document.documentElement.classList.add('material-ready');
@@ -147,7 +148,7 @@
   }
   function syncShellLanguage(){
     const lang=window.AP_LEARNING.language;
-    [shell.querySelector('.m-sidebar'),shell.querySelector('.m-appbar'),shell.querySelector('.m-bottom-nav'),practiceNav,reviewNav,courses,labs,tools,languageMenu,drawer.querySelector('.m-dialog-heading'),...document.querySelectorAll('.module-head,#bankSelView h3,#bankQuizView h3')].forEach(localize);
+    [shell.querySelector('.m-sidebar'),shell.querySelector('.m-appbar'),shell.querySelector('.m-bottom-nav'),practiceNav,reviewNav,courses,labs,tools,languageMenu,$('modalSettings'),drawer.querySelector('.m-dialog-heading'),...document.querySelectorAll('.module-head,#bankSelView h3,#bankQuizView h3')].forEach(localize);
     chapters.forEach(c=>{const d=directory.querySelector(`[data-chapter="${c.id}"]`);d.querySelector('summary>span:nth-child(2)').textContent=c.title[lang];d.querySelectorAll('[data-reading]').forEach((a,i)=>a.textContent=lessons[c.id].sections[i].title[lang]);});
     localize(directory);uiSelect.value=lang;
     readingLanguage.querySelector('.m-language-value').textContent=({both:isEnglish()?'Bilingual':'中英对照',zh:'中文',en:'English'})[window.AP_LEARNING.readingLanguage];
@@ -162,11 +163,31 @@
   $('setTheme').closest('.set-row').hidden=true;
   $('setFont').closest('.set-row').querySelector('.set-info span').textContent='界面缩放';
   $('setWm').closest('.set-row').querySelector('.set-info span').textContent='页脚署名的字号';
+  // Settings keep the existing controllers, with a single header for each pane.
+  const settings=$('modalSettings'),settingsTitle=settings.querySelector('.modal-head h3'),petPanel=$('setPetPanel'),petBack=$('btnPetBack'),petEntry=$('btnPetSettings');
+  const petInfo=$('rowPetEntry').querySelector('.set-info');petInfo.querySelector('span').textContent='桌宠';
+  petEntry.replaceChildren(petInfo,$('setPetEntryState'));petEntry.insertAdjacentHTML('beforeend',icon('arrow'));
+  $('rowPetEntry').replaceChildren(petEntry);
+  petEntry.className='m-settings-entry';petEntry.setAttribute('aria-label','区老师');
+  petBack.className='m-icon-button';petBack.innerHTML=icon('back');petBack.setAttribute('aria-label','返回');petBack.hidden=true;
+  settingsTitle.before(petBack);petPanel.querySelector('.set-sub-head').hidden=true;
+  settings.querySelector('.set-note').textContent='设置保存在此设备。';
+  const petRows=petPanel.querySelectorAll('.set-info');
+  ['显示桌宠','尺寸','颜色','移动'].forEach((label,i)=>{petRows[i].querySelector('b').textContent=label;petRows[i].querySelector('span').hidden=true;});
+  $('setBankMode').closest('.set-row').querySelector('.set-info span').hidden=true;
+  const petItems=document.querySelector('.pet-items');petPanel.append(petItems);
+  function syncSettingsPane(){
+    const pet=petPanel.classList.contains('on');petBack.hidden=!pet;
+    settingsTitle.textContent=pet?'区老师':(isEnglish()?'Settings':'设置');
+    localize(settings);
+    if(!settings.classList.contains('hide'))(pet?petBack:petEntry).focus();
+  }
+  new MutationObserver(syncSettingsPane).observe(petPanel,{attributes:true,attributeFilter:['class']});
   // Some legacy dialogs focus an input synchronously when opened.
   let modalTrigger;
   document.addEventListener('click',e=>{const trigger=e.target.closest('button,a,summary');if(trigger?.getClientRects().length&&!trigger.closest('.modal'))modalTrigger=trigger;},true);
   // Existing modal actions stay connected to their controllers and gain focus management.
-  document.querySelectorAll('.modal').forEach(modal=>{modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');const heading=modal.querySelector('h3');if(heading){if(!heading.id)heading.id=modal.id+'-title';modal.setAttribute('aria-labelledby',heading.id);}let wasOpen=false,lastFocus=null;new MutationObserver(()=>{const open=!modal.classList.contains('hide');if(open===wasOpen)return;wasOpen=open;if(open){lastFocus=modal.contains(document.activeElement)?modalTrigger:document.activeElement;modal.querySelector('input:not([type=hidden]),button,select,textarea')?.focus();}else if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});document.body.classList.toggle('m-modal-open',[...document.querySelectorAll('.modal')].some(m=>!m.classList.contains('hide')));}).observe(modal,{attributes:true,attributeFilter:['class']});});
+  document.querySelectorAll('.modal').forEach(modal=>{modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');const heading=modal.querySelector('h3');if(heading){if(!heading.id)heading.id=modal.id+'-title';modal.setAttribute('aria-labelledby',heading.id);}let wasOpen=false,lastFocus=null;new MutationObserver(()=>{const open=!modal.classList.contains('hide');if(open===wasOpen)return;wasOpen=open;if(open){lastFocus=modal.contains(document.activeElement)?modalTrigger:document.activeElement;[...modal.querySelectorAll('input:not([type=hidden]),button,select,textarea')].find(n=>!n.disabled&&n.getClientRects().length)?.focus();}else if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});document.body.classList.toggle('m-modal-open',[...document.querySelectorAll('.modal')].some(m=>!m.classList.contains('hide')));}).observe(modal,{attributes:true,attributeFilter:['class']});});
   document.addEventListener('keydown',e=>{const modal=[...document.querySelectorAll('.modal:not(.hide)')].at(-1);if(!modal)return;if(e.key==='Escape'){modal.querySelector('.modal-close')?.click();e.preventDefault();}if(e.key==='Tab'){const focusable=[...modal.querySelectorAll('button,a[href],input,select,textarea,[tabindex="0"]')].filter(n=>!n.disabled&&n.getClientRects().length);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){last?.focus();e.preventDefault();}else if(!e.shiftKey&&document.activeElement===last){first?.focus();e.preventDefault();}}});
   render();
 })();
