@@ -1,0 +1,768 @@
+/* Material 3 Theme System for AP Chemistry */
+
+/* ==========================================================================
+   1. Shape, Type, Spacing & Motion Tokens
+   ========================================================================== */
+:root,
+html.material-app {
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  --md-sys-typescale-body-large-font: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", Roboto, sans-serif;
+  --md-sys-typescale-body-large-size: 16px;
+  --md-sys-typescale-body-large-line-height: 26px;
+  --md-sys-typescale-title-large-size: 22px;
+  --md-sys-typescale-headline-small-size: 24px;
+  --md-sys-typescale-label-large-size: 14px;
+
+  --space: 8px;
+  --motion: 200ms cubic-bezier(.2, 0, 0, 1);
+}
+
+/* ==========================================================================
+   2. Base System Color Schemes (Fallback & Shared Tokens)
+   ========================================================================== */
+
+/* Light Base Common */
+html[data-theme-effective="light"],
+html[data-theme="light"],
+html.material-app[data-theme-effective="light"],
+html.material-app[data-theme="light"],
+html.material-app:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  color-scheme: light;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+  --md-sys-color-inverse-surface: #2d3135;
+  --md-sys-color-inverse-on-surface: #f0f3f6;
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.35);
+}
+
+/* Dark Base Common */
+html[data-theme-effective="dark"],
+html[data-theme="dark"],
+html.material-app[data-theme-effective="dark"],
+html.material-app[data-theme="dark"] {
+  color-scheme: dark;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #4d272b;
+  --md-sys-color-on-error-container: #ffdad6;
+  --md-sys-color-inverse-surface: #e1e5ea;
+  --md-sys-color-inverse-on-surface: #282d33;
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.65);
+}
+
+/* ==========================================================================
+   3. Coordinated Color Palettes (6 Palettes, Light & Dark)
+   ========================================================================== */
+
+/* 1. blue: 岩蓝（冷灰＋灰蓝） - 默认 */
+html[data-theme-effective="light"]:not([data-theme-accent]),
+html[data-theme-effective="light"][data-theme-accent="blue"],
+html[data-theme="light"]:not([data-theme-accent]),
+html[data-theme="light"][data-theme-accent="blue"],
+html.material-app:not([data-theme-accent]):not([data-theme-effective="dark"]):not([data-theme="dark"]),
+html.material-app[data-theme-accent="blue"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f3f6f9;
+  --md-sys-color-on-surface: #161d24;
+  --md-sys-color-on-surface-variant: #464f59;
+  --md-sys-color-surface-container-low: #ebf0f5;
+  --md-sys-color-surface-container: #e3eaf0;
+  --md-sys-color-surface-container-high: #dbe3eb;
+  --md-sys-color-surface-container-highest: #d2dbe4;
+  --md-sys-color-outline: #727c88;
+  --md-sys-color-outline-variant: #c2cbd5;
+  --md-sys-color-primary: #2d5479;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d8e5f2;
+  --md-sys-color-on-primary-container: #13304a;
+  --md-sys-color-secondary: #4d5c6c;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #dfe7ef;
+  --md-sys-color-on-secondary-container: #182430;
+  --md-sys-color-tertiary: #416164;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #d7e7e8;
+  --md-sys-color-on-tertiary-container: #122c2e;
+}
+
+html[data-theme-effective="dark"]:not([data-theme-accent]),
+html[data-theme-effective="dark"][data-theme-accent="blue"],
+html[data-theme="dark"]:not([data-theme-accent]),
+html[data-theme="dark"][data-theme-accent="blue"] {
+  --md-sys-color-surface: #11151a;
+  --md-sys-color-on-surface: #e1e6ed;
+  --md-sys-color-on-surface-variant: #c0c8d2;
+  --md-sys-color-surface-container-lowest: #0b0e12;
+  --md-sys-color-surface-container-low: #171c22;
+  --md-sys-color-surface-container: #1d232b;
+  --md-sys-color-surface-container-high: #272e38;
+  --md-sys-color-surface-container-highest: #313a45;
+  --md-sys-color-outline: #8a94a1;
+  --md-sys-color-outline-variant: #3e4652;
+  --md-sys-color-primary: #9ec4ea;
+  --md-sys-color-on-primary: #0f2f4e;
+  --md-sys-color-primary-container: #263b50;
+  --md-sys-color-on-primary-container: #cfe2f6;
+  --md-sys-color-secondary: #b8c7d7;
+  --md-sys-color-on-secondary: #22303e;
+  --md-sys-color-secondary-container: #35414e;
+  --md-sys-color-on-secondary-container: #dbe4ed;
+  --md-sys-color-tertiary: #a3cbcd;
+  --md-sys-color-on-tertiary: #123436;
+  --md-sys-color-tertiary-container: #2b4446;
+  --md-sys-color-on-tertiary-container: #cce6e7;
+}
+
+/* 2. green: 鼠尾草（暖灰白＋灰绿） */
+html[data-theme-effective="light"][data-theme-accent="green"],
+html[data-theme="light"][data-theme-accent="green"],
+html.material-app[data-theme-accent="green"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f4f6f2;
+  --md-sys-color-on-surface: #161d17;
+  --md-sys-color-on-surface-variant: #464f47;
+  --md-sys-color-surface-container-low: #ebefe8;
+  --md-sys-color-surface-container: #e3e8e0;
+  --md-sys-color-surface-container-high: #dbe1d8;
+  --md-sys-color-surface-container-highest: #d1d8cf;
+  --md-sys-color-outline: #727c73;
+  --md-sys-color-outline-variant: #c2cbc3;
+  --md-sys-color-primary: #355f3e;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d8e9da;
+  --md-sys-color-on-primary-container: #103217;
+  --md-sys-color-secondary: #4d5d4f;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #dfe8df;
+  --md-sys-color-on-secondary-container: #172418;
+  --md-sys-color-tertiary: #3d6159;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #d5e9e3;
+  --md-sys-color-on-tertiary-container: #112b25;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="green"],
+html[data-theme="dark"][data-theme-accent="green"] {
+  --md-sys-color-surface: #111612;
+  --md-sys-color-on-surface: #e1e7e2;
+  --md-sys-color-on-surface-variant: #c0c9c1;
+  --md-sys-color-surface-container-lowest: #0b0f0c;
+  --md-sys-color-surface-container-low: #171d18;
+  --md-sys-color-surface-container: #1d251f;
+  --md-sys-color-surface-container-high: #273129;
+  --md-sys-color-surface-container-highest: #313d33;
+  --md-sys-color-outline: #89948a;
+  --md-sys-color-outline-variant: #3e4840;
+  --md-sys-color-primary: #9fd0a7;
+  --md-sys-color-on-primary: #113619;
+  --md-sys-color-primary-container: #28412c;
+  --md-sys-color-on-primary-container: #d1edd6;
+  --md-sys-color-secondary: #b8c9ba;
+  --md-sys-color-on-secondary: #233225;
+  --md-sys-color-secondary-container: #364538;
+  --md-sys-color-on-secondary-container: #dbe5dc;
+  --md-sys-color-tertiary: #a1cec5;
+  --md-sys-color-on-tertiary: #14352f;
+  --md-sys-color-tertiary-container: #2a453f;
+  --md-sys-color-on-tertiary-container: #cae7e1;
+}
+
+/* 3. purple: 雾紫（中性淡紫＋灰紫） */
+html[data-theme-effective="light"][data-theme-accent="purple"],
+html[data-theme="light"][data-theme-accent="purple"],
+html.material-app[data-theme-accent="purple"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f7f4f9;
+  --md-sys-color-on-surface: #19161e;
+  --md-sys-color-on-surface-variant: #4b4553;
+  --md-sys-color-surface-container-low: #eee8f2;
+  --md-sys-color-surface-container: #e6dfeb;
+  --md-sys-color-surface-container-high: #dfd7e5;
+  --md-sys-color-surface-container-highest: #d6ccdc;
+  --md-sys-color-outline: #797382;
+  --md-sys-color-outline-variant: #cbc3d4;
+  --md-sys-color-primary: #594a70;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #eedefa;
+  --md-sys-color-on-primary-container: #251739;
+  --md-sys-color-secondary: #5c5468;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e9e1f2;
+  --md-sys-color-on-secondary-container: #221c2c;
+  --md-sys-color-tertiary: #6d4d5e;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #f5dce8;
+  --md-sys-color-on-tertiary-container: #331726;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="purple"],
+html[data-theme="dark"][data-theme-accent="purple"] {
+  --md-sys-color-surface: #141217;
+  --md-sys-color-on-surface: #e6e1eb;
+  --md-sys-color-on-surface-variant: #c7c0cf;
+  --md-sys-color-surface-container-lowest: #0d0c0f;
+  --md-sys-color-surface-container-low: #1b1720;
+  --md-sys-color-surface-container: #221f28;
+  --md-sys-color-surface-container-high: #2e2936;
+  --md-sys-color-surface-container-highest: #3a3443;
+  --md-sys-color-outline: #918b99;
+  --md-sys-color-outline-variant: #46404f;
+  --md-sys-color-primary: #cbb6e5;
+  --md-sys-color-on-primary: #2d2042;
+  --md-sys-color-primary-container: #3d324e;
+  --md-sys-color-on-primary-container: #e8dbf8;
+  --md-sys-color-secondary: #c8bfd3;
+  --md-sys-color-on-secondary: #2e2738;
+  --md-sys-color-secondary-container: #423a4d;
+  --md-sys-color-on-secondary-container: #e4dceb;
+  --md-sys-color-tertiary: #ddb8cb;
+  --md-sys-color-on-tertiary: #3b2131;
+  --md-sys-color-tertiary-container: #4f3442;
+  --md-sys-color-on-tertiary-container: #f4dbe7;
+}
+
+/* 4. orange: 砂岩（暖米白＋赭棕） */
+html[data-theme-effective="light"][data-theme-accent="orange"],
+html[data-theme="light"][data-theme-accent="orange"],
+html.material-app[data-theme-accent="orange"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f9f6f2;
+  --md-sys-color-on-surface: #1d1814;
+  --md-sys-color-on-surface-variant: #50463f;
+  --md-sys-color-surface-container-low: #efeae2;
+  --md-sys-color-surface-container: #e7e0d6;
+  --md-sys-color-surface-container-high: #dfd7cb;
+  --md-sys-color-surface-container-highest: #d5cbbf;
+  --md-sys-color-outline: #80756c;
+  --md-sys-color-outline-variant: #d0c5bb;
+  --md-sys-color-primary: #724b26;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #f7ded0;
+  --md-sys-color-on-primary-container: #351904;
+  --md-sys-color-secondary: #675649;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #ede2d7;
+  --md-sys-color-on-secondary-container: #271d13;
+  --md-sys-color-tertiary: #5f593b;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #e8e2c0;
+  --md-sys-color-on-tertiary-container: #27220b;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="orange"],
+html[data-theme="dark"][data-theme-accent="orange"] {
+  --md-sys-color-surface: #161310;
+  --md-sys-color-on-surface: #eae3dc;
+  --md-sys-color-on-surface-variant: #cbc2ba;
+  --md-sys-color-surface-container-lowest: #0f0c0a;
+  --md-sys-color-surface-container-low: #1e1a16;
+  --md-sys-color-surface-container: #26211c;
+  --md-sys-color-surface-container-high: #332c25;
+  --md-sys-color-surface-container-highest: #3f362e;
+  --md-sys-color-outline: #968c83;
+  --md-sys-color-outline-variant: #4c4239;
+  --md-sys-color-primary: #deb592;
+  --md-sys-color-on-primary: #3e240a;
+  --md-sys-color-primary-container: #4a3727;
+  --md-sys-color-on-primary-container: #f3d9c3;
+  --md-sys-color-secondary: #cfc1b4;
+  --md-sys-color-on-secondary: #352a20;
+  --md-sys-color-secondary-container: #493d32;
+  --md-sys-color-on-secondary-container: #e8ded4;
+  --md-sys-color-tertiary: #cac3a0;
+  --md-sys-color-on-tertiary: #322d14;
+  --md-sys-color-tertiary-container: #443f29;
+  --md-sys-color-on-tertiary-container: #e5dfc1;
+}
+
+/* 5. rose: 玫瑰灰（暖灰＋低饱和玫瑰） */
+html[data-theme-effective="light"][data-theme-accent="rose"],
+html[data-theme="light"][data-theme-accent="rose"],
+html.material-app[data-theme-accent="rose"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f8f5f5;
+  --md-sys-color-on-surface: #1d1618;
+  --md-sys-color-on-surface-variant: #4f4447;
+  --md-sys-color-surface-container-low: #eee8e9;
+  --md-sys-color-surface-container: #e7dedf;
+  --md-sys-color-surface-container-high: #dfd5d7;
+  --md-sys-color-surface-container-highest: #d5cbcd;
+  --md-sys-color-outline: #7f7376;
+  --md-sys-color-outline-variant: #d0c3c6;
+  --md-sys-color-primary: #6e4450;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #f5d9df;
+  --md-sys-color-on-primary-container: #33151f;
+  --md-sys-color-secondary: #645459;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #eae0e3;
+  --md-sys-color-on-secondary-container: #261b1f;
+  --md-sys-color-tertiary: #694f45;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #f1ddd5;
+  --md-sys-color-on-tertiary-container: #2e1c14;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="rose"],
+html[data-theme="dark"][data-theme-accent="rose"] {
+  --md-sys-color-surface: #151214;
+  --md-sys-color-on-surface: #e9e1e3;
+  --md-sys-color-on-surface-variant: #cac0c3;
+  --md-sys-color-surface-container-lowest: #0e0b0d;
+  --md-sys-color-surface-container-low: #1c1719;
+  --md-sys-color-surface-container: #241e21;
+  --md-sys-color-surface-container-high: #31292d;
+  --md-sys-color-surface-container-highest: #3e3338;
+  --md-sys-color-outline: #948a8e;
+  --md-sys-color-outline-variant: #4a4044;
+  --md-sys-color-primary: #dbb0bd;
+  --md-sys-color-on-primary: #3b1c26;
+  --md-sys-color-primary-container: #4a323a;
+  --md-sys-color-on-primary-container: #f1d6de;
+  --md-sys-color-secondary: #ccc0c4;
+  --md-sys-color-on-secondary: #32282c;
+  --md-sys-color-secondary-container: #473a3f;
+  --md-sys-color-on-secondary-container: #e6dce0;
+  --md-sys-color-tertiary: #d7bcaf;
+  --md-sys-color-on-tertiary: #3a271f;
+  --md-sys-color-tertiary-container: #4b3931;
+  --md-sys-color-on-tertiary-container: #eedcd3;
+}
+
+/* 6. gray: 石墨（纯中性） */
+html[data-theme-effective="light"][data-theme-accent="gray"],
+html[data-theme="light"][data-theme-accent="gray"],
+html.material-app[data-theme-accent="gray"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f5f5f6;
+  --md-sys-color-on-surface: #18181a;
+  --md-sys-color-on-surface-variant: #47474a;
+  --md-sys-color-surface-container-low: #ececed;
+  --md-sys-color-surface-container: #e4e4e6;
+  --md-sys-color-surface-container-high: #dbdcde;
+  --md-sys-color-surface-container-highest: #d2d2d5;
+  --md-sys-color-outline: #757579;
+  --md-sys-color-outline-variant: #c6c6ca;
+  --md-sys-color-primary: #4c5158;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #dde0e5;
+  --md-sys-color-on-primary-container: #191d22;
+  --md-sys-color-secondary: #5a5a5e;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e2e2e6;
+  --md-sys-color-on-secondary-container: #1c1c1f;
+  --md-sys-color-tertiary: #495259;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #dbe1e6;
+  --md-sys-color-on-tertiary-container: #161d22;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="gray"],
+html[data-theme="dark"][data-theme-accent="gray"] {
+  --md-sys-color-surface: #131315;
+  --md-sys-color-on-surface: #e4e4e6;
+  --md-sys-color-on-surface-variant: #c4c4c7;
+  --md-sys-color-surface-container-lowest: #0d0d0f;
+  --md-sys-color-surface-container-low: #19191b;
+  --md-sys-color-surface-container: #202023;
+  --md-sys-color-surface-container-high: #2b2b2f;
+  --md-sys-color-surface-container-highest: #37373b;
+  --md-sys-color-outline: #8e8e93;
+  --md-sys-color-outline-variant: #434347;
+  --md-sys-color-primary: #bfc5ce;
+  --md-sys-color-on-primary: #25292e;
+  --md-sys-color-primary-container: #393e45;
+  --md-sys-color-on-primary-container: #e0e4eb;
+  --md-sys-color-secondary: #c5c5c9;
+  --md-sys-color-on-secondary: #29292d;
+  --md-sys-color-secondary-container: #3e3e42;
+  --md-sys-color-on-secondary-container: #e1e1e5;
+  --md-sys-color-tertiary: #b7c1c8;
+  --md-sys-color-on-tertiary: #222a30;
+  --md-sys-color-tertiary-container: #373f45;
+  --md-sys-color-on-tertiary-container: #dde3e8;
+}
+
+/* ==========================================================================
+   4. Legacy Semantic Variable Mapping
+   ========================================================================== */
+
+/* Light Semantic Mappings */
+html[data-theme-effective="light"],
+html.material-app,
+html.material-app[data-theme-effective="light"],
+html.material-app[data-theme="light"],
+html.material-app:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --bg: var(--md-sys-color-surface);
+  --card: var(--md-sys-color-surface-container-lowest);
+  --ink: var(--md-sys-color-on-surface);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --line: var(--md-sys-color-outline-variant);
+
+  --phy: var(--md-sys-color-primary);
+  --phy-soft: var(--md-sys-color-primary-container);
+  --math: var(--md-sys-color-tertiary);
+  --math-soft: var(--md-sys-color-tertiary-container);
+  --accent: var(--md-sys-color-primary);
+  --learn: var(--md-sys-color-primary);
+  --learn-soft: var(--md-sys-color-primary-container);
+  --bank: var(--md-sys-color-primary);
+  --bank-soft: var(--md-sys-color-primary-container);
+  --wrong: var(--md-sys-color-error);
+  --wrong-soft: var(--md-sys-color-error-container);
+  --vocab: #2e5939;
+  --vocab-soft: #d7e8db;
+  --good: #2e5939;
+  --warn: #7a5433;
+  --bad: var(--md-sys-color-error);
+
+  --shadow: 0 4px 16px var(--md-sys-color-scrim);
+  --r-md: var(--md-sys-shape-corner-medium);
+  --r-lg: var(--md-sys-shape-corner-large);
+  --r-xl: var(--md-sys-shape-corner-extra-large);
+
+  --cfg-track: var(--md-sys-color-surface-container-low);
+  --cfg-box: var(--md-sys-color-surface-container-lowest);
+  --cfg-box-line: var(--md-sys-color-outline-variant);
+  --cfg-fill: var(--md-sys-color-primary);
+  --cfg-arrow: var(--md-sys-color-on-primary-container);
+  --cfg-lb: var(--md-sys-color-on-surface);
+  --cfg-num: var(--md-sys-color-on-surface-variant);
+  --cfg-note: var(--md-sys-color-on-surface-variant);
+}
+
+/* Dark Semantic Mappings */
+html[data-theme-effective="dark"],
+html[data-theme="dark"],
+html.material-app[data-theme-effective="dark"],
+html.material-app[data-theme="dark"] {
+  --bg: var(--md-sys-color-surface);
+  --card: var(--md-sys-color-surface-container);
+  --ink: var(--md-sys-color-on-surface);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --line: var(--md-sys-color-outline-variant);
+
+  --phy: var(--md-sys-color-primary);
+  --phy-soft: var(--md-sys-color-primary-container);
+  --math: var(--md-sys-color-tertiary);
+  --math-soft: var(--md-sys-color-tertiary-container);
+  --accent: var(--md-sys-color-primary);
+  --learn: var(--md-sys-color-primary);
+  --learn-soft: var(--md-sys-color-primary-container);
+  --bank: var(--md-sys-color-primary);
+  --bank-soft: var(--md-sys-color-primary-container);
+  --wrong: var(--md-sys-color-error);
+  --wrong-soft: var(--md-sys-color-error-container);
+  --vocab: #9fd0a7;
+  --vocab-soft: #28412c;
+  --good: #9fd0a7;
+  --warn: #deb592;
+  --bad: var(--md-sys-color-error);
+
+  --shadow: 0 4px 20px var(--md-sys-color-scrim);
+  --r-md: var(--md-sys-shape-corner-medium);
+  --r-lg: var(--md-sys-shape-corner-large);
+  --r-xl: var(--md-sys-shape-corner-extra-large);
+
+  --cfg-track: var(--md-sys-color-surface-container-high);
+  --cfg-box: var(--md-sys-color-surface-container);
+  --cfg-box-line: var(--md-sys-color-outline-variant);
+  --cfg-fill: var(--md-sys-color-primary);
+  --cfg-arrow: var(--md-sys-color-on-primary-container);
+  --cfg-lb: var(--md-sys-color-on-surface);
+  --cfg-num: var(--md-sys-color-on-surface-variant);
+  --cfg-note: var(--md-sys-color-on-surface-variant);
+}
+
+/* ==========================================================================
+   5. Site Polish & Component Consistency
+   ========================================================================== */
+html.material-app body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--md-sys-typescale-body-large-font);
+}
+
+html.material-app #btnSettings {
+  display: none !important;
+}
+
+#appearance {
+  cursor: pointer;
+}
+
+html.material-app .btn {
+  border-radius: var(--md-sys-shape-corner-medium);
+  transition: background var(--motion), border-color var(--motion), color var(--motion);
+}
+
+html.material-app .btn:hover {
+  background: var(--md-sys-color-surface-container-high);
+  border-color: var(--md-sys-color-outline);
+}
+
+html.material-app input,
+html.material-app select,
+html.material-app textarea {
+  accent-color: var(--md-sys-color-primary);
+}
+
+/* ==========================================================================
+   6. Appearance Dialog & Sheet Styles (Title: 配色)
+   ========================================================================== */
+dialog#appearance-dialog {
+  border: 0;
+  padding: 24px;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow: 0 4px 28px var(--md-sys-color-scrim);
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  margin: auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+dialog#appearance-dialog::backdrop {
+  background: var(--md-sys-color-scrim);
+}
+
+.appearance-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.appearance-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.appearance-close {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--motion);
+}
+
+.appearance-close:hover {
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.appearance-close:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.appearance-section {
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.appearance-section:last-of-type {
+  margin-bottom: 8px;
+}
+
+.appearance-section-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 10px;
+  padding: 0;
+  display: block;
+}
+
+/* Mode Options */
+.appearance-mode-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appearance-mode-label {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: background var(--motion), border-color var(--motion), color var(--motion);
+}
+
+.appearance-mode-label input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: inset(50%);
+}
+
+.appearance-mode-label:has(input:checked) {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-color: var(--md-sys-color-primary);
+  font-weight: 500;
+}
+
+.appearance-mode-label:has(input:focus-visible) {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* Coordinated Accent Cards with 3-chip Previews */
+.appearance-accent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appearance-accent-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.appearance-accent-radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
+
+.appearance-preview-card {
+  width: 100%;
+  padding: 10px 6px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  transition: border-color var(--motion), background var(--motion), box-shadow var(--motion);
+}
+
+.appearance-chips {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.appearance-chip {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--md-sys-shape-corner-full);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.appearance-accent-text {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1.2;
+}
+
+.appearance-accent-item:has(input:checked) .appearance-preview-card {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-secondary-container);
+  box-shadow: 0 0 0 1px var(--md-sys-color-primary);
+}
+
+.appearance-accent-item:has(input:checked) .appearance-accent-text {
+  color: var(--md-sys-color-on-secondary-container);
+  font-weight: 600;
+}
+
+.appearance-accent-item:has(input:focus-visible) .appearance-preview-card {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* More Settings Entry */
+.appearance-more {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.appearance-more-btn {
+  border: 0;
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: var(--md-sys-shape-corner-full);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--motion);
+}
+
+.appearance-more-btn:hover {
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.appearance-more-btn:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile Bottom Sheet Modal */
+@media (max-width: 599px) {
+  dialog#appearance-dialog {
+    position: fixed;
+    inset: auto 0 0 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85dvh;
+    border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+    padding: 20px 20px 32px;
+  }
+
+  .appearance-mode-label {
+    min-height: 44px;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}

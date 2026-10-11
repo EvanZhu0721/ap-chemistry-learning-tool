@@ -11834,8 +11834,8 @@ drawQuantum();
           '<button class="btn" id="bkNext"' + (bankState.idx >= n - 1 ? " disabled" : "") + ">下一道 →</button>" +
         "</div>"
       : "";
-    return '<div class="card bk-review"><div class="bk-rv-head"><h3>本次练习 · Review</h3>' +
-      '<span class="bk-scope">范围：' + bankState.ids.join("、") + "</span></div>" +
+    return '<div class="card bk-review"><div class="bk-rv-head"><h3>进度</h3>' +
+      '<span class="bk-scope">' + bankState.ids.length + " 个知识点</span></div>" +
       '<div class="bk-stats">' +
         '<span class="bk-stat"><b>' + n + "</b><small>题目总数</small></span>" +
         '<span class="bk-stat"><b id="bkDone">' + d + "</b><small>已完成</small></span>" +
@@ -12284,7 +12284,6 @@ drawQuantum();
   /* ================= 1. 设置中心 ================= */
   var modal = document.getElementById("modalSettings");
   var btnOpen = document.getElementById("btnSettings");
-  var bodyEl = document.body;
 
   function segSync(seg, v){
     if (!seg) return;
@@ -12312,7 +12311,7 @@ drawQuantum();
   /* —— 字体大小（整体界面缩放） —— */
   function applyFont(v, save){
     v = parseFloat(v); if (!v || v < 0.8 || v > 1.5) v = 1;
-    if (Math.abs(v - 1) < 0.001) bodyEl.style.zoom = ""; else bodyEl.style.zoom = v;
+    if (Math.abs(v - 1) < 0.001) document.body.style.zoom = ""; else document.body.style.zoom = v;
     if (save !== false) LS.set("apchem.fontScale", v);
     segSync(document.getElementById("setFont"), v);
   }
@@ -12771,7 +12770,7 @@ drawQuantum();
   };
 
   /* —— 恢复上次设置（全部初始化完成后再执行；主题已在页头脚本恢复，这里只同步按钮状态） —— */
-  applyTheme(isDark(), false);
+  segSync(document.getElementById("setTheme"), isDark() ? "dark" : "light");
   applyFont(LS.get("apchem.fontScale", "1"), false);
   applyWm(LS.get("apchem.wmSize", "12"), false);
   applyBankMode(LS.get("apchem.bankView", "single"), false);

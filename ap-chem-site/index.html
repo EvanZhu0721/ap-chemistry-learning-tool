@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="material-app">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -20,6 +20,9 @@
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="assets/study.css">
+<link rel="stylesheet" href="assets/material-theme.css">
+<link rel="stylesheet" href="assets/material-app.css">
+<script src="assets/material-theme.js"></script>
 <noscript><style>
 /* ================= 无 JavaScript 兜底 v2 =================
    场景：iOS「文件」App 快速查看 / 微信文件预览 / 金山文档 / 网盘预览
@@ -119,7 +122,7 @@
 </head>
 <body>
 <script>
-try{var _t=localStorage.getItem("apchem.theme");if(_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
+try{var _t=localStorage.getItem("apchem.theme");if(!document.documentElement.classList.contains("material-app")&&_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
 try{var _fs=localStorage.getItem("apchem.fontScale");if(_fs&&_fs!=="1"){document.body.style.zoom=_fs}}catch(e){}
 try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentElement.style.setProperty("--wm-size",_wm+"px")}}catch(e){}
 </script>
@@ -2544,5 +2547,6 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 <script src="assets/lesson-details.js"></script>
 <script src="assets/lecture-glossary.js"></script>
 <script src="assets/study-enhancements.js"></script>
+<script src="assets/material-app.js"></script>
 </body>
 </html>

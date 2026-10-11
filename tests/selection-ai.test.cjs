@@ -78,8 +78,7 @@ async function openPractice(t,token='test-valid-token') {
     if(tok)localStorage.setItem('acct_token',tok);
     else localStorage.removeItem('acct_token');
   },token);
-  await page.goto(base, { waitUntil: 'domcontentloaded' });
-  await page.locator('[data-mod="bank"]').click();
+  await page.goto(base+'/#/practice', { waitUntil: 'domcontentloaded' });
   await page.locator('#bankCount').fill('5');
   await page.locator('#bankStart').click();
   await page.waitForSelector('#bankQBox .pz-item');
@@ -234,7 +233,7 @@ test('2. Local vocabulary stays instant with optional AI actions', async t => {
   }
 
   // Next, select a multi-word passage: word popup should close and AI toolbar appear
-  const container = (await page.locator('#studyGuide[open]').isVisible()) ? '#studyGuide .study-card' : '#bankQBox .pz-item .pz-q';
+  const container = (await page.locator('#studyGuide:not([hidden])').isVisible()) ? '#studyGuide .study-card' : '#bankQBox .pz-item .pz-q';
   await selectPassage(page, container, 8);
   await page.waitForSelector('.study-ai-toolbar');
   assert.equal(await page.locator('.study-word-popup').isVisible(), false);
@@ -245,20 +244,20 @@ test('3. Selection works across Handouts, Old Question Bank, and Book Practice',
   const page = await browser.newPage();
   t.after(()=>page.close());
   await page.addInitScript(() => localStorage.setItem('acct_token', 'token123'));
-  await page.goto(base, { waitUntil: 'domcontentloaded' });
+  await page.goto(base+'/#/learn/1/reading', { waitUntil: 'domcontentloaded' });
 
   // A. Handouts: open Study Guide
-  await page.locator('button:has-text("双语讲解")').first().click();
-  await page.waitForSelector('#studyGuide[open] .study-reading');
+  await page.waitForSelector('#studyGuide:not([hidden]) .study-reading');
   await selectPassage(page, '#studyGuide .study-card p', 7);
   await page.waitForSelector('.study-ai-toolbar, .study-word-popup');
   await page.keyboard.press('Escape');
 
   // Close study guide
-  await page.locator('#studyGuide .study-dialog-actions button:has-text("关闭")').click();
+  await page.locator('.m-navigation [data-route-nav="learn"]').click();
+  await page.waitForFunction(() => document.querySelector('#studyGuide').hidden);
 
   // B. Old Question Bank
-  await page.locator('[data-mod="bank"]').click();
+  await page.locator('.m-navigation [data-route-nav="practice"]').click();
   await page.locator('#bankCount').fill('2');
   await page.locator('#bankStart').click();
   await page.waitForSelector('#bankQBox .pz-item');
@@ -267,8 +266,8 @@ test('3. Selection works across Handouts, Old Question Bank, and Book Practice',
   await page.keyboard.press('Escape');
 
   // C. Book Practice
-  await page.locator('button:has-text("书本题库")').first().click();
-  await page.waitForSelector('#bookPractice[open]');
+  await page.goto(base+'/#/book');
+  await page.waitForSelector('#bookPractice:not([hidden])');
   const hasShell = await page.locator('#bookPractice .study-book-body').isVisible();
   assert.ok(hasShell);
 });
@@ -471,8 +470,7 @@ test('9. Mobile boundary safety, Escape key closes popup, and KaTeX clean text e
   const page = await browser.newPage({ viewport: { width: 375, height: 667 } });
   t.after(()=>page.close());
   await page.addInitScript(() => localStorage.setItem('acct_token', 'mobile-token'));
-  await page.goto(base);
-  await page.locator('[data-mod="bank"]').click();
+  await page.goto(base+'/#/practice');
   await page.locator('#bankCount').fill('2');
   await page.locator('#bankStart').click();
   await page.waitForSelector('#bankQBox .pz-item');
@@ -495,8 +493,7 @@ test('10. Context extraction excludes hidden FRQ reference answers, and KaTeX do
   const page = await browser.newPage();
   t.after(()=>page.close());
   await page.addInitScript(() => localStorage.setItem('acct_token', 'frq-token'));
-  await page.goto(base);
-  await page.locator('[data-mod="bank"]').click();
+  await page.goto(base+'/#/practice');
   // Select FRQ only
   await page.locator('#bankTypes [data-type="mcq"]').click();
   await page.locator('#bankCount').fill('2');
@@ -522,8 +519,8 @@ test('10. Context extraction excludes hidden FRQ reference answers, and KaTeX do
 
   // Verify KaTeX math in Study Guide
   await page.locator('.study-ai-close').click();
-  await page.locator('button:has-text("双语讲解")').first().click();
-  await page.waitForSelector('#studyGuide[open] .katex');
+  await page.goto(base+'/#/learn/1/reading');
+  await page.waitForSelector('#studyGuide:not([hidden]) .katex');
 
   const mathText = await page.evaluate(() => {
     const eq = document.querySelector('#studyGuide .study-equation');
@@ -592,15 +589,17 @@ test('13. Mobile modal remains within screen after long response and Escape pres
   const page=await openPractice(t);await page.setViewportSize({width:375,height:667});
   await page.route('**/api/ai/translate',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({translation:'较长译文。'.repeat(180)})}));
   await page.evaluate(()=>{AP_LEARNING.setLanguage('en');AP_LEARNING.openGuide();});
+  await page.waitForSelector('#studyGuide:not([hidden]) .study-teaching p');
   const p=page.locator('#studyGuide .study-teaching p').first();await p.scrollIntoViewIfNeeded();
   await p.evaluate(el=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);});
   await page.locator('.study-ai-toolbar').getByRole('button',{name:'Translate',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('.study-ai-content')?.textContent.length>100);
   const box=await page.locator('.study-ai-panel').boundingBox();
   assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=375&&box.y+box.height<=667);
-  assert.equal(await page.locator('#studyGuide .study-ai-panel').count(),1);
+  assert.equal(await page.locator('.study-ai-panel').isVisible(),true);
+  assert.equal(await page.locator('#studyGuide').isVisible(),true);
   await page.keyboard.press('Escape');assert.equal(await page.locator('.study-ai-panel').count(),0);
-  assert.equal(await page.locator('#studyGuide').evaluate(d=>d.open),true);
+  assert.equal(await page.locator('#studyGuide').evaluate(d=>!d.hidden),true);
 });
 
 test('14. Imported book selection excludes hidden source and answers',async t=>{
@@ -613,5 +612,6 @@ test('14. Imported book selection excludes hidden source and answers',async t=>{
   await p.evaluate(el=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);});
   await page.locator('.study-ai-toolbar button:has-text("翻译")').click();await page.getByText('模拟书本译文',{exact:true}).waitFor();
   assert.doesNotMatch(body.context,/HIDDEN_SOURCE|HIDDEN_EXPLANATION/);
-  assert.equal(await page.locator('#bookPractice .study-ai-panel').count(),1);
+  assert.equal(await page.locator('.study-ai-panel').isVisible(),true);
+  assert.equal(await page.locator('#bookPractice').isVisible(),true);
 });
