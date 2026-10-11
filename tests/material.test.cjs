@@ -37,6 +37,7 @@ test('slow startup never paints the legacy interface before the Material shell',
     try{
       await requested;
       await page.locator('#material-startup').waitFor({state:'visible'});
+      assert.equal(await page.locator('#material-startup .m-wordmark-chem').isVisible(),true);
       assert.equal(await page.locator('.topbar').isVisible(),false);
       assert.equal(await page.locator('#home').isVisible(),false);
       assert.equal(await page.locator('html').getAttribute('data-theme'),colorScheme);
