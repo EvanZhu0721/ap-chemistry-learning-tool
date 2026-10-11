@@ -35,3 +35,25 @@
 @media(max-width:700px){.study-chapter-nav{position:relative;top:0;max-height:none;overflow-y:hidden}}
 .wm{max-width:calc(100vw - 24px);white-space:normal;text-align:right}.wm-row{display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:20px}.wm-row>span{white-space:nowrap}
 .study-teaching .study-symbol-note{font-size:13px;line-height:1.8;color:var(--muted);padding:10px 12px;border-left:2px solid var(--line)}
+.study-ai-popup{position:fixed;z-index:10001;box-sizing:border-box;background:var(--card,#fff);color:var(--ink,#16223a);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px #11223b35;font-size:14px;line-height:1.7;text-align:left;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow:hidden}
+.study-ai-toolbar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--card,#fff);box-shadow:0 8px 25px #11223b28}
+.study-ai-toolbar .btn{font-size:13px;padding:6px 14px;margin:0;cursor:pointer}
+.study-ai-panel{width:400px;display:flex;flex-direction:column;max-height:min(520px,calc(100dvh - 24px))}
+.study-ai-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card,#fff);flex-shrink:0}
+.study-ai-title{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink,#16223a);flex:1}
+.study-ai-close{background:transparent;border:0;color:var(--muted,#64748b);cursor:pointer;font:inherit;font-size:16px;line-height:1;padding:4px 6px;border-radius:4px}
+.study-ai-close:hover{color:var(--ink,#16223a)}
+.study-ai-body{padding:12px 14px;overflow-y:auto;flex:1 1 auto;display:flex;flex-direction:column;gap:10px}
+.study-ai-content{white-space:pre-wrap;word-break:break-word;line-height:1.7;color:var(--ink,#16223a);font-size:14px}
+.study-ai-status{font-size:12px;color:var(--muted,#64748b)}
+.study-ai-status.error{color:#c53030;font-weight:600}
+.study-ai-actions{display:flex;gap:8px}
+.study-ai-actions .btn{font-size:12px;padding:5px 12px;margin:0}
+.study-ai-messages{display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:280px}
+.study-ai-msg{padding:8px 12px;border-radius:9px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.study-ai-msg-user{background:#3971ba14;color:var(--ink,#16223a);align-self:flex-end;max-width:85%;border:1px solid #3971ba30}
+.study-ai-msg-assistant{background:var(--bg,#f8fafc);color:var(--ink,#16223a);align-self:flex-start;max-width:95%;border:1px solid var(--line)}
+.study-ai-form{display:flex;gap:6px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line);flex-shrink:0}
+.study-ai-input{flex:1;padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;background:var(--card,#fff);color:var(--ink,#16223a);font:inherit}
+.study-ai-send{padding:7px 14px;font-size:13px;margin:0;cursor:pointer}
+@media(max-width:700px){.study-ai-panel{width:calc(100vw - 16px);max-height:calc(100dvh - 32px)}}

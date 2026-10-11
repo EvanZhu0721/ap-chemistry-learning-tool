@@ -38,8 +38,29 @@
   let wordPopup=null;
   function hideWord(){wordPopup?.remove();wordPopup=null;}
   function lookupWord(raw){return glossary?.lookup(raw)||window.__vocab?.lookup(raw)||null;}
-  function showWord(raw,anchor,scope){
-    hideWord();const result=lookupWord(raw);
+
+  function positionPopup(popup,anchor,modal){
+    const bounds=modal?.getBoundingClientRect();
+    const left=bounds?bounds.left+modal.clientLeft:0;
+    const top=bounds?bounds.top+modal.clientTop:0;
+    const right=Math.min(document.documentElement.clientWidth,bounds?left+modal.clientWidth:innerWidth);
+    const bottom=Math.min(innerHeight,bounds?top+modal.clientHeight:innerHeight);
+    popup.style.maxWidth=Math.max(0,right-left-16)+'px';
+    popup.style.maxHeight=Math.max(0,bottom-top-16)+'px';
+    if(popup.parentElement!==(modal||document.body))(modal||document.body).append(popup);
+    const box=popup.getBoundingClientRect(),gap=8;
+    const posX=Math.max(left+8,Math.min(anchor.left,right-box.width-8));
+    const height=popup.classList.contains('study-ai-panel')?Math.min(520,bottom-top-16):box.height;
+    let posY=anchor.bottom+gap;
+    if(posY+height>bottom-8){
+      posY=Math.max(top+8,Math.min(anchor.top-height-gap,bottom-height-8));
+    }
+    popup.style.left=posX+'px';
+    popup.style.top=posY+'px';
+  }
+
+  function showWord(raw,anchor,scope,context=raw){
+    hideAllPopups();const result=lookupWord(raw);
     const popup=el('aside','study-word-popup study-owned');wordPopup=popup;
     popup.setAttribute('role','region');popup.setAttribute('aria-label',t('Chinese word meaning','英文词语中文释义'));
     popup.append(el('strong','study-word-title',raw));
@@ -52,43 +73,367 @@
         add.textContent=entry?t('Saved ✓','已加入 ✓'):t('Could not save','暂时无法保存');add.disabled=!!entry;
       });popup.append(add);
     }
-    // A native modal makes the page behind it inert. Keep the glossary in its top layer.
+    const snapshot={text:raw,context,anchor,scope,modal:scope.closest('dialog[open]'),title:raw};
+    if(activeSnapshot?.text!==raw||activeSnapshot?.context!==context)askHistory=[];
+    activeSnapshot=snapshot;
+    const actions=el('div','study-ai-actions');
+    actions.append(button('Translate','翻译',()=>openAiTranslate(snapshot)),button('Ask AI','问问 AI',()=>openAiAsk(snapshot)));
+    popup.append(actions);
     const modal=scope.closest('dialog[open]');
-    const bounds=modal?.getBoundingClientRect();
-    const left=bounds?bounds.left+modal.clientLeft:0;
-    const top=bounds?bounds.top+modal.clientTop:0;
-    const right=Math.min(document.documentElement.clientWidth,bounds?left+modal.clientWidth:innerWidth);
-    const bottom=Math.min(innerHeight,bounds?top+modal.clientHeight:innerHeight);
-    popup.style.maxWidth=Math.max(0,right-left-16)+'px';
-    popup.style.maxHeight=Math.max(0,bottom-top-16)+'px';
-    (modal||document.body).append(popup);
-    const box=popup.getBoundingClientRect(),gap=9;
-    popup.style.left=Math.max(left+8,Math.min(anchor.left,right-box.width-8))+'px';
-    popup.style.top=Math.max(top+8,Math.min(anchor.bottom+gap,bottom-box.height-8))+'px';
+    positionPopup(popup,anchor,modal);
   }
+
+  const translationCache=new Map();
+  function getCachedTranslation(text,context){return translationCache.get(text+'\0'+context);}
+  function setCachedTranslation(text,context,translation){
+    if(translationCache.size>=50){const first=translationCache.keys().next().value;translationCache.delete(first);}
+    translationCache.set(text+'\0'+context,translation);
+  }
+
+  let aiPopup=null,activeSnapshot=null,currentAbortController=null,currentRequestId=0,askHistory=[];
+  function accountToken(){try{return localStorage.getItem('acct_token');}catch{return '';}}
+  function abortInFlight(){if(currentAbortController){currentAbortController.abort();currentAbortController=null;}currentRequestId++;}
+  function hideAiPopup(){abortInFlight();aiPopup?.remove();aiPopup=null;}
+  function hideAllPopups(){hideWord();hideAiPopup();}
+
+  function findStudyScope(node){
+    if(!node)return null;
+    const parent=node.nodeType===1?node:node.parentElement;
+    if(!parent||parent.closest('button,input,textarea,select,.study-word-popup,.study-ai-popup'))return null;
+    return parent.closest('.study-card,.study-reading,.study-pane-guide,#learnContent .pane,.pz-item,#bankQBox,#bankSession,#bkView,.book-question,.book-context,.study-book-body,#bookPractice,#studyGuide');
+  }
+
+  function extractCleanText(range){
+    if(!range||range.collapsed)return '';
+    range=range.cloneRange();
+    const start=(range.startContainer.nodeType===1?range.startContainer:range.startContainer.parentElement)?.closest('.katex');
+    const end=(range.endContainer.nodeType===1?range.endContainer:range.endContainer.parentElement)?.closest('.katex');
+    if(start)range.setStartBefore(start);
+    if(end)range.setEndAfter(end);
+    const fragment=range.cloneContents();
+    fragment.querySelectorAll('[data-tex]').forEach(eq=>{
+      if(eq.dataset.tex)eq.textContent=' '+eq.dataset.tex+' ';
+    });
+    fragment.querySelectorAll('.katex').forEach(eq=>{
+      const tex=eq.querySelector('annotation[encoding="application/x-tex"]');
+      if(tex)eq.replaceWith(' \\('+tex.textContent+'\\) ');
+      else eq.querySelectorAll('.katex-mathml').forEach(n=>n.remove());
+    });
+    fragment.querySelectorAll('[hidden],style,script,.study-word-popup,.study-ai-popup').forEach(n=>n.remove());
+    fragment.querySelectorAll('br').forEach(br=>br.replaceWith('\n'));
+    fragment.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6,tr').forEach(block=>block.append('\n'));
+    const text=fragment.textContent||'';
+    return text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/[ \t]+/g,' ').replace(/\n\s*\n+/g,'\n\n').trim();
+  }
+
+  function extractContext(range,scope){
+    const node=range.commonAncestorContainer;
+    const parent=node.nodeType===1?node:node.parentElement;
+    const pzItem=parent?.closest('.pz-item');
+    if(pzItem){
+      const clone=pzItem.cloneNode(true);
+      clone.querySelectorAll('details:not([open]),[hidden],.hide,.frq-ans,.pz-fb,button,.katex-mathml,style,script,.study-word-popup,.study-ai-popup').forEach(n=>n.remove());
+      clone.querySelectorAll('*').forEach(n=>{if(n.style&&(n.style.display==='none'||n.style.visibility==='hidden'))n.remove();});
+      return (clone.textContent||'').replace(/\s+/g,' ').trim().slice(0,2000);
+    }
+    const bookQ=parent?.closest('.book-question,.book-context');
+    if(bookQ){
+      const clone=bookQ.cloneNode(true);
+      clone.querySelectorAll('details:not([open]),[hidden],.book-feedback,.book-source-sheet,button,.katex-mathml,style,script,.study-word-popup,.study-ai-popup').forEach(n=>n.remove());
+      return (clone.textContent||'').replace(/\s+/g,' ').trim().slice(0,2000);
+    }
+    const block=parent?.closest('section,article,.study-block,.study-teaching,.study-example,.study-check,p,li')||scope;
+    if(block){
+      const clone=block.cloneNode(true);
+      clone.querySelectorAll('details:not([open]),[hidden],button,.katex-mathml,style,script,.study-word-popup,.study-ai-popup').forEach(n=>n.remove());
+      return (clone.textContent||'').replace(/\s+/g,' ').trim().slice(0,2000);
+    }
+    return '';
+  }
+
+  function showAiToolbar(snapshot){
+    hideAllPopups();
+    const toolbar=el('div','study-ai-popup study-ai-toolbar study-owned');
+    toolbar.setAttribute('role','toolbar');toolbar.setAttribute('aria-label',t('AI Actions','AI 操作'));
+    aiPopup=toolbar;
+    const btnTrans=button('Translate','翻译',()=>openAiTranslate(snapshot));
+    const btnAsk=button('Ask AI','问问 AI',()=>openAiAsk(snapshot));
+    toolbar.append(btnTrans,btnAsk);
+    if(snapshot.text.length>6000){btnTrans.disabled=btnAsk.disabled=true;toolbar.append(el('span','',t('Select up to 6000 characters.','请将选段缩短至 6000 字以内。')));}
+    positionPopup(toolbar,snapshot.anchor,snapshot.modal);
+  }
+
+  function openAiTranslate(snapshot){
+    abortInFlight();hideWord();
+    if(!aiPopup){
+      aiPopup=el('aside','study-ai-popup study-ai-panel study-owned');
+      aiPopup.setAttribute('role','dialog');
+    }else{
+      aiPopup.className='study-ai-popup study-ai-panel study-owned';
+      aiPopup.replaceChildren();
+    }
+    aiPopup.setAttribute('role','dialog');aiPopup.setAttribute('aria-label',t('AI Translation','AI 翻译'));
+    const head=el('div','study-ai-head');
+    head.append(el('strong','study-ai-title',snapshot.title));
+    const closeBtn=el('button','study-ai-close','×');
+    closeBtn.type='button';closeBtn.setAttribute('aria-label',t('Close','关闭'));
+    closeBtn.addEventListener('click',hideAiPopup);
+    head.append(closeBtn);aiPopup.append(head);
+
+    const body=el('div','study-ai-body');
+    const statusEl=el('div','study-ai-status','');
+    const contentEl=el('div','study-ai-content','');
+    const actionsEl=el('div','study-ai-actions');
+    body.append(statusEl,contentEl,actionsEl);
+    aiPopup.append(body);
+    positionPopup(aiPopup,snapshot.anchor,snapshot.modal);
+
+    const cached=getCachedTranslation(snapshot.text,snapshot.context);
+    if(cached){contentEl.textContent=cached;return;}
+
+    const token=accountToken();
+    if(!token){
+      statusEl.textContent=t('Please sign in first.','请先登录账号后再使用翻译。');
+      statusEl.className='study-ai-status error';
+      return;
+    }
+
+    const reqId=++currentRequestId;
+    const controller=new AbortController();currentAbortController=controller;
+    statusEl.textContent=t('Translating…','正在翻译…');
+    actionsEl.append(button('Cancel','取消',()=>controller.abort()));
+
+    fetch('/api/ai/translate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body:JSON.stringify({text:snapshot.text.slice(0,6000),context:snapshot.context.slice(0,2000)}),
+      signal:controller.signal
+    }).then(async resp=>{
+      if(reqId!==currentRequestId)return;
+      if(!resp.ok){
+        let msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+        if(resp.status===401)msg=t('Session expired. Please sign in again.','登录已失效，请重新登录。');
+        else if(resp.status===429)msg=t('Too many requests. Please try again later.','请求过于频繁，请稍后再试。');
+        else if(resp.status===503)msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+        else{try{const d=await resp.json();if(d.error)msg=d.error;}catch{}}
+        statusEl.textContent=msg;statusEl.className='study-ai-status error';
+        actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
+        return;
+      }
+      const data=await resp.json();
+      if(reqId!==currentRequestId)return;
+      if(data.error){
+        statusEl.textContent=data.error;statusEl.className='study-ai-status error';
+        actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
+        return;
+      }
+      if(typeof data.translation!=='string'||!data.translation.trim())throw Error('Invalid translation');
+      const translation=data.translation;
+      setCachedTranslation(snapshot.text,snapshot.context,translation);
+      statusEl.textContent='';contentEl.textContent=translation;actionsEl.replaceChildren();
+    }).catch(err=>{
+      if(reqId!==currentRequestId)return;
+      if(err.name==='AbortError'){
+        statusEl.textContent=t('Request cancelled.','请求已取消。');statusEl.className='study-ai-status';
+      }else{
+        statusEl.textContent=t('Network request failed. Please check your connection.','网络请求失败，请检查连接后重试。');
+        statusEl.className='study-ai-status error';
+      }
+      actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
+    });
+  }
+
+  function openAiAsk(snapshot,customQuestion=null){
+    abortInFlight();hideWord();
+    if(!aiPopup){
+      aiPopup=el('aside','study-ai-popup study-ai-panel study-owned');
+      aiPopup.setAttribute('role','dialog');
+    }else{
+      aiPopup.className='study-ai-popup study-ai-panel study-owned';
+      aiPopup.replaceChildren();
+    }
+    aiPopup.setAttribute('role','dialog');aiPopup.setAttribute('aria-label',t('Ask AI','问问 AI'));
+    const head=el('div','study-ai-head');
+    head.append(el('strong','study-ai-title',snapshot.title));
+    const closeBtn=el('button','study-ai-close','×');
+    closeBtn.type='button';closeBtn.setAttribute('aria-label',t('Close','关闭'));
+    closeBtn.addEventListener('click',hideAiPopup);
+    head.append(closeBtn);aiPopup.append(head);
+
+    const body=el('div','study-ai-body');
+    const messagesEl=el('div','study-ai-messages');
+    const statusEl=el('div','study-ai-status','');
+    const actionsEl=el('div','study-ai-actions');
+    const form=el('form','study-ai-form');
+    const input=el('input','study-ai-input');
+    input.type='text';input.maxLength=1000;input.placeholder=t('Ask a follow-up question…','输入追问内容…');
+    input.setAttribute('aria-label',t('Follow-up question','追问内容'));
+    const sendBtn=button('Send','发送',()=>{},'btn study-ai-send');sendBtn.type='submit';
+    form.append(input,sendBtn);
+    form.addEventListener('submit',e=>{
+      e.preventDefault();const q=input.value.trim();if(!q||sendBtn.disabled)return;input.value='';openAiAsk(snapshot,q);
+    });
+    body.append(messagesEl,statusEl,actionsEl,form);aiPopup.append(body);
+
+    const question=customQuestion||t('Please explain this chemistry content and key concepts.','请解释这段化学内容及相关知识点。');
+    [...askHistory,{role:'user',content:question}].forEach(item=>{
+      const m=el('div','study-ai-msg study-ai-msg-'+item.role);
+      m.textContent=item.content;
+      messagesEl.append(m);
+    });
+
+    positionPopup(aiPopup,snapshot.anchor,snapshot.modal);
+
+    const token=accountToken();
+    if(!token){
+      statusEl.textContent=t('Please sign in first.','请先登录账号后再使用 AI 问答。');
+      statusEl.className='study-ai-status error';
+      return;
+    }
+
+    const assistantMsgEl=el('div','study-ai-msg study-ai-msg-assistant');
+    messagesEl.append(assistantMsgEl);
+
+    const reqId=++currentRequestId;
+    const controller=new AbortController();currentAbortController=controller;
+    statusEl.textContent=t('AI is thinking…','AI 正在解答…');
+    sendBtn.disabled=true;input.disabled=true;
+    actionsEl.append(button('Cancel','取消',()=>controller.abort()));
+
+    const historyPayload=askHistory.slice(-8).map(x=>({
+      role:x.role,content:String(x.content).slice(0,6000)
+    }));
+
+    fetch('/api/ai/ask',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body:JSON.stringify({
+        text:snapshot.text.slice(0,6000),
+        context:snapshot.context.slice(0,2000),
+        question:question.slice(0,1000),
+        history:historyPayload
+      }),
+      signal:controller.signal
+    }).then(async resp=>{
+      if(reqId!==currentRequestId)return;
+      if(!resp.ok){
+        let msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+        if(resp.status===401)msg=t('Session expired. Please sign in again.','登录已失效，请重新登录。');
+        else if(resp.status===429)msg=t('Too many requests. Please try again later.','请求过于频繁，请稍后再试。');
+        else if(resp.status===503)msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+        else{try{const d=await resp.json();if(d.error)msg=d.error;}catch{}}
+        if(reqId!==currentRequestId)return;
+        assistantMsgEl.remove();sendBtn.disabled=false;input.disabled=false;
+        statusEl.textContent=msg;statusEl.className='study-ai-status error';
+        actionsEl.replaceChildren(button('Retry','重试',()=>openAiAsk(snapshot,customQuestion)));
+        return;
+      }
+      const reader=resp.body.getReader();
+      const decoder=new TextDecoder('utf-8');
+      let buffer='',accumulated='',completed=false;
+      function consume(line){
+        if(!line.trim())return;
+        const item=JSON.parse(line);
+        if(item.error)throw Error(String(item.error));
+        if(typeof item.delta==='string'){
+          accumulated+=item.delta;assistantMsgEl.textContent=accumulated;messagesEl.scrollTop=messagesEl.scrollHeight;
+        }
+        if(item.done===true)completed=true;
+      }
+      while(true){
+        const {done,value}=await reader.read();
+        if(done)break;
+        if(reqId!==currentRequestId)return;
+        buffer+=decoder.decode(value,{stream:true});
+        const lines=buffer.split('\n');
+        buffer=lines.pop();
+        for(const line of lines)consume(line);
+      }
+      consume(buffer+decoder.decode());
+      if(reqId!==currentRequestId)return;
+      if(!completed||!accumulated.trim())throw Error(t('Answer interrupted. Please retry.','回答连接中断，请重试。'));
+      statusEl.textContent='';actionsEl.replaceChildren();
+      sendBtn.disabled=false;input.disabled=false;
+      askHistory.push({role:'user',content:question},{role:'assistant',content:accumulated.slice(0,6000)});
+      if(askHistory.length>8)askHistory=askHistory.slice(-8);
+    }).catch(err=>{
+      if(reqId!==currentRequestId)return;
+      controller.abort();sendBtn.disabled=false;input.disabled=false;
+      if(!assistantMsgEl.textContent)assistantMsgEl.remove();
+      if(err.name==='AbortError'){
+        statusEl.textContent=t('Request cancelled.','请求已取消。');statusEl.className='study-ai-status';
+      }else{
+        statusEl.textContent=t('Answer incomplete. Please retry.','回答未完成，请重试。');
+        statusEl.className='study-ai-status error';
+      }
+      actionsEl.replaceChildren(button('Retry','重试',()=>openAiAsk(snapshot,customQuestion)));
+    });
+  }
+
   function inspectSelection(){
     const selection=window.getSelection();if(!selection||selection.isCollapsed||selection.rangeCount!==1)return;
-    const raw=selection.toString().trim();if(!/^[A-Za-z]+(?:['’\-][A-Za-z]+)*(?:\s+[A-Za-z]+(?:['’\-][A-Za-z]+)*){0,4}$/.test(raw)||raw.length>70)return;
     const range=selection.getRangeAt(0),node=range.commonAncestorContainer;
     const parent=node.nodeType===1?node:node.parentElement;
-    const scope=parent?.closest('.study-card');if(!scope||parent.closest('.katex,button,input,textarea,.study-word-popup'))return;
+    if(!parent||parent.closest('button,input,textarea,select,.study-word-popup,.study-ai-popup'))return;
+    const scope=findStudyScope(parent);if(!scope)return;
     if(!scope.contains(range.startContainer)||!scope.contains(range.endContainer))return;
-    showWord(raw,range.getBoundingClientRect(),scope);
+
+    const cleanText=extractCleanText(range);if(!cleanText||cleanText.length<1)return;
+
+    const isSingleWord=/^[A-Za-z]+(?:['’\-][A-Za-z]+)*(?:\s+[A-Za-z]+(?:['’\-][A-Za-z]+)*){0,3}$/.test(cleanText)&&cleanText.length<=60;
+    if(isSingleWord){
+      const localResult=lookupWord(cleanText);
+      if(localResult){
+        hideAiPopup();showWord(cleanText,range.getBoundingClientRect(),scope,extractContext(range,scope));return;
+      }
+    }
+
+    hideWord();
+    const context=extractContext(range,scope);
+    if(aiPopup&&activeSnapshot?.text===cleanText&&activeSnapshot?.context===context)return;
+    const anchor=range.getBoundingClientRect();
+    const modal=scope.closest('dialog[open]');
+    let title=cleanText.split('\n')[0].trim();
+    if(title.length>36)title=title.slice(0,36)+'…';
+
+    if(!activeSnapshot||activeSnapshot.text!==cleanText||activeSnapshot.context!==context){
+      askHistory=[];
+    }
+    activeSnapshot={text:cleanText,context:context,anchor:anchor,scope:scope,modal:modal,title:title};
+    showAiToolbar(activeSnapshot);
   }
+
   let selectTimer;
-  document.addEventListener('selectionchange',()=>{
-    clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,250);
+  document.addEventListener('selectionchange',()=>{clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,250);});
+  document.addEventListener('pointerup',event=>{
+    if(!event.target.closest('.study-word-popup,.study-ai-popup')){clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,30);}
   });
-  document.addEventListener('pointerup',event=>{if(!event.target.closest('.study-word-popup')){clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,30);}});
-  document.addEventListener('pointerdown',event=>{if(!event.target.closest('.study-word-popup'))hideWord();});
-  document.addEventListener('click',event=>{const term=event.target.closest('.study-term');if(term&&window.getSelection()?.isCollapsed)showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card'));});
+  document.addEventListener('pointerdown',event=>{
+    if(event.target.closest('.study-ai-popup button,.study-word-popup button')){event.preventDefault();return;}
+    if(!event.target.closest('.study-word-popup,.study-ai-popup'))hideAllPopups();
+  });
+  document.addEventListener('click',event=>{
+    const sel=window.getSelection();
+    if(sel&&!sel.isCollapsed&&sel.toString().trim().length>0){
+      if(event.target.closest('.w'))event.stopPropagation();
+    }
+    const term=event.target.closest('.study-term');
+    if(term&&window.getSelection()?.isCollapsed)showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card'));
+  },true);
   document.addEventListener('keydown',event=>{
     const term=event.target.closest('.study-term');
     if(term&&['Enter',' '].includes(event.key)){event.preventDefault();showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card'));}
-    if(event.key==='Escape'&&wordPopup){event.preventDefault();event.stopPropagation();hideWord();}
+    if(event.key==='Escape'){
+      if(aiPopup||wordPopup){event.preventDefault();event.stopPropagation();hideAllPopups();}
+    }
   },true);
-  document.addEventListener('scroll',event=>{if(wordPopup&&!wordPopup.contains(event.target))hideWord();},true);
-  window.addEventListener('resize',hideWord);
+  document.addEventListener('scroll',event=>{
+    if(wordPopup&&!wordPopup.contains(event.target))hideWord();
+    if(aiPopup&&!aiPopup.contains(event.target)&&aiPopup.classList.contains('study-ai-toolbar'))hideAiPopup();
+  },true);
+  window.addEventListener('resize',hideAllPopups);
+  window.addEventListener('hashchange',hideAllPopups);
+
   function readingHint(){return el('p','study-lookup-hint',t('Bold terms are key concepts. Select an English word or short term to see its Chinese meaning; click a bold term or focus it and press Enter.','粗体标出英文重点词。选中英文单词或短语可查中文；也可点击重点词，或用 Tab 聚焦后按 Enter。'));}
   const UI = new Map(Object.entries({
     'AP Chemistry 学习工具':'AP Chemistry Learning Tool',
@@ -245,7 +590,7 @@
   }
   function showDialog(d) { if (!d.open) d.showModal(); }
   function renderGuide() {
-    hideWord();
+    hideAllPopups();
     guide.replaceChildren(header(guide,t('Bilingual chemistry guide','化学双语学习讲解')));
     const layout=el('div','study-layout'); const nav=el('nav','study-chapter-nav'); nav.setAttribute('aria-label',t('Chapters','章节'));
     content.chapters.forEach(c=>{const b=button(`${c.id}. ${c.title.en}`,`${c.id}. ${c.title.zh}`,()=>{activeChapter=c.id;renderGuide();guide.scrollTop=0;},'study-chapter-button');
@@ -256,7 +601,8 @@
     layout.append(nav,body);guide.append(layout);renderMath(body);emphasise(body);
   }
   function openGuide(id) { if (id) activeChapter=id; renderGuide(); showDialog(guide);guide.scrollTop=0; }
-  guide.addEventListener('close',hideWord);
+  guide.addEventListener('close',hideAllPopups);
+  book.addEventListener('close',hideAllPopups);
   // Book data is optional, local and loaded only when requested.
   let bookLoad;
   function loadBook() {
@@ -361,7 +707,7 @@
     bookData=await loadBook();renderBookShell();
   }
   function renderLanguage() {
-    hideWord();
+    hideAllPopups();
     document.documentElement.lang=language==='en'?'en':'zh-CN';languageSelect.value=language;
     document.title=t('AP Chemistry · Bilingual Learning','AP Chemistry · 双语学习工具');
     translate(document.body);
@@ -393,7 +739,7 @@
   }
   languageSelect.addEventListener('change',()=>{language=languageSelect.value;save('apchem.language',language);renderLanguage();});
   renderLanguage();
-  const paneObserver=new MutationObserver(()=>{hideWord();renderActivePanes();});
+  const paneObserver=new MutationObserver(()=>{hideAllPopups();renderActivePanes();});
   paneHosts.forEach(({pane})=>paneObserver.observe(pane,{attributes:true,attributeFilter:['class']}));
   // Translate newly generated navigation text without observing the animation loops.
   const uiObserver=new MutationObserver(records=>{
