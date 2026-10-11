@@ -11515,16 +11515,14 @@ drawQuantum();
   function renderVocab(){
     if (!vList) return;
     if (vCount) vCount.textContent = VOCAB.length;
+    $("mod-vocab").classList.toggle("vocab-empty", !VOCAB.length);
+    $("vClear").disabled = !VOCAB.length;
     if (!VOCAB.length){
       vList.innerHTML =
         '<div class="v-empty">' +
-          '<div class="v-empty-t">生词本还是空的</div>' +
-          '<p>在题目的英文里<b>点击任意一个不认识的单词</b>，或者用顶部的<b>翻译</b>查词，查过的词会自动收录到这里。</p>' +
-          '<div class="v-sug">先试试这几个：' +
-            ["isotope", "orbital", "electronegativity", "resonance", "octet", "limiting"].map(function(w){
-              return '<button class="btn v-sug-b" data-w="' + w + '">' + w + "</button>";
-            }).join("") +
-          "</div>" +
+          '<div class="v-empty-t">暂无生词</div>' +
+          '<p>查过的单词会保存在这里。</p>' +
+          '<button class="btn v-lookup">查词</button>' +
         "</div>";
       return;
     }
@@ -11551,8 +11549,7 @@ drawQuantum();
         persist(); renderVocab(); renderRecite();
         return;
       }
-      var sug = e.target.closest && e.target.closest(".v-sug-b");
-      if (sug) openTranslate(sug.dataset.w);
+      if (e.target.closest && e.target.closest(".v-lookup")) openTranslate();
     });
   }
 
@@ -11589,7 +11586,7 @@ drawQuantum();
       recWord.textContent = "—";
       if (recPos) recPos.textContent = "";
       if (recFb){ recFb.className = "rec-fb"; recFb.innerHTML = ""; }
-      if (recState) recState.innerHTML = "生词本为空，先去收录几个单词吧。";
+      if (recState) recState.textContent = "暂无生词";
       return;
     }
     if (recIdx >= VOCAB.length) recIdx = 0;
@@ -11612,7 +11609,7 @@ drawQuantum();
     }
     var ok = checkMeaning(typed, v.cn);
     if (ok) v.ok = 1;
-    persist();
+    persist(); renderVocab();
     recFb.className = "rec-fb show " + (ok ? "ok" : "no");
     recFb.innerHTML =
       '<div class="rec-verdict">' + (ok ? "✓ 答对了" : "✗ 再想想") + "</div>" +
@@ -11638,7 +11635,7 @@ drawQuantum();
   if (recNext) recNext.addEventListener("click", function(){ if (VOCAB.length){ recIdx = (recIdx + 1) % VOCAB.length; renderRecite(); } });
   if (recMark) recMark.addEventListener("click", function(){
     if (!VOCAB.length) return;
-    VOCAB[recIdx].ok = 1; persist();
+    VOCAB[recIdx].ok = 1; persist(); renderVocab();
     if (recOkEl) recOkEl.textContent = VOCAB.filter(function(x){ return x.ok; }).length;
     recFb.className = "rec-fb show ok";
     recFb.innerHTML = "已标记为掌握：<b>" + VOCAB[recIdx].w + "</b>";

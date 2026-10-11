@@ -508,6 +508,7 @@
   const UI = new Map(Object.entries({
     'AP Chemistry 学习工具':'AP Chemistry Learning Tool',
     '首页':'Home','学习':'Learn','题库':'Question bank','错题本':'Review','生词本':'Vocabulary','设置':'Settings',
+    '个单词':'words','暂无生词':'No saved words','查过的单词会保存在这里。':'Words you look up appear here.','查词':'Look up a word','清空生词本':'Clear vocabulary',
     '进入 →':'Open →','公式表':'Formula sheet','查缺补漏':'Knowledge check','大纲':'Outline','翻译':'Translation','刷新':'Reload',
     '← 返回首页':'← Home','登录 / 注册':'Sign in / Register','← 返回单元列表':'← All units',
     '9 个单元':'9 units','按小节归类':'Organised by topic','一键练习':'Quick practice','按范围选':'Choose topics','自选题量':'Choose question count',

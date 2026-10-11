@@ -95,6 +95,36 @@ test('all chapters, examples, checks and original laboratory panes remain reacha
   }
 });
 
+test('vocabulary lookup, mastery and clearing keep the list and recall state in sync',async t=>{
+  const page=await open(t,390,'/review/vocabulary');
+  assert.equal(await page.locator('#vClear').isDisabled(),true);
+  await page.locator('.v-lookup').click();
+  await page.locator('#trInput').fill('isotope');
+  await page.locator('#trGo').click();
+  await page.locator('#modalTr .modal-close').click();
+  assert.equal(await page.locator('.v-item').count(),1);
+  await page.locator('[data-pane="v-recite"]').click();
+  await page.locator('#recInput').fill('同位素');
+  await page.locator('#recCheck').click();
+  assert.equal(await page.locator('.rec-fb.ok').count(),1);
+  await page.locator('[data-pane="v-list"]').click();
+  assert.equal(await page.locator('.v-ok').count(),1);
+  await page.evaluate(()=>__vocab.add('orbital'));
+  await page.locator('[data-pane="v-recite"]').click();
+  await page.locator('#recNext').click();
+  await page.locator('#recMark').click();
+  await page.locator('[data-pane="v-list"]').click();
+  assert.equal(await page.locator('.v-ok').count(),2);
+  await page.locator('#vClear').click();
+  assert.equal(await page.locator('.v-empty').isVisible(),true);
+  await page.locator('[data-pane="v-recite"]').click();
+  assert.equal(await page.locator('#recInput').isVisible(),false);
+  assert.equal(await page.locator('.rec-fb').isVisible(),false);
+  assert.equal(await page.locator('#recState').innerText(),'暂无生词');
+  await page.reload();
+  assert.equal(await page.locator('#vCount').innerText(),'0');
+});
+
 test('reading language is in the app bar, persists, and keeps formulas single',async t=>{
   const page=await open(t,1440,'/learn/1/reading');
   assert.equal(await page.locator('.m-appbar #reading-language').isVisible(),true);

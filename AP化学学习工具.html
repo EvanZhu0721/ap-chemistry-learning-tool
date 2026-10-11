@@ -4296,7 +4296,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   <!-- ===== ★ [新增] 生词本（与 Unit 1 / Unit 2 并列的独立 UI） ===== -->
   <div class="module vocab" id="mod-vocab">
     <noscript><div class="nojs-need"><b>生词本需要浏览器</b>生词本由「翻译」查词后自动收录，依赖 JavaScript 与本地存储，禁用脚本时无法显示。<br>请在 Safari 中打开本文件，或使用在线链接。</div></noscript>
-    <div class="module-head"><h2>生词本 · Vocabulary</h2><p>翻译查过的单词会自动收录到这里：集中复习中文释义与对应知识点，并可进入背诵模式自测。</p></div>
+    <div class="module-head"><h2>生词本</h2></div>
     <nav class="tabs" data-tabs>
       <a class="tab on" href="#v-list" data-pane="v-list">单词列表</a>
       <a class="tab" href="#v-recite" data-pane="v-recite">背诵模式</a>
@@ -4304,8 +4304,8 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
     <section class="pane on" id="v-list">
       <div class="card">
-        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h3 style="margin:0">已收录单词：<span id="vCount">0</span> 个</h3>
+        <div class="row v-list-head">
+          <h3><span id="vCount">0</span> <span>个单词</span></h3>
           <button class="btn" id="vClear">清空生词本</button>
         </div>
         <div id="vList"></div>
@@ -4318,7 +4318,6 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
           <h3 style="margin:0">背诵模式</h3>
           <div class="rec-prog">已掌握 <b id="recOk">0</b> / <span id="recTotal">0</span></div>
         </div>
-        <p class="lead" style="text-align:center">根据下面显示的英文单词，写出它的中文释义。</p>
         <div class="rec-word" id="recWord">&mdash;</div>
         <div class="rec-pos" id="recPos"></div>
         <div class="rec-row">
@@ -16031,16 +16030,14 @@ drawQuantum();
   function renderVocab(){
     if (!vList) return;
     if (vCount) vCount.textContent = VOCAB.length;
+    $("mod-vocab").classList.toggle("vocab-empty", !VOCAB.length);
+    $("vClear").disabled = !VOCAB.length;
     if (!VOCAB.length){
       vList.innerHTML =
         '<div class="v-empty">' +
-          '<div class="v-empty-t">生词本还是空的</div>' +
-          '<p>在题目的英文里<b>点击任意一个不认识的单词</b>，或者用顶部的<b>翻译</b>查词，查过的词会自动收录到这里。</p>' +
-          '<div class="v-sug">先试试这几个：' +
-            ["isotope", "orbital", "electronegativity", "resonance", "octet", "limiting"].map(function(w){
-              return '<button class="btn v-sug-b" data-w="' + w + '">' + w + "</button>";
-            }).join("") +
-          "</div>" +
+          '<div class="v-empty-t">暂无生词</div>' +
+          '<p>查过的单词会保存在这里。</p>' +
+          '<button class="btn v-lookup">查词</button>' +
         "</div>";
       return;
     }
@@ -16067,8 +16064,7 @@ drawQuantum();
         persist(); renderVocab(); renderRecite();
         return;
       }
-      var sug = e.target.closest && e.target.closest(".v-sug-b");
-      if (sug) openTranslate(sug.dataset.w);
+      if (e.target.closest && e.target.closest(".v-lookup")) openTranslate();
     });
   }
 
@@ -16105,7 +16101,7 @@ drawQuantum();
       recWord.textContent = "—";
       if (recPos) recPos.textContent = "";
       if (recFb){ recFb.className = "rec-fb"; recFb.innerHTML = ""; }
-      if (recState) recState.innerHTML = "生词本为空，先去收录几个单词吧。";
+      if (recState) recState.textContent = "暂无生词";
       return;
     }
     if (recIdx >= VOCAB.length) recIdx = 0;
@@ -16128,7 +16124,7 @@ drawQuantum();
     }
     var ok = checkMeaning(typed, v.cn);
     if (ok) v.ok = 1;
-    persist();
+    persist(); renderVocab();
     recFb.className = "rec-fb show " + (ok ? "ok" : "no");
     recFb.innerHTML =
       '<div class="rec-verdict">' + (ok ? "✓ 答对了" : "✗ 再想想") + "</div>" +
@@ -16154,7 +16150,7 @@ drawQuantum();
   if (recNext) recNext.addEventListener("click", function(){ if (VOCAB.length){ recIdx = (recIdx + 1) % VOCAB.length; renderRecite(); } });
   if (recMark) recMark.addEventListener("click", function(){
     if (!VOCAB.length) return;
-    VOCAB[recIdx].ok = 1; persist();
+    VOCAB[recIdx].ok = 1; persist(); renderVocab();
     if (recOkEl) recOkEl.textContent = VOCAB.filter(function(x){ return x.ok; }).length;
     recFb.className = "rec-fb show ok";
     recFb.innerHTML = "已标记为掌握：<b>" + VOCAB[recIdx].w + "</b>";

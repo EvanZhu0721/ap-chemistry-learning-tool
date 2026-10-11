@@ -255,6 +255,46 @@ html.material-app { scroll-padding-top: 96px; --ui-viewport-height: calc(100dvh 
 .material-app #trHint { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; color: var(--md-sys-color-on-surface-variant); }
 .material-app #trOut .study-ai-actions:empty { display: none; }
 .material-app .v-del { display: inline-flex; align-items: center; min-height: 48px; padding: 8px 12px; color: var(--md-sys-color-on-surface-variant); }
+.material-app .vocab .module-head { margin-bottom: 20px; }
+.material-app .vocab .tabs { display: inline-flex; flex-wrap: nowrap; gap: 0; margin: 0 0 24px; border: 1px solid var(--md-sys-color-outline); border-radius: 28px; overflow: hidden; max-width: 100%; }
+.material-app .vocab .tab { display: flex; align-items: center; justify-content: center; padding: 10px 24px; border: 0; border-radius: 0; margin: 0; white-space: nowrap; font-size: 14px; }
+.material-app .vocab .tab + .tab { border-left: 1px solid var(--md-sys-color-outline); }
+.material-app .vocab .tab.on { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.material-app .vocab .tab:not(.on):hover { background: var(--md-sys-color-surface-container); }
+.material-app .vocab .tab:focus-visible { outline-offset: -4px; }
+.material-app .vocab .card { border: 0; padding: 0; background: transparent; }
+.material-app .v-list-head { justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+.material-app .v-list-head h3 { margin: 0; font-size: 14px; font-weight: 400; color: var(--md-sys-color-on-surface-variant); }
+.material-app .vocab #vClear { border: 0; padding-inline: 12px; }
+.material-app .vocab #vClear:disabled { visibility: hidden; }
+.material-app .vocab .v-empty { padding: 56px 16px; }
+.material-app .vocab .v-empty-t { font-size: 20px; font-weight: 500; margin-bottom: 8px; }
+.material-app .vocab .v-empty p { margin-bottom: 24px; color: var(--md-sys-color-on-surface-variant); }
+.material-app .vocab :is(.v-lookup,.rec-check) { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: var(--md-sys-color-primary); }
+.material-app .vocab :is(.v-lookup,.rec-check):hover { filter: brightness(1.08); }
+.material-app .vocab .v-item { border: 0; border-bottom: 1px solid var(--md-sys-color-outline-variant); border-radius: 0; background: transparent; padding: 16px 0; margin: 0; }
+.material-app .vocab .v-top { align-items: center; gap: 8px; }
+.material-app .vocab .v-w { overflow-wrap: anywhere; min-width: 0; }
+.material-app .vocab .v-ok { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.material-app .vocab .v-kp .kp { background: var(--md-sys-color-surface-container); border-color: var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface-variant); }
+.material-app .vocab .v-del:hover { color: var(--md-sys-color-error); }
+.material-app .vocab .rec-top { padding: 0 0 20px; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+.material-app .vocab .rec-top h3 { margin: 0; font-size: 14px; font-weight: 500; }
+.material-app .vocab .rec-prog b { color: var(--md-sys-color-primary); }
+.material-app .vocab .rec-word { margin-top: 32px; font-size: clamp(28px, 5vw, 40px); }
+.material-app .vocab .rec-pos { color: var(--md-sys-color-on-surface-variant); }
+.material-app .vocab .rec-row { flex-wrap: wrap; margin-bottom: 20px; }
+.material-app .vocab .rec-row input { min-width: 0; flex: 1 1 180px; background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); border-color: var(--md-sys-color-outline); }
+.material-app .vocab .rec-row input:focus { border-color: var(--md-sys-color-primary); box-shadow: none; outline: 2px solid var(--md-sys-color-primary); outline-offset: -2px; }
+.material-app .vocab .rec-fb { background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); border: 0; padding: 20px; border-radius: 16px; }
+.material-app .vocab .rec-fb.ok { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.material-app .vocab .rec-fb.no { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+.material-app .vocab .rec-fb.warn { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.material-app .vocab .rec-fb :is(.rec-verdict,.rec-line,.rec-lab,.rec-tip,.kp) { color: inherit; }
+.material-app .vocab .rec-fb .kp { background: transparent; border-color: currentColor; }
+.material-app .vocab .rec-acts .btn { border: 0; padding-inline: 14px; }
+.material-app .vocab.vocab-empty :is(.rec-word,.rec-pos,.rec-row,.rec-acts) { display: none; }
+.material-app .vocab.vocab-empty .rec-state { padding: 56px 16px; margin: 0; font-size: 20px; color: var(--md-sys-color-on-surface-variant); }
 .material-app .w:hover { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); border-color: var(--md-sys-color-primary); }
 
 /* Dialogs, accounts and contextual assistance. */
