@@ -5,6 +5,44 @@ const http=require('node:http');
 const path=require('node:path');
 const {chromium}=require('playwright');
 
+test('Context keeps nearby definitions, late selections and source TeX without hidden answers',async t=>{
+  for(const kind of ['paragraph','long-question','math']){
+    await t.test(kind,async t=>{
+      const page=await openPractice(t);let body;
+      await page.route('**/api/ai/translate',r=>{body=r.request().postDataJSON();return r.fulfill({contentType:'application/json',body:'{"translation":"上下文测试完成"}'});});
+      await page.evaluate(kind=>{
+        const host=document.createElement('div');host.className=kind==='long-question'?'pz-item':'study-card';
+        document.querySelector('#bankQBox').replaceChildren(host);
+        if(kind==='long-question'){
+          host.innerHTML='<p>'+('Remote background. '.repeat(220))+' NEARBY_CONDITION <span id="context-target">The potential decreases here.</span> NEARBY_RESULT</p>';
+        }else{
+          host.innerHTML='<section><p>'+('Remote background. '.repeat(160))+'</p><p>Here potential means chemical potential in joules per mole.</p><p id="context-target">The potential decreases here.</p><p>Temperature remains fixed.</p><p hidden>HIDDEN_CONTEXT_ANSWER</p><details><summary>Answer</summary>HIDDEN_CLOSED_ANSWER</details></section>';
+          if(kind==='math'){
+            const eq=document.createElement('span');host.querySelector('section p:nth-child(2)').append(eq);
+            katex.render(String.raw`\frac{a}{b}+K_a+[H^+]`,eq);
+          }
+        }
+        const target=host.querySelector('#context-target');
+        const r=document.createRange();r.selectNodeContents(target);
+        const s=getSelection();s.removeAllRanges();s.addRange(r);
+        document.dispatchEvent(new Event('selectionchange'));
+      },kind);
+      await page.locator('.study-ai-toolbar button:has-text("翻译")').click();
+      await page.getByText('上下文测试完成',{exact:true}).waitFor();
+      assert.ok(body.context.length<=2000);
+      assert.ok(body.context.includes('The potential decreases here.'));
+      if(kind==='long-question'){
+        assert.match(body.context,/NEARBY_CONDITION/);assert.match(body.context,/NEARBY_RESULT/);
+      }else{
+        assert.match(body.context,/chemical potential in joules per mole/);
+        assert.match(body.context,/Temperature remains fixed/);
+        assert.doesNotMatch(body.context,/HIDDEN_CONTEXT_ANSWER|HIDDEN_CLOSED_ANSWER/);
+      }
+      if(kind==='math')assert.equal(body.context.split(String.raw`\(\frac{a}{b}+K_a+[H^+]\)`).length,2);
+    });
+  }
+});
+
 let browser, server, base;
 
 before(async()=>{
@@ -282,6 +320,32 @@ test('4. Translation calls /api/ai/translate, renders textContent with newlines,
   const cachedContent = await page.locator('.study-ai-panel .study-ai-content').innerText();
   assert.equal(cachedContent, '第一行：化学反应平衡\n第二行：速率常数与温度');
   assert.equal(translateCalls, 1, 'Second translate call for same text+context must use in-memory cache');
+});
+
+test('Translation renders LaTeX on first response and cache hit without interpreting HTML', async t => {
+  const page = await openPractice(t);
+  let calls = 0;
+  const translation = String.raw`平衡 $K_c$，离子 \(Ca^{2+}\)。
+$$K=\frac{[B]}{[A]}$$
+\[\Delta G=-RT\ln K\]
+<img src=x onerror="window.translationInjected=true">`;
+  await page.route('**/api/ai/translate', route => {
+    calls++;
+    return route.fulfill({contentType:'application/json',body:JSON.stringify({translation})});
+  });
+  for (let attempt=0; attempt<2; attempt++) {
+    await selectPassage(page, '#bankQBox .pz-item .pz-q', 7);
+    await page.locator('.study-ai-toolbar button:has-text("翻译")').click();
+    const panel = page.locator('.study-ai-content');
+    await panel.locator('.katex').nth(3).waitFor();
+    assert.equal(await panel.locator('.katex').count(), 4);
+    assert.equal(await panel.locator('.katex-display').count(), 2);
+    assert.equal(await panel.locator('.katex-error,img').count(), 0);
+    assert.ok((await panel.textContent()).includes('<img src=x'));
+    assert.equal(await page.evaluate(()=>window.translationInjected), undefined);
+    await page.locator('.study-ai-close').click();
+  }
+  assert.equal(calls, 1);
 });
 
 test('5. Streaming Ask AI with application/x-ndjson, textContent, and follow-up history', async t => {
