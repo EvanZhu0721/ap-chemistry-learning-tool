@@ -2,6 +2,15 @@
 html.material-app { scroll-padding-top: 96px; --ui-viewport-height: calc(100dvh / var(--ui-scale, 1)); }
 .material-app body { margin: 0; font-size: 15px; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
 .material-app [hidden] { display: none !important; }
+/* Keep the legacy document out of the first paint until the new shell is ready. */
+.material-loading body { overflow: hidden; }
+.material-loading body > :not(.m-startup),
+.material-loading body > :not(.m-startup) * { visibility: hidden !important; }
+.m-startup { display: none; }
+.material-loading .m-startup { position: fixed; inset: 0; z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; background: var(--md-sys-color-surface); }
+.m-startup .m-brand, .m-startup p { margin: 0; }
+.m-startup progress { width: 100px; height: 4px; accent-color: var(--md-sys-color-primary); }
+.m-startup button { min-height: 44px; padding: 0 20px; border: 1px solid var(--md-sys-color-outline); border-radius: 24px; color: var(--md-sys-color-primary); background: transparent; }
 .material-app :where(button, input, select, textarea) { font: inherit; color: inherit; }
 .material-app :where(button, a, input, select, textarea, summary):focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 3px; }
 .material-app :where(h1, h2)[tabindex="-1"]:focus { outline: none; }

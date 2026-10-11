@@ -122,10 +122,24 @@
 </head>
 <body>
 <script>
+document.documentElement.classList.add('material-loading');
+window.addEventListener('load',function(){
+  if(document.documentElement.classList.contains('material-ready'))return;
+  var startup=document.getElementById('material-startup');
+  startup.querySelector('progress').hidden=true;
+  startup.querySelector('p').hidden=false;
+  var retry=startup.querySelector('button');retry.hidden=false;retry.onclick=function(){location.reload();};
+});
 try{var _t=localStorage.getItem("apchem.theme");if(!document.documentElement.classList.contains("material-app")&&_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
 try{var _fs=localStorage.getItem("apchem.fontScale");if(_fs&&_fs!=="1"){document.body.style.zoom=_fs}}catch(e){}
 try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentElement.style.setProperty("--wm-size",_wm+"px")}}catch(e){}
 </script>
+<div id="material-startup" class="m-startup" role="status">
+  <div class="m-brand" aria-label="AP Chem"><span class="m-wordmark-ap">AP</span><span class="m-wordmark-chem">Chem</span></div>
+  <progress aria-label="加载中"></progress>
+  <p hidden>加载失败</p>
+  <button type="button" hidden>重新加载</button>
+</div>
 <noscript>
   <div class="nojs">
     <b>当前阅读器没有运行 JavaScript —— 已切换为「无脚本阅读模式」</b>

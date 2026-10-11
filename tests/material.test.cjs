@@ -26,6 +26,50 @@ async function open(t,width=1440,route='/learn'){
 }
 async function route(page,route){await page.evaluate(r=>location.hash=r,route);await page.waitForFunction(r=>location.hash==='#'+r&&document.querySelector('.m-content .m-active-page'),route);await page.waitForTimeout(50);}
 
+test('slow startup never paints the legacy interface before the Material shell',async t=>{
+  for(const asset of ['app.js','material-app.js'])for(const colorScheme of ['light','dark']){
+    const page=await browser.newPage({colorScheme,viewport:{width:colorScheme==='dark'?390:1440,height:900}});
+    const errors=[];page.on('pageerror',e=>errors.push(e.message));t.after(()=>page.close());
+    let release,blocked;
+    const gate=new Promise(resolve=>release=resolve),requested=new Promise(resolve=>blocked=resolve);
+    await page.route('**/assets/'+asset,async request=>{blocked();await gate;await request.continue();});
+    const navigation=page.goto(base);
+    try{
+      await requested;
+      await page.locator('#material-startup').waitFor({state:'visible'});
+      assert.equal(await page.locator('.topbar').isVisible(),false);
+      assert.equal(await page.locator('#home').isVisible(),false);
+      assert.equal(await page.locator('html').getAttribute('data-theme'),colorScheme);
+      assert.equal(await page.locator('.material-ready').count(),0);
+    }finally{release();await navigation;}
+    assert.equal(await page.locator('.m-shell').isVisible(),true);
+    assert.equal(await page.locator('.m-course-row').count(),14);
+    assert.equal(await page.locator('#material-startup').count(),0);
+    assert.equal(await page.locator('.topbar').isVisible(),false);
+    assert.deepEqual(errors,[]);
+  }
+});
+
+test('failed startup offers a working retry without exposing the legacy interface',async t=>{
+  const page=await browser.newPage();t.after(()=>page.close());
+  await page.route('**/assets/material-app.js',request=>request.abort());
+  await page.goto(base);
+  assert.equal(await page.locator('#material-startup p').innerText(),'加载失败');
+  assert.equal(await page.locator('#material-startup progress').isVisible(),false);
+  assert.equal(await page.locator('.topbar').isVisible(),false);
+  await page.unroute('**/assets/material-app.js');
+  await page.locator('#material-startup button').click();
+  await page.locator('.material-ready .m-shell').waitFor({state:'visible'});
+  assert.equal(await page.locator('#material-startup').count(),0);
+});
+
+test('the no-script reading fallback remains visible',async t=>{
+  const page=await browser.newPage({javaScriptEnabled:false});t.after(()=>page.close());
+  await page.goto(base);
+  assert.equal(await page.locator('.nojs').isVisible(),true);
+  assert.equal(await page.locator('#material-startup').isVisible(),false);
+});
+
 test('all chapters, examples, checks and original laboratory panes remain reachable',async t=>{
   const page=await open(t);
   assert.equal(await page.locator('.m-course-row').count(),14);
