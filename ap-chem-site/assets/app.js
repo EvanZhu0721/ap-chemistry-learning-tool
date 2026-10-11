@@ -10043,7 +10043,7 @@ drawQuantum();
         Array.prototype.forEach.call(optsEls, function(x){
           var j = +x.dataset.j;
           x.classList.remove("sel");
-          if (j === it.ans) x.classList.add("right");
+          if (ok && j === it.ans) x.classList.add("right");
           else if (j === chosen) x.classList.add("wrong");
           else x.classList.add("dim");
         });
@@ -10068,6 +10068,11 @@ drawQuantum();
             '<div class="pz-ansrow">' + ansChip + rangeChip + "</div>" +
             explainBody +
             "</div></details>";
+          var fold = fb.querySelector(".pz-fold");
+          fold.addEventListener("toggle", function(){
+            optsEls[it.ans].classList.toggle("right", fold.open);
+            optsEls[it.ans].classList.toggle("dim", !fold.open);
+          });
         }
         recordAnswer(it.id, ok);
         if (typeof opts.onAnswer === "function") opts.onAnswer(ok, it);
@@ -11760,7 +11765,14 @@ drawQuantum();
            '<span class="bank-fold-hint">点击展开</span></summary>' +
            '<div class="bank-unit-body">' + allCb + rangesHtml + "</div></details>";
     });
+    var openUnits = {};
+    Array.prototype.forEach.call(rangesBox.querySelectorAll("details[open] [data-unitall]"), function(cb){
+      openUnits[cb.dataset.unitall] = true;
+    });
     rangesBox.innerHTML = h;
+    Array.prototype.forEach.call(rangesBox.querySelectorAll("[data-unitall]"), function(cb){
+      cb.closest("details").open = !!openUnits[cb.dataset.unitall];
+    });
     Array.prototype.forEach.call(rangesBox.querySelectorAll("input[data-range]"), function(cb){
       cb.addEventListener("change", function(){
         picked[cb.dataset.range] = cb.checked;
@@ -11807,7 +11819,7 @@ drawQuantum();
     if (sv) sv.hidden = (which !== "sel");
     if (qv) qv.hidden = (which !== "quiz");
   }
-  var bankState = { sel: [], ids: [], done: {}, idx: 0 };
+  var bankState = { sel: [], ids: [], done: {}, cards: {}, idx: 0 };
 
   function bkCountDone(){ var n = 0; for (var k in bankState.done){ if (bankState.done[k]) n++; } return n; }
 
@@ -11852,10 +11864,18 @@ drawQuantum();
     var single = (window.__bankView !== "all");
     session.innerHTML = bankReviewHTML() + '<div class="card"><div id="bankQBox"></div></div>';
     var onAns = function(ok, it){ bankState.done[it.id] = 1; refreshBankReview(); };
-    if (single){
-      Q.renderQ($("bankQBox"), [bankState.sel[bankState.idx]], { showSource: true, showRange: true, startNo: bankState.idx + 1, onAnswer: onAns });
-    } else {
-      Q.renderQ($("bankQBox"), bankState.sel, { showSource: true, showRange: true, onAnswer: onAns });
+    // Keep each question's DOM and handlers for this practice, including unsubmitted choices.
+    var first = single ? bankState.idx : 0;
+    var end = single ? first + 1 : bankState.sel.length;
+    for (var i = first; i < end; i++){
+      var it = bankState.sel[i];
+      if (!bankState.cards[it.id]){
+        var card = document.createElement("div");
+        Q.renderQ(card, [it], { showSource: true, showRange: true, startNo: i + 1, onAnswer: onAns });
+        bankState.cards[it.id] = card;
+      }
+      bankState.cards[it.id].style.marginBottom = i < end - 1 ? "14px" : "";
+      $("bankQBox").appendChild(bankState.cards[it.id]);
     }
     refreshBankReview();
     bindBankNav();
@@ -11880,6 +11900,7 @@ drawQuantum();
     bankState.sel = copy.slice(0, want);
     bankState.ids = ids;
     bankState.done = {};
+    bankState.cards = {};
     bankState.idx = 0;
     renderBankQuiz();
     if (session.scrollIntoView) session.scrollIntoView({ behavior: "smooth", block: "start" });
