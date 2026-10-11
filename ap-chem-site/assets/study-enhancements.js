@@ -126,6 +126,30 @@
 
   let aiPopup=null,activeSnapshot=null,currentAbortController=null,currentRequestId=0,askHistory=[];
   function accountToken(){try{return localStorage.getItem('acct_token');}catch{return '';}}
+  function translationFailure(message,status=0){return Object.assign(new Error(message),{translation:true,status});}
+  async function requestTranslation(snapshot,signal){
+    const cached=getCachedTranslation(snapshot.text,snapshot.context);
+    if(cached)return cached;
+    const token=accountToken();
+    if(!token)throw translationFailure(t('Please sign in first.','请先登录账号后再使用翻译。'),401);
+    const resp=await fetch('/api/ai/translate',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body:JSON.stringify({text:snapshot.text.slice(0,6000),context:snapshot.context.slice(0,2000)}),signal
+    });
+    if(!resp.ok){
+      let message=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+      if(resp.status===401)message=t('Session expired. Please sign in again.','登录已失效，请重新登录。');
+      else if(resp.status===429)message=t('Too many requests. Please try again later.','请求过于频繁，请稍后再试。');
+      else if(resp.status!==503){try{const data=await resp.json();if(data.error)message=data.error;}catch{}}
+      throw translationFailure(message,resp.status);
+    }
+    const data=await resp.json();
+    if(data.error)throw translationFailure(data.error);
+    if(typeof data.translation!=='string'||!data.translation.trim())throw translationFailure(t('Invalid translation. Please retry.','翻译格式异常，请重试。'));
+    if(!signal.aborted)setCachedTranslation(snapshot.text,snapshot.context,data.translation);
+    return data.translation;
+  }
+  function translationErrorText(error){return error.translation?error.message:t('Network request failed. Please check your connection.','网络请求失败，请检查连接后重试。');}
   function abortInFlight(){if(currentAbortController){currentAbortController.abort();currentAbortController=null;}currentRequestId++;}
   function hideAiPopup(){abortInFlight();aiPopup?.remove();aiPopup=null;}
   function hideAllPopups(){hideWord();hideAiPopup();}
@@ -231,57 +255,63 @@
     const cached=getCachedTranslation(snapshot.text,snapshot.context);
     if(cached){contentEl.textContent=cached;renderMath(contentEl,true);return;}
 
-    const token=accountToken();
-    if(!token){
-      statusEl.textContent=t('Please sign in first.','请先登录账号后再使用翻译。');
-      statusEl.className='study-ai-status error';
-      return;
-    }
-
     const reqId=++currentRequestId;
     const controller=new AbortController();currentAbortController=controller;
     statusEl.textContent=t('Translating…','正在翻译…');
     actionsEl.append(button('Cancel','取消',()=>controller.abort()));
 
-    fetch('/api/ai/translate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
-      body:JSON.stringify({text:snapshot.text.slice(0,6000),context:snapshot.context.slice(0,2000)}),
-      signal:controller.signal
-    }).then(async resp=>{
+    requestTranslation(snapshot,controller.signal).then(translation=>{
       if(reqId!==currentRequestId)return;
-      if(!resp.ok){
-        let msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
-        if(resp.status===401)msg=t('Session expired. Please sign in again.','登录已失效，请重新登录。');
-        else if(resp.status===429)msg=t('Too many requests. Please try again later.','请求过于频繁，请稍后再试。');
-        else if(resp.status===503)msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
-        else{try{const d=await resp.json();if(d.error)msg=d.error;}catch{}}
-        statusEl.textContent=msg;statusEl.className='study-ai-status error';
-        actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
-        return;
-      }
-      const data=await resp.json();
-      if(reqId!==currentRequestId)return;
-      if(data.error){
-        statusEl.textContent=data.error;statusEl.className='study-ai-status error';
-        actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
-        return;
-      }
-      if(typeof data.translation!=='string'||!data.translation.trim())throw Error('Invalid translation');
-      const translation=data.translation;
-      setCachedTranslation(snapshot.text,snapshot.context,translation);
       statusEl.textContent='';contentEl.textContent=translation;renderMath(contentEl,true);actionsEl.replaceChildren();
     }).catch(err=>{
       if(reqId!==currentRequestId)return;
       if(err.name==='AbortError'){
         statusEl.textContent=t('Request cancelled.','请求已取消。');statusEl.className='study-ai-status';
       }else{
-        statusEl.textContent=t('Network request failed. Please check your connection.','网络请求失败，请检查连接后重试。');
+        statusEl.textContent=translationErrorText(err);
         statusEl.className='study-ai-status error';
       }
       actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
     });
   }
+
+  let toolTranslationAbort=null;
+  function resetTranslationTool(){
+    toolTranslationAbort?.abort();toolTranslationAbort=null;
+    $('trOut').className='tr-out study-owned';$('trOut').replaceChildren();$('trHint').replaceChildren();
+  }
+  function translateTool(raw,forceAI=false){
+    hideAllPopups();resetTranslationTool();
+    const text=String(raw??'').trim(),out=$('trOut'),hint=$('trHint');
+    out.classList.add('show');
+    if(!text||text.length>6000){out.textContent=text?t('Use up to 6000 characters.','请将文本缩短至 6000 字以内。'):t('Enter text to translate.','请输入要翻译的内容。');return;}
+    const local=forceAI?null:lookupWord(text);
+    if(local){
+      const word=el('div','tr-word',local.key);word.append(el('span','tr-pos',local.e[0]));
+      out.append(word,el('div','tr-cn',local.e[1]));
+      if(local.e[2])out.append(el('div','tr-kp',local.e[2]));
+      window.__vocab.addEntry(local.key,local.e);
+      hint.append(el('span','',t('Dictionary · Saved to vocabulary','词表 · 已加入生词本')),button('AI translation','AI 翻译',()=>translateTool(text,true)));
+      return;
+    }
+    const controller=new AbortController();toolTranslationAbort=controller;
+    const status=el('div','study-ai-status',t('Translating…','正在翻译…'));
+    const result=el('div','study-ai-content'),actions=el('div','study-ai-actions');
+    actions.append(button('Cancel','取消',()=>controller.abort()));out.append(status,result,actions);
+    hint.textContent=t('AI translation','AI 翻译');
+    requestTranslation({text,context:''},controller.signal).then(translation=>{
+      if(toolTranslationAbort!==controller)return;
+      status.textContent='';result.textContent=translation;renderMath(result,true);actions.replaceChildren();
+    }).catch(error=>{
+      if(toolTranslationAbort!==controller)return;
+      status.textContent=error.name==='AbortError'?t('Request cancelled.','请求已取消。'):translationErrorText(error);
+      status.classList.toggle('error',error.name!=='AbortError');
+      actions.replaceChildren(button('Retry','重试',()=>translateTool(text,true)));
+      if(error.status===401)actions.prepend(button('Sign in','登录',()=>{$('modalTr').classList.add('hide');$('btnUser').click();}));
+    });
+  }
+  $('trInput').addEventListener('input',resetTranslationTool);
+  new MutationObserver(()=>{if($('modalTr').classList.contains('hide'))resetTranslationTool();}).observe($('modalTr'),{attributes:true,attributeFilter:['class']});
 
   function openAiAsk(snapshot,customQuestion=null){
     abortInFlight();hideWord();
@@ -478,7 +508,7 @@
   const UI = new Map(Object.entries({
     'AP Chemistry 学习工具':'AP Chemistry Learning Tool',
     '首页':'Home','学习':'Learn','题库':'Question bank','错题本':'Review','生词本':'Vocabulary','设置':'Settings',
-    '进入 →':'Open →','公式表':'Formula sheet','查缺补漏':'Knowledge check','大纲':'Outline','翻译':'Dictionary','刷新':'Reload',
+    '进入 →':'Open →','公式表':'Formula sheet','查缺补漏':'Knowledge check','大纲':'Outline','翻译':'Translation','刷新':'Reload',
     '← 返回首页':'← Home','登录 / 注册':'Sign in / Register','← 返回单元列表':'← All units',
     '9 个单元':'9 units','按小节归类':'Organised by topic','一键练习':'Quick practice','按范围选':'Choose topics','自选题量':'Choose question count',
     '中英双语解析':'Bilingual explanations','自动记录':'Automatic history','三态分类':'Track progress','一键订正':'Retry mistakes','单词列表':'Word list','背诵模式':'Recall practice','自动收录':'Save new words',
@@ -1055,6 +1085,8 @@
   ['learnDirectory','bankRanges','bankSession','crumb','lsTitle','lsMeta'].forEach(id=>{const n=$(id);if(n)uiObserver.observe(n,{childList:true,subtree:true});});
   if(window.__q?.renderQ){const render=window.__q.renderQ;window.__q.renderQ=function(container,...args){const out=render.call(this,container,...args);renderMath(container);return out;};}
   window.AP_LEARNING={
+    translateTool,
+    resetTranslationTool,
     openGuide,
     openBook,
     showGuide,

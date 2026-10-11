@@ -4340,11 +4340,10 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
 <div class="modal hide" id="modalTr">
   <div class="modal-box">
-    <div class="modal-head"><h3>翻译 · 单词翻译</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-head"><h3>翻译</h3><button class="btn modal-close">关闭</button></div>
     <div class="modal-body">
-      <p class="pn-lead">翻译<b>只翻译一个英文单词</b>（不翻译句子或公式）。翻译完成后，该单词会<b>自动收录进生词本</b>。</p>
       <div class="tr-row">
-        <input id="trInput" type="text" placeholder="输入一个英文单词，例如 isotope" autocomplete="off" spellcheck="false">
+        <textarea id="trInput" rows="4" maxlength="6000" aria-label="翻译原文" placeholder="输入英文单词或段落" autocomplete="off" spellcheck="false"></textarea>
         <button class="btn tr-go" id="trGo">翻译</button>
       </div>
       <div class="tr-out" id="trOut"></div>
@@ -15997,59 +15996,19 @@ drawQuantum();
   /* ============ C. 翻译 ============ */
   var trInput = $("trInput"), trOut = $("trOut"), trHint = $("trHint");
 
-  function countWords(s){
-    var parts = String(s).trim().split(/[^A-Za-z\-']+/).filter(function(x){ return x.length > 0; });
-    return parts.length;
-  }
-
   function doTranslate(raw){
-    var w = String(raw == null ? "" : raw).trim();
-    trOut.className = "tr-out";
-    trOut.innerHTML = "";
-    trHint.innerHTML = "";
-    if (!w){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "请输入一个英文单词。";
-      return;
-    }
-    var n = countWords(w);
-    if (n === 0){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "没有检测到英文单词。<b>翻译只用于翻译单个单词</b>，不翻译句子或公式。";
-      return;
-    }
-    if (n > 1){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "检测到 <b>" + n + "</b> 个单词。翻译<b>仅用于翻译单个单词</b>，请只输入一个词，例如 <b>isotope</b>。";
-      return;
-    }
-    var r = lookup(w);
-    if (!r){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "词典中暂时没有 <b>" + w + "</b>。<br><span class=\"tr-tip\">可以换一个形式试试（如复数写成单数），或直接在题目里点击其它不认识的单词。</span>";
-      return;
-    }
-    var e = r.e, isNew = true;
-    for (var i = 0; i < VOCAB.length; i++) if (VOCAB[i].w === r.key) isNew = false;
-    addWord(w);
-    trOut.className = "tr-out show ok";
-    trOut.innerHTML =
-      '<div class="tr-word">' + r.key + '<span class="tr-pos">' + e[0] + "</span></div>" +
-      '<div class="tr-cn">' + e[1] + "</div>" +
-      '<div class="tr-kp"><span class="kp">' + e[2] + "</span></div>";
-    trHint.innerHTML = isNew
-      ? "✓ 已自动加入生词本（当前共 " + VOCAB.length + " 个单词）"
-      : "这个词已在生词本中（当前共 " + VOCAB.length + " 个单词）";
+    window.AP_LEARNING.translateTool(raw);
   }
 
   var trGo = $("trGo");
   if (trGo) trGo.addEventListener("click", function(){ doTranslate(trInput ? trInput.value : ""); });
   if (trInput){
-    trInput.addEventListener("keydown", function(e){ if (e.key === "Enter") doTranslate(trInput.value); });
+    trInput.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault();doTranslate(trInput.value); } });
   }
 
   function openTranslate(word){
     closeAll();
+    window.AP_LEARNING.resetTranslationTool();
     var m = $("modalTr");
     if (m) m.classList.remove("hide");
     if (trInput) trInput.value = word || "";

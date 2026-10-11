@@ -158,7 +158,7 @@ test('six palettes have readable light and dark roles and persist without touchi
 
 test('tools and account dialogs close with Escape and return keyboard focus',async t=>{
   const page=await open(t,768,'/tools');
-  for(const [text,id] of [['公式与周期表','modalFormula'],['课程大纲','modalPdf'],['查缺补漏','modalGap'],['词典','modalTr'],['学习设置','modalSettings']]){
+  for(const [text,id] of [['公式与周期表','modalFormula'],['课程大纲','modalPdf'],['查缺补漏','modalGap'],['翻译','modalTr'],['学习设置','modalSettings']]){
     const button=page.locator('.m-tool-row').filter({hasText:text});await button.click();
     assert.equal(await page.locator('#'+id).isVisible(),true);
     await page.keyboard.press('Escape');assert.equal(await page.locator('#'+id).isVisible(),false);

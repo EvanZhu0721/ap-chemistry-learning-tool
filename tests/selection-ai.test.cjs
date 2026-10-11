@@ -85,6 +85,83 @@ async function openPractice(t,token='test-valid-token') {
   return page;
 }
 
+async function openTranslator(t,token='toolbar-token'){
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  t.after(async()=>{await page.close();assert.deepEqual(errors,[]);});
+  if(token)await page.addInitScript(token=>localStorage.setItem('acct_token',token),token);
+  await page.goto(base+'/#/tools');
+  await page.locator('.m-tool-row').filter({hasText:'翻译'}).click();
+  return page;
+}
+
+test('toolbar dictionary lookup stays instant and can upgrade to AI translation',async t=>{
+  const page=await openTranslator(t);let calls=0,body;
+  await page.route('**/api/ai/translate',r=>{calls++;body=r.request().postDataJSON();return r.fulfill({contentType:'application/json',body:'{"translation":"AI 对同位素的翻译"}'});});
+  for(const word of ['isotope','isotopes']){
+    await page.locator('#trInput').fill(word);await page.locator('#trGo').click();
+    assert.match(await page.locator('#trOut').innerText(),/同位素/);
+    assert.equal(calls,0);
+  }
+  assert.equal(await page.evaluate(()=>__vocab.list.filter(w=>w.w==='isotope').length),1);
+  await page.locator('#trHint button').click();
+  await page.getByText('AI 对同位素的翻译',{exact:true}).waitFor();
+  assert.equal(calls,1);assert.deepEqual(body,{text:'isotopes',context:''});
+});
+
+test('toolbar passage translation uses auth, safe formula rendering and the shared cache',async t=>{
+  const page=await openTranslator(t);let calls=0,body,auth;
+  const translation=String.raw`平衡时 $K_c$ 保持不变。<img src=x onerror="window.injected=true">`;
+  await page.route('**/api/ai/translate',r=>{calls++;body=r.request().postDataJSON();auth=r.request().headers().authorization;return r.fulfill({contentType:'application/json',body:JSON.stringify({translation})});});
+  const text='At equilibrium, the constant is K_c.\nThe temperature is fixed.';
+  await page.locator('#trInput').fill(text);await page.locator('#trGo').click();
+  await page.locator('#trOut .katex').waitFor();
+  assert.deepEqual(body,{text,context:''});assert.equal(auth,'Bearer toolbar-token');
+  assert.equal(await page.locator('#trOut img').count(),0);
+  assert.equal(await page.evaluate(()=>!!window.injected),false);
+  assert.equal(await page.locator('#trOut .katex-error').count(),0);
+  await page.locator('#trGo').click();await page.locator('#trOut .katex').waitFor();
+  assert.equal(calls,1);assert.equal(await page.locator('#trOut .katex').count(),1);
+  assert.equal(await page.evaluate(()=>__vocab.list.length),0,'paragraphs must not enter the vocabulary list');
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+});
+
+test('toolbar validates text and offers account sign-in before an AI request',async t=>{
+  const page=await openTranslator(t,null);let calls=0;
+  await page.route('**/api/ai/translate',r=>{calls++;return r.abort();});
+  await page.locator('#trGo').click();assert.match(await page.locator('#trOut').innerText(),/请输入/);
+  await page.evaluate(()=>AP_LEARNING.translateTool('x'.repeat(6001)));
+  assert.match(await page.locator('#trOut').innerText(),/6000/);
+  await page.locator('#trInput').fill('The temperature is fixed.');await page.locator('#trGo').click();
+  await page.locator('#trOut .study-ai-status.error').waitFor();
+  assert.match(await page.locator('#trOut').innerText(),/登录/);assert.equal(calls,0);
+  await page.locator('#trOut button').filter({hasText:'登录'}).click();
+  assert.equal(await page.locator('#modalAccount').isVisible(),true);
+  assert.equal(await page.locator('#modalTr').isVisible(),false);
+});
+
+test('editing or closing the translator cancels requests and ignores late responses',async t=>{
+  const page=await openTranslator(t);
+  await page.evaluate(()=>{
+    const original=window.fetch;window.pendingTranslations=[];
+    window.fetch=(url,options)=>url==='/api/ai/translate'?new Promise(resolve=>pendingTranslations.push({signal:options.signal,resolve})):original(url,options);
+  });
+  await page.locator('#trInput').fill('First passage.');await page.locator('#trGo').click();
+  await page.locator('#trInput').fill('Second passage.');
+  assert.equal(await page.evaluate(()=>pendingTranslations[0].signal.aborted),true);
+  await page.locator('#trGo').click();
+  await page.evaluate(()=>pendingTranslations[0].resolve(new Response(JSON.stringify({translation:'STALE_RESULT'}))));
+  assert.doesNotMatch(await page.locator('#trOut').innerText(),/STALE_RESULT/);
+  await page.evaluate(()=>pendingTranslations[1].resolve(new Response(JSON.stringify({translation:'CURRENT_RESULT'}))));
+  await page.getByText('CURRENT_RESULT',{exact:true}).waitFor();
+  await page.locator('#trInput').fill('Third passage.');await page.locator('#trGo').click();
+  await page.locator('#modalTr .modal-close').click();
+  await page.waitForFunction(()=>pendingTranslations[2].signal.aborted);
+  await page.evaluate(()=>pendingTranslations[2].resolve(new Response(JSON.stringify({translation:'CLOSED_RESULT'}))));
+  await page.locator('.m-tool-row').filter({hasText:'翻译'}).click();
+  assert.equal(await page.locator('#trOut').innerText(),'');
+});
+
 // Select multiple words in an element (triggers sentence/passage AI toolbar)
 async function selectPassage(page, selector, wordCount = 6) {
   return await page.evaluate(({ sel, count }) => {

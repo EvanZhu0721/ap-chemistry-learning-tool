@@ -249,6 +249,11 @@ html.material-app { scroll-padding-top: 96px; --ui-viewport-height: calc(100dvh 
 .material-app :is(.v-pos,.tr-pos) { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); }
 .material-app :is(.v-cn,.tr-cn,.steps4,.fx-row b) { color: var(--md-sys-color-on-surface); }
 .material-app :is(.tr-out.ok,.fx-row) { background: var(--md-sys-color-surface-container-low); border-color: var(--md-sys-color-outline-variant); }
+.material-app .tr-row { flex-wrap: wrap; justify-content: flex-end; }
+.material-app #trInput { flex: 1 0 100%; width: 100%; min-height: 120px; padding: 14px; resize: vertical; border: 1px solid var(--md-sys-color-outline); border-radius: 12px; background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); font: inherit; line-height: 1.7; }
+.material-app #trOut { background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); border-color: var(--md-sys-color-outline-variant); overflow-wrap: anywhere; }
+.material-app #trHint { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; color: var(--md-sys-color-on-surface-variant); }
+.material-app #trOut .study-ai-actions:empty { display: none; }
 .material-app .v-del { display: inline-flex; align-items: center; min-height: 48px; padding: 8px 12px; color: var(--md-sys-color-on-surface-variant); }
 .material-app .w:hover { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); border-color: var(--md-sys-color-primary); }
 
