@@ -123,17 +123,21 @@ test('tools and account dialogs close with Escape and return keyboard focus',asy
   await page.keyboard.press('Escape');assert.equal(await page.locator('#btnUser').evaluate(n=>n===document.activeElement),true);
 });
 
-test('system theme follows the current OS on cold start, regardless of the legacy theme',async t=>{
-  for(const colorScheme of ['light','dark']){
+test('system theme is the default and follows the OS, regardless of the legacy theme',async t=>{
+  for(const mode of [null,'system'])for(const colorScheme of ['light','dark']){
     const page=await browser.newPage({colorScheme});t.after(()=>page.close());
-    await page.addInitScript(()=>{
-      localStorage.setItem('apchem.themeMode','system');
+    await page.addInitScript(mode=>{
+      if(mode)localStorage.setItem('apchem.themeMode',mode);
       localStorage.setItem('apchem.theme',matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark');
-    });
+    },mode);
     await page.goto(base);
+    assert.equal(await page.locator('html').getAttribute('data-theme-mode'),'system');
     assert.equal(await page.locator('html').getAttribute('data-theme'),colorScheme);
     assert.equal(await page.locator('html').getAttribute('data-theme-effective'),colorScheme);
     assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).colorScheme),colorScheme);
+    const next=colorScheme==='light'?'dark':'light';
+    await page.emulateMedia({colorScheme:next});
+    await page.waitForFunction(theme=>document.documentElement.dataset.theme===theme,next);
   }
 });
 

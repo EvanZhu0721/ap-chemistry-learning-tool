@@ -82,8 +82,7 @@
     if (rawMode === 'light' || rawMode === 'dark' || rawMode === 'system') {
       return rawMode;
     }
-    const legacy = safeGet(STORAGE_KEY_LEGACY, null);
-    return legacy === 'dark' ? 'dark' : 'light';
+    return 'system';
   }
 
   function getInitialAccent() {
