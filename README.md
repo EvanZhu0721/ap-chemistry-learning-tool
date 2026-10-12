@@ -13,11 +13,12 @@ python -m http.server 8000 --bind 127.0.0.1 --directory ap-chem-site
 
 Open `http://localhost:8000`. Use **Language / 语言** to switch the new study
 content and main navigation between Chinese and English. The language preference
-is stored on this browser/device. Use **Study guide / 双语讲解** for the 14-chapter
+is stored on this browser/device. Use **Study guide / 双语讲解** for the nine-unit
 guide or open any of the 49 course tabs for its focused explanation.
 
 The new explanations follow the review chapter organisation of Neil D. Jespersen's
-*AP Chemistry Premium 2025*. They are independently written bilingual study notes,
+*AP Chemistry Premium 2025*, regrouped into the nine official AP Chemistry units.
+They are independently written bilingual study notes,
 not a full translation of the book. Each chapter includes prerequisites, learning goals, three sequential teaching
 sections, two worked examples, two self-checks with hidden answers, a formula recap,
 and common mistakes. Both languages contain the same explanations and calculations.
@@ -52,6 +53,8 @@ units, alongside its original reference entries.
 
 The import tool supports the supplied Barron's *AP Chemistry Premium 2025* EPUB
 layout: 14 review chapters, 3 diagnostic tests, and 3 in-book practice tests.
+The 14 review chapters are regrouped into the nine official AP Chemistry units for
+study, while book practice keeps the original chapter numbering of the source EPUB.
 The additional online tests are not in the EPUB and are not imported.
 
 ```powershell
@@ -84,7 +87,8 @@ with the legacy review book. FRQ working is kept only while viewing the question
 - `AP化学学习工具.html`: original application source plus the enhancement includes.
 - `sync-site.py`: generates site HTML, CSS, and the original application JS from
   the source file, using repository-relative paths.
-- `ap-chem-site/assets/study-content.js`: 14 bilingual chapter explanations.
+- `ap-chem-site/assets/study-content.js`: 9 bilingual unit explanations (merged
+  from the book's 14 review chapters).
 - `ap-chem-site/assets/topic-notes.js`: 49 focused bilingual topic notes.
 - `ap-chem-site/assets/lesson-details.js`: paired teaching sections, worked examples and self-checks.
 - `ap-chem-site/assets/lecture-glossary.js`: local chemistry term definitions.

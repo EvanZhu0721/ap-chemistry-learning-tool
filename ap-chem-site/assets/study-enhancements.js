@@ -617,7 +617,7 @@
     card.append(block('Common mistake','常见错误',c.trap));
     const actions = el('div','study-actions');
     actions.append(button('Practise this chapter','练习本章题目',()=>openBook('chapter'+String(c.id).padStart(2,'0'))));
-    if (compact) actions.append(button('Open all 14 chapters','查看全部 14 章',()=>openGuide(c.id)));
+    if (compact) actions.append(button('Open all 9 chapters','查看全部 9 章',()=>openGuide(c.id)));
     card.append(actions);
     return card;
   }
@@ -700,7 +700,7 @@
     content.chapters.forEach(c=>{const b=button(`${c.id}. ${c.title.en}`,`${c.id}. ${c.title.zh}`,()=>{activeChapter=c.id;renderGuide();guide.scrollTop=0;},'study-chapter-button');
       b.setAttribute('aria-current',String(c.id===activeChapter));nav.append(b);});
     const body=el('div','study-reading');
-    body.append(el('p','study-source',t('Original study notes arranged around the 14 review chapters of AP Chemistry Premium 2025.','依据 AP Chemistry Premium 2025 的 14 章复习顺序编写的讲解。')),
+    body.append(el('p','study-source',t('Original study notes reorganised into the nine official AP Chemistry units.','按官方 AP 化学九个单元重新组织的双语讲解。')),
       chapterCard(content.chapters.find(c=>c.id===activeChapter)));
     layout.append(nav,body);guide.append(layout);renderMath(body);emphasise(body);
   }
@@ -724,7 +724,7 @@
     currentBookRequestId++;
     if (id !== undefined && id !== null) {
       const parsed = Number(id);
-      if (parsed >= 1 && parsed <= 14) activeChapter = parsed;
+      if (parsed >= 1 && parsed <= content.chapters.length) activeChapter = parsed;
     }
     if (tab && ['reading','examples','checks'].includes(tab)) {
       guideTab = tab;
@@ -1043,7 +1043,7 @@
     if (!isMaterial() && homeCard.parentElement) {
       homeCard.replaceChildren(el('div','study-eyebrow',t('UNDERSTAND · APPLY · REVIEW','理解 · 推导 · 练习')),
         el('h2','',t('Understand the chemistry behind the answer.','把原理讲清楚，再把题做明白。')),
-        el('p','',t('Learn step by step across 14 bilingual chapters: foundations, explanations, two worked examples per chapter, and self-checks. Select English words for Chinese meanings.','从基础学起：14 章中英讲义，循序解释、每章两道分步例题与自测。英文重点词加粗，支持划词查中文。')),
+        el('p','',t('Learn step by step across 9 bilingual chapters: foundations, explanations, two worked examples per chapter, and self-checks. Select English words for Chinese meanings.','从基础学起：9 章中英讲义，循序解释、每章两道分步例题与自测。英文重点词加粗，支持划词查中文。')),
         button('Explore the study guide','查看双语讲解',()=>openGuide()),button('Open book practice','进入书本题库',()=>openBook()));
     }
     if (bankLink.parentElement) {

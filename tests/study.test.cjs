@@ -21,7 +21,7 @@ test('every original learning pane has a chapter mapping and both languages',()=
   assert.equal(panes.length,49);
   for(const id of panes){assert.ok(study.paneChapters[id],id);for(const c of study.paneChapters[id])assert.ok(study.chapters.some(ch=>ch.id===c));
     const topic=context.window.AP_TOPICS[id];assert.ok(topic,id);for(let i=0;i<4;i++)assert.ok(topic[i].length>0);if(topic[4])katex.renderToString(topic[4],{throwOnError:true,displayMode:true});}
-  assert.equal(study.chapters.length,14);
+  assert.equal(study.chapters.length,9);
   for(const c of study.chapters){
     for(const field of ['title','core','why','symbols','example','trap'])for(const lang of ['en','zh'])assert.ok(c[field][lang].length>0,`${c.id}.${field}.${lang}`);
     assert.equal(c.steps.length,3);
