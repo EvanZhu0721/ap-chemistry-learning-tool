@@ -97,6 +97,33 @@ retains the enhancement includes. Edit the new content modules directly; they
 are not regenerated. The root HTML and site share the vendored renderer, so the
 root HTML now needs the adjacent `ap-chem-site/assets/` folder when copied.
 
+## Selection translation and AI
+
+Selecting text offers **翻译** and **问问 AI**. Local glossary lookup remains
+instant and free of network requests. AI requests require an existing website
+login and are sent only after a button click. The selected text and nearby
+context are sent to DeepSeek; translation results are cached only in page memory.
+
+Run `node ai-server/server.js` with Node.js 22 or later. Set `DEEPSEEK_API_KEY`
+in the server environment, never in frontend files. The default model is
+`deepseek-flash` (DeepSeek V4.1 Flash); `DEEPSEEK_MODEL` overrides it. Both actions
+disable thinking; translation uses JSON output and questions stream plain text.
+Without a key the service returns an explicit “not configured” response.
+
+The AI service listens on `127.0.0.1:8788` (`PORT` overrides it). Route
+`/api/ai/*` to this service before the account service's `/api/*` route.
+It validates login tokens using `/api/me` over `ACCOUNT_SOCKET`, or loopback
+`ACCOUNT_PORT` (default 8787). Keep the account service's existing isolation;
+only the AI process needs outbound HTTPS. `SITE_ORIGIN` defaults to
+`https://www.apchemistry.net`; set it to the frontend origin for local testing.
+Limit defaults: 10 requests/minute/account, 60/minute/service, 4 simultaneous
+model calls, 45 seconds/request. These in-memory limits reset on restart.
+
+Run `node --test ai-server/server.test.js` for mocked backend tests and
+`node --test tests/selection-ai.test.cjs` for browser regressions (Playwright
+required, `PLAYWRIGHT_CHANNEL=msedge` selects installed Edge). Real model quality
+and latency require a configured API key and a separate live check.
+
 ## Checks
 
 ```powershell

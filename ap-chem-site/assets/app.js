@@ -11480,59 +11480,19 @@ drawQuantum();
   /* ============ C. 翻译 ============ */
   var trInput = $("trInput"), trOut = $("trOut"), trHint = $("trHint");
 
-  function countWords(s){
-    var parts = String(s).trim().split(/[^A-Za-z\-']+/).filter(function(x){ return x.length > 0; });
-    return parts.length;
-  }
-
   function doTranslate(raw){
-    var w = String(raw == null ? "" : raw).trim();
-    trOut.className = "tr-out";
-    trOut.innerHTML = "";
-    trHint.innerHTML = "";
-    if (!w){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "请输入一个英文单词。";
-      return;
-    }
-    var n = countWords(w);
-    if (n === 0){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "没有检测到英文单词。<b>翻译只用于翻译单个单词</b>，不翻译句子或公式。";
-      return;
-    }
-    if (n > 1){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "检测到 <b>" + n + "</b> 个单词。翻译<b>仅用于翻译单个单词</b>，请只输入一个词，例如 <b>isotope</b>。";
-      return;
-    }
-    var r = lookup(w);
-    if (!r){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "词典中暂时没有 <b>" + w + "</b>。<br><span class=\"tr-tip\">可以换一个形式试试（如复数写成单数），或直接在题目里点击其它不认识的单词。</span>";
-      return;
-    }
-    var e = r.e, isNew = true;
-    for (var i = 0; i < VOCAB.length; i++) if (VOCAB[i].w === r.key) isNew = false;
-    addWord(w);
-    trOut.className = "tr-out show ok";
-    trOut.innerHTML =
-      '<div class="tr-word">' + r.key + '<span class="tr-pos">' + e[0] + "</span></div>" +
-      '<div class="tr-cn">' + e[1] + "</div>" +
-      '<div class="tr-kp"><span class="kp">' + e[2] + "</span></div>";
-    trHint.innerHTML = isNew
-      ? "✓ 已自动加入生词本（当前共 " + VOCAB.length + " 个单词）"
-      : "这个词已在生词本中（当前共 " + VOCAB.length + " 个单词）";
+    window.AP_LEARNING.translateTool(raw);
   }
 
   var trGo = $("trGo");
   if (trGo) trGo.addEventListener("click", function(){ doTranslate(trInput ? trInput.value : ""); });
   if (trInput){
-    trInput.addEventListener("keydown", function(e){ if (e.key === "Enter") doTranslate(trInput.value); });
+    trInput.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault();doTranslate(trInput.value); } });
   }
 
   function openTranslate(word){
     closeAll();
+    window.AP_LEARNING.resetTranslationTool();
     var m = $("modalTr");
     if (m) m.classList.remove("hide");
     if (trInput) trInput.value = word || "";
@@ -11555,16 +11515,14 @@ drawQuantum();
   function renderVocab(){
     if (!vList) return;
     if (vCount) vCount.textContent = VOCAB.length;
+    $("mod-vocab").classList.toggle("vocab-empty", !VOCAB.length);
+    $("vClear").disabled = !VOCAB.length;
     if (!VOCAB.length){
       vList.innerHTML =
         '<div class="v-empty">' +
-          '<div class="v-empty-t">生词本还是空的</div>' +
-          '<p>在题目的英文里<b>点击任意一个不认识的单词</b>，或者用顶部的<b>翻译</b>查词，查过的词会自动收录到这里。</p>' +
-          '<div class="v-sug">先试试这几个：' +
-            ["isotope", "orbital", "electronegativity", "resonance", "octet", "limiting"].map(function(w){
-              return '<button class="btn v-sug-b" data-w="' + w + '">' + w + "</button>";
-            }).join("") +
-          "</div>" +
+          '<div class="v-empty-t">暂无生词</div>' +
+          '<p>查过的单词会保存在这里。</p>' +
+          '<button class="btn v-lookup">查词</button>' +
         "</div>";
       return;
     }
@@ -11591,8 +11549,7 @@ drawQuantum();
         persist(); renderVocab(); renderRecite();
         return;
       }
-      var sug = e.target.closest && e.target.closest(".v-sug-b");
-      if (sug) openTranslate(sug.dataset.w);
+      if (e.target.closest && e.target.closest(".v-lookup")) openTranslate();
     });
   }
 
@@ -11629,7 +11586,7 @@ drawQuantum();
       recWord.textContent = "—";
       if (recPos) recPos.textContent = "";
       if (recFb){ recFb.className = "rec-fb"; recFb.innerHTML = ""; }
-      if (recState) recState.innerHTML = "生词本为空，先去收录几个单词吧。";
+      if (recState) recState.textContent = "暂无生词";
       return;
     }
     if (recIdx >= VOCAB.length) recIdx = 0;
@@ -11652,7 +11609,7 @@ drawQuantum();
     }
     var ok = checkMeaning(typed, v.cn);
     if (ok) v.ok = 1;
-    persist();
+    persist(); renderVocab();
     recFb.className = "rec-fb show " + (ok ? "ok" : "no");
     recFb.innerHTML =
       '<div class="rec-verdict">' + (ok ? "✓ 答对了" : "✗ 再想想") + "</div>" +
@@ -11678,7 +11635,7 @@ drawQuantum();
   if (recNext) recNext.addEventListener("click", function(){ if (VOCAB.length){ recIdx = (recIdx + 1) % VOCAB.length; renderRecite(); } });
   if (recMark) recMark.addEventListener("click", function(){
     if (!VOCAB.length) return;
-    VOCAB[recIdx].ok = 1; persist();
+    VOCAB[recIdx].ok = 1; persist(); renderVocab();
     if (recOkEl) recOkEl.textContent = VOCAB.filter(function(x){ return x.ok; }).length;
     recFb.className = "rec-fb show ok";
     recFb.innerHTML = "已标记为掌握：<b>" + VOCAB[recIdx].w + "</b>";
@@ -11834,8 +11791,8 @@ drawQuantum();
           '<button class="btn" id="bkNext"' + (bankState.idx >= n - 1 ? " disabled" : "") + ">下一道 →</button>" +
         "</div>"
       : "";
-    return '<div class="card bk-review"><div class="bk-rv-head"><h3>本次练习 · Review</h3>' +
-      '<span class="bk-scope">范围：' + bankState.ids.join("、") + "</span></div>" +
+    return '<div class="card bk-review"><div class="bk-rv-head"><h3>进度</h3>' +
+      '<span class="bk-scope">' + bankState.ids.length + " 个知识点</span></div>" +
       '<div class="bk-stats">' +
         '<span class="bk-stat"><b>' + n + "</b><small>题目总数</small></span>" +
         '<span class="bk-stat"><b id="bkDone">' + d + "</b><small>已完成</small></span>" +
@@ -12284,12 +12241,12 @@ drawQuantum();
   /* ================= 1. 设置中心 ================= */
   var modal = document.getElementById("modalSettings");
   var btnOpen = document.getElementById("btnSettings");
-  var bodyEl = document.body;
 
   function segSync(seg, v){
     if (!seg) return;
     Array.prototype.forEach.call(seg.querySelectorAll("button"), function(b){
       b.classList.toggle("on", b.dataset.v === String(v));
+      b.setAttribute("aria-pressed", b.dataset.v === String(v) ? "true" : "false");
     });
   }
   function wireSeg(seg, onPick){
@@ -12312,7 +12269,8 @@ drawQuantum();
   /* —— 字体大小（整体界面缩放） —— */
   function applyFont(v, save){
     v = parseFloat(v); if (!v || v < 0.8 || v > 1.5) v = 1;
-    if (Math.abs(v - 1) < 0.001) bodyEl.style.zoom = ""; else bodyEl.style.zoom = v;
+    root.style.setProperty("--ui-scale", v);
+    if (Math.abs(v - 1) < 0.001) document.body.style.zoom = ""; else document.body.style.zoom = v;
     if (save !== false) LS.set("apchem.fontScale", v);
     segSync(document.getElementById("setFont"), v);
   }
@@ -12385,12 +12343,21 @@ drawQuantum();
     c = c.toUpperCase();
     if (segEls) for (var i = 0; i < segEls.length; i++) segEls[i].style.background = c;
     if (save !== false) LS.set("apchem.petColor", c);
-    if (petColorInput) petColorInput.value = c;
+    if (petColorInput) { petColorInput.value = c; petColorInput.removeAttribute("aria-invalid"); }
     Array.prototype.forEach.call(document.querySelectorAll("#modalSettings .swatch"), function(sw){
       sw.classList.toggle("on", (sw.dataset.c || "").toUpperCase() === c);
+      sw.setAttribute("aria-pressed", sw.classList.contains("on") ? "true" : "false");
     });
   }
-  if (petColorInput) petColorInput.addEventListener("input", function(){ applyPetColor(petColorInput.value, true); });
+  if (petColorInput) {
+    petColorInput.addEventListener("input", function(){
+      petColorInput.removeAttribute("aria-invalid");
+      if (/^#[0-9a-fA-F]{6}$/.test(petColorInput.value)) applyPetColor(petColorInput.value, true);
+    });
+    petColorInput.addEventListener("change", function(){
+      petColorInput.setAttribute("aria-invalid", /^#[0-9a-fA-F]{6}$/.test(petColorInput.value) ? "false" : "true");
+    });
+  }
   Array.prototype.forEach.call(document.querySelectorAll("#modalSettings .swatch"), function(sw){
     sw.addEventListener("click", function(){ applyPetColor(sw.dataset.c, true); });
   });
@@ -12564,8 +12531,8 @@ drawQuantum();
     if (sn) sn.textContent = squashUses;
     if (bn) bn.textContent = boilUses;
     var sb = document.getElementById("itemSquash"), bb = document.getElementById("itemBoil");
-    if (sb) sb.classList.toggle("disabled", squashUses <= 0);
-    if (bb) bb.classList.toggle("disabled", boilUses <= 0);
+    if (sb) { sb.classList.toggle("disabled", squashUses <= 0); sb.disabled = squashUses <= 0; }
+    if (bb) { bb.classList.toggle("disabled", boilUses <= 0); bb.disabled = boilUses <= 0; }
   }
 
   function useSquash(){
@@ -12771,7 +12738,7 @@ drawQuantum();
   };
 
   /* —— 恢复上次设置（全部初始化完成后再执行；主题已在页头脚本恢复，这里只同步按钮状态） —— */
-  applyTheme(isDark(), false);
+  segSync(document.getElementById("setTheme"), isDark() ? "dark" : "light");
   applyFont(LS.get("apchem.fontScale", "1"), false);
   applyWm(LS.get("apchem.wmSize", "12"), false);
   applyBankMode(LS.get("apchem.bankView", "single"), false);

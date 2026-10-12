@@ -34,7 +34,7 @@ assert 'nojs-radio' in BODY, '正文里缺少无脚本选择器，抽取出错'
 
 # ---------- 组装 ----------
 HEAD = '''<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="material-app">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -55,6 +55,9 @@ HEAD = '''<!DOCTYPE html>
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="assets/study.css">
+<link rel="stylesheet" href="assets/material-theme.css">
+<link rel="stylesheet" href="assets/material-app.css">
+<script src="assets/material-theme.js"></script>
 ''' + NOSCRIPT_STYLE + '''
 </head>
 <body>'''
@@ -70,6 +73,7 @@ TAIL = '''
 <script src="assets/lesson-details.js"></script>
 <script src="assets/lecture-glossary.js"></script>
 <script src="assets/study-enhancements.js"></script>
+<script src="assets/material-app.js"></script>
 </body>
 </html>
 '''

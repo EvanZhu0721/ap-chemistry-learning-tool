@@ -1,0 +1,768 @@
+/* Material 3 Theme System for AP Chemistry */
+
+/* ==========================================================================
+   1. Shape, Type, Spacing & Motion Tokens
+   ========================================================================== */
+:root,
+html.material-app {
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  --md-sys-typescale-body-large-font: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", Roboto, sans-serif;
+  --md-sys-typescale-body-large-size: 16px;
+  --md-sys-typescale-body-large-line-height: 26px;
+  --md-sys-typescale-title-large-size: 22px;
+  --md-sys-typescale-headline-small-size: 24px;
+  --md-sys-typescale-label-large-size: 14px;
+
+  --space: 8px;
+  --motion: 200ms cubic-bezier(.2, 0, 0, 1);
+}
+
+/* ==========================================================================
+   2. Base System Color Schemes (Fallback & Shared Tokens)
+   ========================================================================== */
+
+/* Light Base Common */
+html[data-theme-effective="light"],
+html[data-theme="light"],
+html.material-app[data-theme-effective="light"],
+html.material-app[data-theme="light"],
+html.material-app:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  color-scheme: light;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+  --md-sys-color-inverse-surface: #2d3135;
+  --md-sys-color-inverse-on-surface: #f0f3f6;
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.35);
+}
+
+/* Dark Base Common */
+html[data-theme-effective="dark"],
+html[data-theme="dark"],
+html.material-app[data-theme-effective="dark"],
+html.material-app[data-theme="dark"] {
+  color-scheme: dark;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #4d272b;
+  --md-sys-color-on-error-container: #ffdad6;
+  --md-sys-color-inverse-surface: #e1e5ea;
+  --md-sys-color-inverse-on-surface: #282d33;
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.65);
+}
+
+/* ==========================================================================
+   3. Coordinated Color Palettes (6 Palettes, Light & Dark)
+   ========================================================================== */
+
+/* 1. blue: 经典蓝（鲜明蔚蓝） - 默认 */
+html[data-theme-effective="light"]:not([data-theme-accent]),
+html[data-theme-effective="light"][data-theme-accent="blue"],
+html[data-theme="light"]:not([data-theme-accent]),
+html[data-theme="light"][data-theme-accent="blue"],
+html.material-app:not([data-theme-accent]):not([data-theme-effective="dark"]):not([data-theme="dark"]),
+html.material-app[data-theme-accent="blue"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f8f9fd;
+  --md-sys-color-on-surface: #181c22;
+  --md-sys-color-on-surface-variant: #424752;
+  --md-sys-color-surface-container-low: #f0f3fa;
+  --md-sys-color-surface-container: #e8edf6;
+  --md-sys-color-surface-container-high: #e0e7f1;
+  --md-sys-color-surface-container-highest: #d8e1ed;
+  --md-sys-color-outline: #717783;
+  --md-sys-color-outline-variant: #c1c7d4;
+  --md-sys-color-primary: #005fb0;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d4e3ff;
+  --md-sys-color-on-primary-container: #001c3d;
+  --md-sys-color-secondary: #435e7d;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #cfe1fa;
+  --md-sys-color-on-secondary-container: #001d36;
+  --md-sys-color-tertiary: #296373;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #cbe7f2;
+  --md-sys-color-on-tertiary-container: #001f27;
+}
+
+html[data-theme-effective="dark"]:not([data-theme-accent]),
+html[data-theme-effective="dark"][data-theme-accent="blue"],
+html[data-theme="dark"]:not([data-theme-accent]),
+html[data-theme="dark"][data-theme-accent="blue"] {
+  --md-sys-color-surface: #0f141a;
+  --md-sys-color-on-surface: #e0e2eb;
+  --md-sys-color-on-surface-variant: #c1c7d3;
+  --md-sys-color-surface-container-lowest: #0a0e13;
+  --md-sys-color-surface-container-low: #161c23;
+  --md-sys-color-surface-container: #1c222a;
+  --md-sys-color-surface-container-high: #262d36;
+  --md-sys-color-surface-container-highest: #313843;
+  --md-sys-color-outline: #8b919d;
+  --md-sys-color-outline-variant: #414752;
+  --md-sys-color-primary: #a2c9ff;
+  --md-sys-color-on-primary: #00315f;
+  --md-sys-color-primary-container: #004786;
+  --md-sys-color-on-primary-container: #d4e3ff;
+  --md-sys-color-secondary: #b6cbdf;
+  --md-sys-color-on-secondary: #1e3247;
+  --md-sys-color-secondary-container: #2f4861;
+  --md-sys-color-on-secondary-container: #cfe1fa;
+  --md-sys-color-tertiary: #9cd1e0;
+  --md-sys-color-on-tertiary: #003540;
+  --md-sys-color-tertiary-container: #1e4c58;
+  --md-sys-color-on-tertiary-container: #bde9f8;
+}
+
+/* 2. green: 翡翠绿（鲜明翠绿） */
+html[data-theme-effective="light"][data-theme-accent="green"],
+html[data-theme="light"][data-theme-accent="green"],
+html.material-app[data-theme-accent="green"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f7faf5;
+  --md-sys-color-on-surface: #171d18;
+  --md-sys-color-on-surface-variant: #414942;
+  --md-sys-color-surface-container-low: #eef4ec;
+  --md-sys-color-surface-container: #e6eee3;
+  --md-sys-color-surface-container-high: #dee8dc;
+  --md-sys-color-surface-container-highest: #d5e1d3;
+  --md-sys-color-outline: #707971;
+  --md-sys-color-outline-variant: #bfc9bf;
+  --md-sys-color-primary: #0c6d39;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #cbf5d4;
+  --md-sys-color-on-primary-container: #00210b;
+  --md-sys-color-secondary: #43654b;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #d0edd7;
+  --md-sys-color-on-secondary-container: #0a2312;
+  --md-sys-color-tertiary: #2e6659;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #c8ebd9;
+  --md-sys-color-on-tertiary-container: #012019;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="green"],
+html[data-theme="dark"][data-theme-accent="green"] {
+  --md-sys-color-surface: #0f1511;
+  --md-sys-color-on-surface: #e0e4df;
+  --md-sys-color-on-surface-variant: #c0c8be;
+  --md-sys-color-surface-container-lowest: #090f0c;
+  --md-sys-color-surface-container-low: #161d17;
+  --md-sys-color-surface-container: #1c241e;
+  --md-sys-color-surface-container-high: #262f28;
+  --md-sys-color-surface-container-highest: #313b33;
+  --md-sys-color-outline: #8a9389;
+  --md-sys-color-outline-variant: #404941;
+  --md-sys-color-primary: #85d99c;
+  --md-sys-color-on-primary: #003919;
+  --md-sys-color-primary-container: #005327;
+  --md-sys-color-on-primary-container: #b5f1c5;
+  --md-sys-color-secondary: #b8d2bd;
+  --md-sys-color-on-secondary: #203625;
+  --md-sys-color-secondary-container: #334c38;
+  --md-sys-color-on-secondary-container: #d2edd8;
+  --md-sys-color-tertiary: #9fd0c1;
+  --md-sys-color-on-tertiary: #02372d;
+  --md-sys-color-tertiary-container: #204d41;
+  --md-sys-color-on-tertiary-container: #c1ede0;
+}
+
+/* 3. purple: 鸢尾紫（浓郁紫罗兰） */
+html[data-theme-effective="light"][data-theme-accent="purple"],
+html[data-theme="light"][data-theme-accent="purple"],
+html.material-app[data-theme-accent="purple"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #faf7fd;
+  --md-sys-color-on-surface: #1b1722;
+  --md-sys-color-on-surface-variant: #474351;
+  --md-sys-color-surface-container-low: #f3eef9;
+  --md-sys-color-surface-container: #ebe4f4;
+  --md-sys-color-surface-container-high: #e3dbed;
+  --md-sys-color-surface-container-highest: #d9d0e5;
+  --md-sys-color-outline: #777281;
+  --md-sys-color-outline-variant: #c7c2d2;
+  --md-sys-color-primary: #6b3ea3;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #edd7ff;
+  --md-sys-color-on-primary-container: #25004e;
+  --md-sys-color-secondary: #5c5276;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #eadff8;
+  --md-sys-color-on-secondary-container: #1f1537;
+  --md-sys-color-tertiary: #734661;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffd7eb;
+  --md-sys-color-on-tertiary-container: #2e0a21;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="purple"],
+html[data-theme="dark"][data-theme-accent="purple"] {
+  --md-sys-color-surface: #131119;
+  --md-sys-color-on-surface: #e5e0ec;
+  --md-sys-color-on-surface-variant: #c6c0d0;
+  --md-sys-color-surface-container-lowest: #0d0b13;
+  --md-sys-color-surface-container-low: #1a1721;
+  --md-sys-color-surface-container: #211e29;
+  --md-sys-color-surface-container-high: #2c2834;
+  --md-sys-color-surface-container-highest: #373340;
+  --md-sys-color-outline: #908a9a;
+  --md-sys-color-outline-variant: #464250;
+  --md-sys-color-primary: #ceb4ff;
+  --md-sys-color-on-primary: #3b0b72;
+  --md-sys-color-primary-container: #522589;
+  --md-sys-color-on-primary-container: #ecd6ff;
+  --md-sys-color-secondary: #c8bed9;
+  --md-sys-color-on-secondary: #2c2440;
+  --md-sys-color-secondary-container: #423a57;
+  --md-sys-color-on-secondary-container: #e7dcf7;
+  --md-sys-color-tertiary: #e3b4cd;
+  --md-sys-color-on-tertiary: #401931;
+  --md-sys-color-tertiary-container: #582d47;
+  --md-sys-color-on-tertiary-container: #fad7eb;
+}
+
+/* 4. orange: 琥珀橙（明亮琥珀） */
+html[data-theme-effective="light"][data-theme-accent="orange"],
+html[data-theme="light"][data-theme-accent="orange"],
+html.material-app[data-theme-accent="orange"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #fcf8f4;
+  --md-sys-color-on-surface: #201a14;
+  --md-sys-color-on-surface-variant: #4e443c;
+  --md-sys-color-surface-container-low: #f6f0ea;
+  --md-sys-color-surface-container: #eee6de;
+  --md-sys-color-surface-container-high: #e6ded4;
+  --md-sys-color-surface-container-highest: #ded4ca;
+  --md-sys-color-outline: #7f746b;
+  --md-sys-color-outline-variant: #d0c3b8;
+  --md-sys-color-primary: #924d00;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #ffdcc0;
+  --md-sys-color-on-primary-container: #301400;
+  --md-sys-color-secondary: #6c5544;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #f9dfcb;
+  --md-sys-color-on-secondary-container: #28170a;
+  --md-sys-color-tertiary: #695a2c;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #fae3a6;
+  --md-sys-color-on-tertiary-container: #241b00;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="orange"],
+html[data-theme="dark"][data-theme-accent="orange"] {
+  --md-sys-color-surface: #16120e;
+  --md-sys-color-on-surface: #ede0d6;
+  --md-sys-color-on-surface-variant: #cdc1b6;
+  --md-sys-color-surface-container-lowest: #0f0c09;
+  --md-sys-color-surface-container-low: #1e1814;
+  --md-sys-color-surface-container: #26201b;
+  --md-sys-color-surface-container-high: #322a24;
+  --md-sys-color-surface-container-highest: #3e352e;
+  --md-sys-color-outline: #968a80;
+  --md-sys-color-outline-variant: #4c423a;
+  --md-sys-color-primary: #ffb779;
+  --md-sys-color-on-primary: #4e2600;
+  --md-sys-color-primary-container: #6f3800;
+  --md-sys-color-on-primary-container: #ffdcc0;
+  --md-sys-color-secondary: #d9beab;
+  --md-sys-color-on-secondary: #3a271b;
+  --md-sys-color-secondary-container: #513d30;
+  --md-sys-color-on-secondary-container: #f8decb;
+  --md-sys-color-tertiary: #d6c690;
+  --md-sys-color-on-tertiary: #382e07;
+  --md-sys-color-tertiary-container: #4f431b;
+  --md-sys-color-on-tertiary-container: #f5e4ab;
+}
+
+/* 5. rose: 蔷薇红（鲜明珊瑚玫瑰） */
+html[data-theme-effective="light"][data-theme-accent="rose"],
+html[data-theme="light"][data-theme-accent="rose"],
+html.material-app[data-theme-accent="rose"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #fdf7f8;
+  --md-sys-color-on-surface: #20181b;
+  --md-sys-color-on-surface-variant: #4e4247;
+  --md-sys-color-surface-container-low: #f8eff1;
+  --md-sys-color-surface-container: #f0e6e9;
+  --md-sys-color-surface-container-high: #e8dde1;
+  --md-sys-color-surface-container-highest: #dfd2d7;
+  --md-sys-color-outline: #7f7278;
+  --md-sys-color-outline-variant: #cfc1c7;
+  --md-sys-color-primary: #9b2756;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #ffd9e3;
+  --md-sys-color-on-primary-container: #3f001c;
+  --md-sys-color-secondary: #6c535d;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #fbdae5;
+  --md-sys-color-on-secondary-container: #29141e;
+  --md-sys-color-tertiary: #754b39;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffd8cb;
+  --md-sys-color-on-tertiary-container: #301103;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="rose"],
+html[data-theme="dark"][data-theme-accent="rose"] {
+  --md-sys-color-surface: #161114;
+  --md-sys-color-on-surface: #ede0e3;
+  --md-sys-color-on-surface-variant: #cec0c5;
+  --md-sys-color-surface-container-lowest: #0f0a0d;
+  --md-sys-color-surface-container-low: #1e1619;
+  --md-sys-color-surface-container: #261e22;
+  --md-sys-color-surface-container-high: #32282d;
+  --md-sys-color-surface-container-highest: #3e3338;
+  --md-sys-color-outline: #968990;
+  --md-sys-color-outline-variant: #4c4046;
+  --md-sys-color-primary: #ffb0c9;
+  --md-sys-color-on-primary: #5f002d;
+  --md-sys-color-primary-container: #7e0e3f;
+  --md-sys-color-on-primary-container: #ffd9e3;
+  --md-sys-color-secondary: #d9bec9;
+  --md-sys-color-on-secondary: #3b2530;
+  --md-sys-color-secondary-container: #523a45;
+  --md-sys-color-on-secondary-container: #f7d8e4;
+  --md-sys-color-tertiary: #e5b8a6;
+  --md-sys-color-on-tertiary: #422212;
+  --md-sys-color-tertiary-container: #5a3424;
+  --md-sys-color-on-tertiary-container: #ffd9cb;
+}
+
+/* 6. gray: 石墨灰（现代中性） */
+html[data-theme-effective="light"][data-theme-accent="gray"],
+html[data-theme="light"][data-theme-accent="gray"],
+html.material-app[data-theme-accent="gray"]:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --md-sys-color-surface: #f6f6f8;
+  --md-sys-color-on-surface: #191c1f;
+  --md-sys-color-on-surface-variant: #43474d;
+  --md-sys-color-surface-container-low: #ededf0;
+  --md-sys-color-surface-container: #e5e5e9;
+  --md-sys-color-surface-container-high: #dddee2;
+  --md-sys-color-surface-container-highest: #d4d5da;
+  --md-sys-color-outline: #74777d;
+  --md-sys-color-outline-variant: #c3c6cc;
+  --md-sys-color-primary: #424953;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d8dee8;
+  --md-sys-color-on-primary-container: #131b23;
+  --md-sys-color-secondary: #565c64;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #dfe3eb;
+  --md-sys-color-on-secondary-container: #151c22;
+  --md-sys-color-tertiary: #49525c;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #dde1ea;
+  --md-sys-color-on-tertiary-container: #161e26;
+}
+
+html[data-theme-effective="dark"][data-theme-accent="gray"],
+html[data-theme="dark"][data-theme-accent="gray"] {
+  --md-sys-color-surface: #121316;
+  --md-sys-color-on-surface: #e2e2e6;
+  --md-sys-color-on-surface-variant: #c3c5cb;
+  --md-sys-color-surface-container-lowest: #0d0e10;
+  --md-sys-color-surface-container-low: #181a1d;
+  --md-sys-color-surface-container: #1f2124;
+  --md-sys-color-surface-container-high: #2a2c30;
+  --md-sys-color-surface-container-highest: #36373c;
+  --md-sys-color-outline: #8c8f95;
+  --md-sys-color-outline-variant: #43464c;
+  --md-sys-color-primary: #c0c7d2;
+  --md-sys-color-on-primary: #272f38;
+  --md-sys-color-primary-container: #3c444e;
+  --md-sys-color-on-primary-container: #dbe2ee;
+  --md-sys-color-secondary: #c3c7cf;
+  --md-sys-color-on-secondary: #2b3037;
+  --md-sys-color-secondary-container: #3f454d;
+  --md-sys-color-on-secondary-container: #dfe3eb;
+  --md-sys-color-tertiary: #b8c1cc;
+  --md-sys-color-on-tertiary: #242d36;
+  --md-sys-color-tertiary-container: #39424c;
+  --md-sys-color-on-tertiary-container: #dce1ec;
+}
+
+/* ==========================================================================
+   4. Legacy Semantic Variable Mapping
+   ========================================================================== */
+
+/* Light Semantic Mappings */
+html[data-theme-effective="light"],
+html.material-app,
+html.material-app[data-theme-effective="light"],
+html.material-app[data-theme="light"],
+html.material-app:not([data-theme-effective="dark"]):not([data-theme="dark"]) {
+  --bg: var(--md-sys-color-surface);
+  --card: var(--md-sys-color-surface-container-lowest);
+  --ink: var(--md-sys-color-on-surface);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --line: var(--md-sys-color-outline-variant);
+
+  --phy: var(--md-sys-color-primary);
+  --phy-soft: var(--md-sys-color-primary-container);
+  --math: var(--md-sys-color-tertiary);
+  --math-soft: var(--md-sys-color-tertiary-container);
+  --accent: var(--md-sys-color-primary);
+  --learn: var(--md-sys-color-primary);
+  --learn-soft: var(--md-sys-color-primary-container);
+  --bank: var(--md-sys-color-primary);
+  --bank-soft: var(--md-sys-color-primary-container);
+  --wrong: var(--md-sys-color-error);
+  --wrong-soft: var(--md-sys-color-error-container);
+  --vocab: #0c6d39;
+  --vocab-soft: #cbf5d4;
+  --good: #0c6d39;
+  --warn: #924d00;
+  --bad: var(--md-sys-color-error);
+
+  --shadow: 0 4px 16px var(--md-sys-color-scrim);
+  --r-md: var(--md-sys-shape-corner-medium);
+  --r-lg: var(--md-sys-shape-corner-large);
+  --r-xl: var(--md-sys-shape-corner-extra-large);
+
+  --cfg-track: var(--md-sys-color-surface-container-low);
+  --cfg-box: var(--md-sys-color-surface-container-lowest);
+  --cfg-box-line: var(--md-sys-color-outline-variant);
+  --cfg-fill: var(--md-sys-color-primary);
+  --cfg-arrow: var(--md-sys-color-on-primary-container);
+  --cfg-lb: var(--md-sys-color-on-surface);
+  --cfg-num: var(--md-sys-color-on-surface-variant);
+  --cfg-note: var(--md-sys-color-on-surface-variant);
+}
+
+/* Dark Semantic Mappings */
+html[data-theme-effective="dark"],
+html[data-theme="dark"],
+html.material-app[data-theme-effective="dark"],
+html.material-app[data-theme="dark"] {
+  --bg: var(--md-sys-color-surface);
+  --card: var(--md-sys-color-surface-container);
+  --ink: var(--md-sys-color-on-surface);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --line: var(--md-sys-color-outline-variant);
+
+  --phy: var(--md-sys-color-primary);
+  --phy-soft: var(--md-sys-color-primary-container);
+  --math: var(--md-sys-color-tertiary);
+  --math-soft: var(--md-sys-color-tertiary-container);
+  --accent: var(--md-sys-color-primary);
+  --learn: var(--md-sys-color-primary);
+  --learn-soft: var(--md-sys-color-primary-container);
+  --bank: var(--md-sys-color-primary);
+  --bank-soft: var(--md-sys-color-primary-container);
+  --wrong: var(--md-sys-color-error);
+  --wrong-soft: var(--md-sys-color-error-container);
+  --vocab: #85d99c;
+  --vocab-soft: #005327;
+  --good: #85d99c;
+  --warn: #ffb779;
+  --bad: var(--md-sys-color-error);
+
+  --shadow: 0 4px 20px var(--md-sys-color-scrim);
+  --r-md: var(--md-sys-shape-corner-medium);
+  --r-lg: var(--md-sys-shape-corner-large);
+  --r-xl: var(--md-sys-shape-corner-extra-large);
+
+  --cfg-track: var(--md-sys-color-surface-container-high);
+  --cfg-box: var(--md-sys-color-surface-container);
+  --cfg-box-line: var(--md-sys-color-outline-variant);
+  --cfg-fill: var(--md-sys-color-primary);
+  --cfg-arrow: var(--md-sys-color-on-primary-container);
+  --cfg-lb: var(--md-sys-color-on-surface);
+  --cfg-num: var(--md-sys-color-on-surface-variant);
+  --cfg-note: var(--md-sys-color-on-surface-variant);
+}
+
+/* ==========================================================================
+   5. Site Polish & Component Consistency
+   ========================================================================== */
+html.material-app body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--md-sys-typescale-body-large-font);
+}
+
+html.material-app #btnSettings {
+  display: none !important;
+}
+
+#appearance {
+  cursor: pointer;
+}
+
+html.material-app .btn {
+  border-radius: var(--md-sys-shape-corner-medium);
+  transition: background var(--motion), border-color var(--motion), color var(--motion);
+}
+
+html.material-app .btn:hover {
+  background: var(--md-sys-color-surface-container-high);
+  border-color: var(--md-sys-color-outline);
+}
+
+html.material-app input,
+html.material-app select,
+html.material-app textarea {
+  accent-color: var(--md-sys-color-primary);
+}
+
+/* ==========================================================================
+   6. Appearance Dialog & Sheet Styles (Title: 配色)
+   ========================================================================== */
+dialog#appearance-dialog {
+  border: 0;
+  padding: 24px;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow: 0 4px 28px var(--md-sys-color-scrim);
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  margin: auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+dialog#appearance-dialog::backdrop {
+  background: var(--md-sys-color-scrim);
+}
+
+.appearance-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.appearance-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.appearance-close {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--motion);
+}
+
+.appearance-close:hover {
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.appearance-close:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.appearance-section {
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.appearance-section:last-of-type {
+  margin-bottom: 8px;
+}
+
+.appearance-section-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 10px;
+  padding: 0;
+  display: block;
+}
+
+/* Mode Options */
+.appearance-mode-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appearance-mode-label {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: background var(--motion), border-color var(--motion), color var(--motion);
+}
+
+.appearance-mode-label input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: inset(50%);
+}
+
+.appearance-mode-label:has(input:checked) {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-color: var(--md-sys-color-primary);
+  font-weight: 500;
+}
+
+.appearance-mode-label:has(input:focus-visible) {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* Coordinated Accent Cards with 3-chip Previews */
+.appearance-accent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appearance-accent-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.appearance-accent-radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
+
+.appearance-preview-card {
+  width: 100%;
+  padding: 10px 6px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  transition: border-color var(--motion), background var(--motion), box-shadow var(--motion);
+}
+
+.appearance-chips {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.appearance-chip {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--md-sys-shape-corner-full);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.appearance-accent-text {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1.2;
+}
+
+.appearance-accent-item:has(input:checked) .appearance-preview-card {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-secondary-container);
+  box-shadow: 0 0 0 1px var(--md-sys-color-primary);
+}
+
+.appearance-accent-item:has(input:checked) .appearance-accent-text {
+  color: var(--md-sys-color-on-secondary-container);
+  font-weight: 600;
+}
+
+.appearance-accent-item:has(input:focus-visible) .appearance-preview-card {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* More Settings Entry */
+.appearance-more {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.appearance-more-btn {
+  border: 0;
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: var(--md-sys-shape-corner-full);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--motion);
+}
+
+.appearance-more-btn:hover {
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.appearance-more-btn:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile Bottom Sheet Modal */
+@media (max-width: 599px) {
+  dialog#appearance-dialog {
+    position: fixed;
+    inset: auto 0 0 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85dvh;
+    border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+    padding: 20px 20px 32px;
+  }
+
+  .appearance-mode-label {
+    min-height: 44px;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}

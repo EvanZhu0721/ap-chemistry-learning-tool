@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="material-app">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -20,6 +20,9 @@
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="assets/study.css">
+<link rel="stylesheet" href="assets/material-theme.css">
+<link rel="stylesheet" href="assets/material-app.css">
+<script src="assets/material-theme.js"></script>
 <noscript><style>
 /* ================= 无 JavaScript 兜底 v2 =================
    场景：iOS「文件」App 快速查看 / 微信文件预览 / 金山文档 / 网盘预览
@@ -119,10 +122,24 @@
 </head>
 <body>
 <script>
-try{var _t=localStorage.getItem("apchem.theme");if(_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
+document.documentElement.classList.add('material-loading');
+window.addEventListener('load',function(){
+  if(document.documentElement.classList.contains('material-ready'))return;
+  var startup=document.getElementById('material-startup');
+  startup.querySelector('progress').hidden=true;
+  startup.querySelector('p').hidden=false;
+  var retry=startup.querySelector('button');retry.hidden=false;retry.onclick=function(){location.reload();};
+});
+try{var _t=localStorage.getItem("apchem.theme");if(!document.documentElement.classList.contains("material-app")&&_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
 try{var _fs=localStorage.getItem("apchem.fontScale");if(_fs&&_fs!=="1"){document.body.style.zoom=_fs}}catch(e){}
 try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentElement.style.setProperty("--wm-size",_wm+"px")}}catch(e){}
 </script>
+<div id="material-startup" class="m-startup" role="status">
+  <div class="m-brand" aria-label="AP Chem"><span class="m-wordmark-ap">AP</span><span class="m-wordmark-chem">Chem</span></div>
+  <progress aria-label="加载中"></progress>
+  <p hidden>加载失败</p>
+  <button type="button" hidden>重新加载</button>
+</div>
 <noscript>
   <div class="nojs">
     <b>当前阅读器没有运行 JavaScript —— 已切换为「无脚本阅读模式」</b>
@@ -2314,7 +2331,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   <!-- ===== ★ [新增] 生词本（与 Unit 1 / Unit 2 并列的独立 UI） ===== -->
   <div class="module vocab" id="mod-vocab">
     <noscript><div class="nojs-need"><b>生词本需要浏览器</b>生词本由「翻译」查词后自动收录，依赖 JavaScript 与本地存储，禁用脚本时无法显示。<br>请在 Safari 中打开本文件，或使用在线链接。</div></noscript>
-    <div class="module-head"><h2>生词本 · Vocabulary</h2><p>翻译查过的单词会自动收录到这里：集中复习中文释义与对应知识点，并可进入背诵模式自测。</p></div>
+    <div class="module-head"><h2>生词本</h2></div>
     <nav class="tabs" data-tabs>
       <a class="tab on" href="#v-list" data-pane="v-list">单词列表</a>
       <a class="tab" href="#v-recite" data-pane="v-recite">背诵模式</a>
@@ -2322,8 +2339,8 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
     <section class="pane on" id="v-list">
       <div class="card">
-        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h3 style="margin:0">已收录单词：<span id="vCount">0</span> 个</h3>
+        <div class="row v-list-head">
+          <h3><span id="vCount">0</span> <span>个单词</span></h3>
           <button class="btn" id="vClear">清空生词本</button>
         </div>
         <div id="vList"></div>
@@ -2336,7 +2353,6 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
           <h3 style="margin:0">背诵模式</h3>
           <div class="rec-prog">已掌握 <b id="recOk">0</b> / <span id="recTotal">0</span></div>
         </div>
-        <p class="lead" style="text-align:center">根据下面显示的英文单词，写出它的中文释义。</p>
         <div class="rec-word" id="recWord">&mdash;</div>
         <div class="rec-pos" id="recPos"></div>
         <div class="rec-row">
@@ -2358,11 +2374,10 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
 <div class="modal hide" id="modalTr">
   <div class="modal-box">
-    <div class="modal-head"><h3>翻译 · 单词翻译</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-head"><h3>翻译</h3><button class="btn modal-close">关闭</button></div>
     <div class="modal-body">
-      <p class="pn-lead">翻译<b>只翻译一个英文单词</b>（不翻译句子或公式）。翻译完成后，该单词会<b>自动收录进生词本</b>。</p>
       <div class="tr-row">
-        <input id="trInput" type="text" placeholder="输入一个英文单词，例如 isotope" autocomplete="off" spellcheck="false">
+        <textarea id="trInput" rows="4" maxlength="6000" aria-label="翻译原文" placeholder="输入英文单词或段落" autocomplete="off" spellcheck="false"></textarea>
         <button class="btn tr-go" id="trGo">翻译</button>
       </div>
       <div class="tr-out" id="trOut"></div>
@@ -2470,12 +2485,12 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
       <div class="set-row">
         <div class="set-info"><b>区老师颜色</b><span>毛毛虫身体圆圈的颜色</span></div>
         <div class="set-colors">
-          <span class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></span>
-          <span class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></span>
-          <span class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></span>
-          <span class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></span>
-          <span class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></span>
-          <input type="color" id="setPetColor" value="#5cb85c" aria-label="自定义区老师颜色">
+          <button type="button" class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></button>
+          <button type="button" class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></button>
+          <button type="button" class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></button>
+          <button type="button" class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></button>
+          <button type="button" class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></button>
+          <input type="text" id="setPetColor" value="#5cb85c" maxlength="7" pattern="#[0-9a-fA-F]{6}" spellcheck="false" autocomplete="off" aria-label="自定义区老师颜色 HEX">
         </div>
       </div>
       <div class="set-row set-row-last">
@@ -2544,5 +2559,6 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 <script src="assets/lesson-details.js"></script>
 <script src="assets/lecture-glossary.js"></script>
 <script src="assets/study-enhancements.js"></script>
+<script src="assets/material-app.js"></script>
 </body>
 </html>

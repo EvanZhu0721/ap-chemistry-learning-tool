@@ -28,8 +28,7 @@ after(async()=>{if(browser)await browser.close();if(server)await new Promise(res
 async function practice(t,type='mcq') {
   const page=await browser.newPage();
   t.after(()=>page.close());
-  await page.goto(base);
-  await page.locator('[data-mod="bank"]').click();
+  await page.goto(base+'/#/practice');
   await page.locator('#bankTypes [data-type="'+(type==='mcq'?'frq':'mcq')+'"]').click();
   await page.locator('#bankCount').fill('3');
   await page.locator('#bankStart').click();
@@ -100,8 +99,7 @@ test('FRQ revealed parts and self-assessment survive navigation without another 
   assert.equal(await page.locator('#bkDone').innerText(),'1');
 });
 test('selecting a whole unit preserves expanded units',async t=>{
-  const page=await browser.newPage();t.after(()=>page.close());await page.goto(base);
-  await page.locator('[data-mod="bank"]').click();
+  const page=await browser.newPage();t.after(()=>page.close());await page.goto(base+'/#/practice');
   const fold=page.locator('#bankRanges .bank-unit-fold').first();
   await fold.locator('summary').click();await fold.locator('[data-unitall]').click();
   assert.equal(await fold.evaluate(el=>el.open),true);

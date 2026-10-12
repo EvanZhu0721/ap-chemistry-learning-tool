@@ -8,6 +8,9 @@
   const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode still works */ } };
   let language = read('apchem.language', 'zh');
   if (!['zh','en'].includes(language)) language = 'zh';
+  let readingLanguage = read('apchem.readingLanguage', 'both');
+  if (!['zh','en','both'].includes(readingLanguage)) readingLanguage = 'both';
+  const isMaterial = () => document.documentElement.classList.contains('material-app');
   const t = (en, zh) => language === 'en' ? en : zh;
   const text = value => value[language];
   const el = (tag, cls, value) => { const n = document.createElement(tag); if (cls) n.className = cls; if (value !== undefined) n.textContent = value; return n; };
@@ -17,11 +20,42 @@
   const glossary=window.AP_LECTURE_GLOSSARY;
   const escapeRE=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   const termPattern=glossary ? new RegExp('\\b(?:'+glossary.entries.map(([term])=>escapeRE(term)).sort((a,b)=>b.length-a.length).join('|')+')(?:s)?\\b','gi') : null;
+  function renderBi(parent, tag, biObj, cls = '', prefix = '') {
+    if (!biObj) return;
+    if (typeof biObj === 'string') {
+      parent.append(el(tag, cls, prefix + biObj));
+      return;
+    }
+    const enText = prefix + (biObj.en ?? '');
+    const zhText = prefix + (biObj.zh ?? '');
+    if (readingLanguage === 'en') {
+      parent.append(el(tag, (cls ? cls + ' ' : '') + 'english', enText));
+    } else if (readingLanguage === 'zh') {
+      parent.append(el(tag, (cls ? cls + ' ' : '') + 'chinese', zhText));
+    } else if (tag === 'h3') {
+      const heading=el(tag,cls),en=el('span','english',enText),zh=el('span','chinese',zhText);
+      en.lang='en';zh.lang='zh-CN';heading.append(en,zh);parent.append(heading);
+    } else {
+      parent.append(
+        el(tag, (cls ? cls + ' ' : '') + 'english', enText),
+        el(tag, (cls ? cls + ' ' : '') + 'chinese', zhText)
+      );
+    }
+  }
+  function blockBi(enTitle, zhTitle, biValue, cls = 'study-block') {
+    const n = el('section', cls);
+    n.append(el('h3', '', t(enTitle, zhTitle)));
+    renderBi(n, 'p', biValue);
+    return n;
+  }
   function emphasise(root) {
-    if(language!=='en'||!termPattern)return;
-    root.querySelectorAll('.study-card p,.study-card li').forEach(block=>{
+    const isEnActive = language === 'en' || readingLanguage === 'en' || readingLanguage === 'both';
+    if (!isEnActive || !termPattern) return;
+    root.querySelectorAll('.study-card p, .study-card li, .reader-content p, .reader-content li, .study-teaching p, .study-example li').forEach(block=>{
       const walker=document.createTreeWalker(block,NodeFilter.SHOW_TEXT);const nodes=[];
-      while(walker.nextNode())if(!walker.currentNode.parentElement.closest('.katex,strong,button'))nodes.push(walker.currentNode);
+      while(walker.nextNode()){
+        if(!walker.currentNode.parentElement.closest('.katex,strong,button,.chinese'))nodes.push(walker.currentNode);
+      }
       let count=0;const seen=new Set();
       for(const node of nodes){
         termPattern.lastIndex=0;const raw=node.nodeValue;const fragment=document.createDocumentFragment();let offset=0,match;
@@ -38,8 +72,29 @@
   let wordPopup=null;
   function hideWord(){wordPopup?.remove();wordPopup=null;}
   function lookupWord(raw){return glossary?.lookup(raw)||window.__vocab?.lookup(raw)||null;}
-  function showWord(raw,anchor,scope){
-    hideWord();const result=lookupWord(raw);
+
+  function positionPopup(popup,anchor,modal){
+    const bounds=modal?.getBoundingClientRect();
+    const left=bounds?bounds.left+modal.clientLeft:0;
+    const top=bounds?bounds.top+modal.clientTop:0;
+    const right=Math.min(document.documentElement.clientWidth,bounds?left+modal.clientWidth:innerWidth);
+    const bottom=Math.min(innerHeight,bounds?top+modal.clientHeight:innerHeight);
+    popup.style.maxWidth=Math.max(0,right-left-16)+'px';
+    popup.style.maxHeight=Math.max(0,bottom-top-16)+'px';
+    if(popup.parentElement!==(modal||document.body))(modal||document.body).append(popup);
+    const box=popup.getBoundingClientRect(),gap=8;
+    const posX=Math.max(left+8,Math.min(anchor.left,right-box.width-8));
+    const height=popup.classList.contains('study-ai-panel')?Math.min(520,bottom-top-16):box.height;
+    let posY=anchor.bottom+gap;
+    if(posY+height>bottom-8){
+      posY=Math.max(top+8,Math.min(anchor.top-height-gap,bottom-height-8));
+    }
+    popup.style.left=posX+'px';
+    popup.style.top=posY+'px';
+  }
+
+  function showWord(raw,anchor,scope,context=raw){
+    hideAllPopups();const result=lookupWord(raw);
     const popup=el('aside','study-word-popup study-owned');wordPopup=popup;
     popup.setAttribute('role','region');popup.setAttribute('aria-label',t('Chinese word meaning','英文词语中文释义'));
     popup.append(el('strong','study-word-title',raw));
@@ -52,48 +107,409 @@
         add.textContent=entry?t('Saved ✓','已加入 ✓'):t('Could not save','暂时无法保存');add.disabled=!!entry;
       });popup.append(add);
     }
-    // A native modal makes the page behind it inert. Keep the glossary in its top layer.
+    const snapshot={text:raw,context,anchor,scope,modal:scope.closest('dialog[open]'),title:raw};
+    if(activeSnapshot?.text!==raw||activeSnapshot?.context!==context)askHistory=[];
+    activeSnapshot=snapshot;
+    const actions=el('div','study-ai-actions');
+    actions.append(button('Translate','翻译',()=>openAiTranslate(snapshot)),button('Ask AI','问问 AI',()=>openAiAsk(snapshot)));
+    popup.append(actions);
     const modal=scope.closest('dialog[open]');
-    const bounds=modal?.getBoundingClientRect();
-    const left=bounds?bounds.left+modal.clientLeft:0;
-    const top=bounds?bounds.top+modal.clientTop:0;
-    const right=Math.min(document.documentElement.clientWidth,bounds?left+modal.clientWidth:innerWidth);
-    const bottom=Math.min(innerHeight,bounds?top+modal.clientHeight:innerHeight);
-    popup.style.maxWidth=Math.max(0,right-left-16)+'px';
-    popup.style.maxHeight=Math.max(0,bottom-top-16)+'px';
-    (modal||document.body).append(popup);
-    const box=popup.getBoundingClientRect(),gap=9;
-    popup.style.left=Math.max(left+8,Math.min(anchor.left,right-box.width-8))+'px';
-    popup.style.top=Math.max(top+8,Math.min(anchor.bottom+gap,bottom-box.height-8))+'px';
+    positionPopup(popup,anchor,modal);
   }
+
+  const translationCache=new Map();
+  function getCachedTranslation(text,context){return translationCache.get(text+'\0'+context);}
+  function setCachedTranslation(text,context,translation){
+    if(translationCache.size>=50){const first=translationCache.keys().next().value;translationCache.delete(first);}
+    translationCache.set(text+'\0'+context,translation);
+  }
+
+  let aiPopup=null,activeSnapshot=null,currentAbortController=null,currentRequestId=0,askHistory=[];
+  function accountToken(){try{return localStorage.getItem('acct_token');}catch{return '';}}
+  function translationFailure(message,status=0){return Object.assign(new Error(message),{translation:true,status});}
+  async function requestTranslation(snapshot,signal){
+    const cached=getCachedTranslation(snapshot.text,snapshot.context);
+    if(cached)return cached;
+    const token=accountToken();
+    if(!token)throw translationFailure(t('Please sign in first.','请先登录账号后再使用翻译。'),401);
+    const resp=await fetch('/api/ai/translate',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body:JSON.stringify({text:snapshot.text.slice(0,6000),context:snapshot.context.slice(0,2000)}),signal
+    });
+    if(!resp.ok){
+      let message=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+      if(resp.status===401)message=t('Session expired. Please sign in again.','登录已失效，请重新登录。');
+      else if(resp.status===429)message=t('Too many requests. Please try again later.','请求过于频繁，请稍后再试。');
+      else if(resp.status!==503){try{const data=await resp.json();if(data.error)message=data.error;}catch{}}
+      throw translationFailure(message,resp.status);
+    }
+    const data=await resp.json();
+    if(data.error)throw translationFailure(data.error);
+    if(typeof data.translation!=='string'||!data.translation.trim())throw translationFailure(t('Invalid translation. Please retry.','翻译格式异常，请重试。'));
+    if(!signal.aborted)setCachedTranslation(snapshot.text,snapshot.context,data.translation);
+    return data.translation;
+  }
+  function translationErrorText(error){return error.translation?error.message:t('Network request failed. Please check your connection.','网络请求失败，请检查连接后重试。');}
+  function abortInFlight(){if(currentAbortController){currentAbortController.abort();currentAbortController=null;}currentRequestId++;}
+  function hideAiPopup(){abortInFlight();aiPopup?.remove();aiPopup=null;}
+  function hideAllPopups(){hideWord();hideAiPopup();}
+
+  function findStudyScope(node){
+    if(!node)return null;
+    const parent=node.nodeType===1?node:node.parentElement;
+    if(!parent||parent.closest('button,input,textarea,select,.study-word-popup,.study-ai-popup'))return null;
+    return parent.closest('.study-card,.study-reading,.study-pane-guide,#learnContent .pane,.pz-item,#bankQBox,#bankSession,#bkView,.book-question,.book-context,.study-book-body,#bookPractice,#studyGuide,.reader-content,.study-teaching,.study-page');
+  }
+
+  function cleanFragment(fragment){
+    fragment.querySelectorAll('details:not([open]),[hidden],.hide,.frq-ans,.pz-fb,.book-feedback,.book-source-sheet,button,style,script,.study-word-popup,.study-ai-popup').forEach(n=>n.remove());
+    fragment.querySelectorAll('*').forEach(n=>{if(n.style&&(n.style.display==='none'||n.style.visibility==='hidden'))n.remove();});
+    fragment.querySelectorAll('[data-tex]').forEach(eq=>{
+      if(eq.dataset.tex)eq.textContent=' '+eq.dataset.tex+' ';
+    });
+    fragment.querySelectorAll('.katex').forEach(eq=>{
+      const tex=eq.querySelector('annotation[encoding="application/x-tex"]');
+      if(tex)eq.replaceWith(' \\('+tex.textContent+'\\) ');
+      else eq.querySelectorAll('.katex-mathml').forEach(n=>n.remove());
+    });
+    fragment.querySelectorAll('br').forEach(br=>br.replaceWith('\n'));
+    fragment.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6,tr').forEach(block=>block.append('\n'));
+    return (fragment.textContent||'').replace(/\r\n?/g,'\n').replace(/[ \t]+/g,' ').replace(/\n\s*\n+/g,'\n\n').trim();
+  }
+
+  function extractCleanText(range){
+    if(!range||range.collapsed)return '';
+    range=range.cloneRange();
+    const start=(range.startContainer.nodeType===1?range.startContainer:range.startContainer.parentElement)?.closest('.katex');
+    const end=(range.endContainer.nodeType===1?range.endContainer:range.endContainer.parentElement)?.closest('.katex');
+    if(start)range.setStartBefore(start);
+    if(end)range.setEndAfter(end);
+    return cleanFragment(range.cloneContents());
+  }
+
+  function extractContext(range,scope){
+    const node=range.commonAncestorContainer;
+    const parent=node.nodeType===1?node:node.parentElement;
+    const block=parent?.closest('section,article,.study-block,.study-teaching,.study-example,.study-check,p,li')||scope;
+    const question=parent?.closest('.pz-item,.book-question,.book-context');
+    const container=question||(block?.matches('p,li')&&scope.contains(block.parentElement)?block.parentElement:block);
+    if(!container)return '';
+    const whole=document.createRange();whole.selectNodeContents(container);
+    const text=extractCleanText(whole);
+    if(text.length<=2000)return text;
+    // Measure from the DOM range, so repeated words cannot anchor the wrong occurrence.
+    const before=whole.cloneRange();before.setEnd(range.startContainer,range.startOffset);
+    const offset=extractCleanText(before).length;
+    const selected=extractCleanText(range);
+    let start=Math.max(0,offset-Math.max(0,Math.floor((2000-selected.length)/2)));
+    // Keep the entire paragraph when it fits, using leftover space for its neighbours.
+    if(block&&block!==container&&container.contains(block)){
+      const paragraph=document.createRange();paragraph.selectNodeContents(block);
+      const paragraphText=extractCleanText(paragraph);
+      if(paragraphText.length<=2000){
+        const prefix=whole.cloneRange();prefix.setEndBefore(block);
+        start=Math.max(0,extractCleanText(prefix).length-Math.floor((2000-paragraphText.length)/2));
+      }
+    }
+    start=Math.min(start,Math.max(0,text.length-2000));
+    return text.slice(start,start+2000).trim();
+  }
+
+  function showAiToolbar(snapshot){
+    hideAllPopups();
+    const toolbar=el('div','study-ai-popup study-ai-toolbar study-owned');
+    toolbar.setAttribute('role','toolbar');toolbar.setAttribute('aria-label',t('AI Actions','AI 操作'));
+    aiPopup=toolbar;
+    const btnTrans=button('Translate','翻译',()=>openAiTranslate(snapshot));
+    const btnAsk=button('Ask AI','问问 AI',()=>openAiAsk(snapshot));
+    toolbar.append(btnTrans,btnAsk);
+    if(snapshot.text.length>6000){btnTrans.disabled=btnAsk.disabled=true;toolbar.append(el('span','',t('Select up to 6000 characters.','请将选段缩短至 6000 字以内。')));}
+    positionPopup(toolbar,snapshot.anchor,snapshot.modal);
+  }
+
+  function openAiTranslate(snapshot){
+    abortInFlight();hideWord();
+    if(!aiPopup){
+      aiPopup=el('aside','study-ai-popup study-ai-panel study-owned');
+      aiPopup.setAttribute('role','dialog');
+    }else{
+      aiPopup.className='study-ai-popup study-ai-panel study-owned';
+      aiPopup.replaceChildren();
+    }
+    aiPopup.setAttribute('role','dialog');aiPopup.setAttribute('aria-label',t('AI Translation','AI 翻译'));
+    const head=el('div','study-ai-head');
+    head.append(el('strong','study-ai-title',snapshot.title));
+    const closeBtn=el('button','study-ai-close','×');
+    closeBtn.type='button';closeBtn.setAttribute('aria-label',t('Close','关闭'));
+    closeBtn.addEventListener('click',hideAiPopup);
+    head.append(closeBtn);aiPopup.append(head);
+
+    const body=el('div','study-ai-body');
+    const statusEl=el('div','study-ai-status','');
+    const contentEl=el('div','study-ai-content','');
+    const actionsEl=el('div','study-ai-actions');
+    body.append(statusEl,contentEl,actionsEl);
+    aiPopup.append(body);
+    positionPopup(aiPopup,snapshot.anchor,snapshot.modal);
+
+    const cached=getCachedTranslation(snapshot.text,snapshot.context);
+    if(cached){contentEl.textContent=cached;renderMath(contentEl,true);return;}
+
+    const reqId=++currentRequestId;
+    const controller=new AbortController();currentAbortController=controller;
+    statusEl.textContent=t('Translating…','正在翻译…');
+    actionsEl.append(button('Cancel','取消',()=>controller.abort()));
+
+    requestTranslation(snapshot,controller.signal).then(translation=>{
+      if(reqId!==currentRequestId)return;
+      statusEl.textContent='';contentEl.textContent=translation;renderMath(contentEl,true);actionsEl.replaceChildren();
+    }).catch(err=>{
+      if(reqId!==currentRequestId)return;
+      if(err.name==='AbortError'){
+        statusEl.textContent=t('Request cancelled.','请求已取消。');statusEl.className='study-ai-status';
+      }else{
+        statusEl.textContent=translationErrorText(err);
+        statusEl.className='study-ai-status error';
+      }
+      actionsEl.replaceChildren(button('Retry','重试',()=>openAiTranslate(snapshot)));
+    });
+  }
+
+  let toolTranslationAbort=null;
+  function resetTranslationTool(){
+    toolTranslationAbort?.abort();toolTranslationAbort=null;
+    $('trOut').className='tr-out study-owned';$('trOut').replaceChildren();$('trHint').replaceChildren();
+  }
+  function translateTool(raw,forceAI=false){
+    hideAllPopups();resetTranslationTool();
+    const text=String(raw??'').trim(),out=$('trOut'),hint=$('trHint');
+    out.classList.add('show');
+    if(!text||text.length>6000){out.textContent=text?t('Use up to 6000 characters.','请将文本缩短至 6000 字以内。'):t('Enter text to translate.','请输入要翻译的内容。');return;}
+    const local=forceAI?null:lookupWord(text);
+    if(local){
+      const word=el('div','tr-word',local.key);word.append(el('span','tr-pos',local.e[0]));
+      out.append(word,el('div','tr-cn',local.e[1]));
+      if(local.e[2])out.append(el('div','tr-kp',local.e[2]));
+      window.__vocab.addEntry(local.key,local.e);
+      hint.append(el('span','',t('Dictionary · Saved to vocabulary','词表 · 已加入生词本')),button('AI translation','AI 翻译',()=>translateTool(text,true)));
+      return;
+    }
+    const controller=new AbortController();toolTranslationAbort=controller;
+    const status=el('div','study-ai-status',t('Translating…','正在翻译…'));
+    const result=el('div','study-ai-content'),actions=el('div','study-ai-actions');
+    actions.append(button('Cancel','取消',()=>controller.abort()));out.append(status,result,actions);
+    hint.textContent=t('AI translation','AI 翻译');
+    requestTranslation({text,context:''},controller.signal).then(translation=>{
+      if(toolTranslationAbort!==controller)return;
+      status.textContent='';result.textContent=translation;renderMath(result,true);actions.replaceChildren();
+    }).catch(error=>{
+      if(toolTranslationAbort!==controller)return;
+      status.textContent=error.name==='AbortError'?t('Request cancelled.','请求已取消。'):translationErrorText(error);
+      status.classList.toggle('error',error.name!=='AbortError');
+      actions.replaceChildren(button('Retry','重试',()=>translateTool(text,true)));
+      if(error.status===401)actions.prepend(button('Sign in','登录',()=>{$('modalTr').classList.add('hide');$('btnUser').click();}));
+    });
+  }
+  $('trInput').addEventListener('input',resetTranslationTool);
+  new MutationObserver(()=>{if($('modalTr').classList.contains('hide'))resetTranslationTool();}).observe($('modalTr'),{attributes:true,attributeFilter:['class']});
+
+  function openAiAsk(snapshot,customQuestion=null){
+    abortInFlight();hideWord();
+    if(!aiPopup){
+      aiPopup=el('aside','study-ai-popup study-ai-panel study-owned');
+      aiPopup.setAttribute('role','dialog');
+    }else{
+      aiPopup.className='study-ai-popup study-ai-panel study-owned';
+      aiPopup.replaceChildren();
+    }
+    aiPopup.setAttribute('role','dialog');aiPopup.setAttribute('aria-label',t('Ask AI','问问 AI'));
+    const head=el('div','study-ai-head');
+    head.append(el('strong','study-ai-title',snapshot.title));
+    const closeBtn=el('button','study-ai-close','×');
+    closeBtn.type='button';closeBtn.setAttribute('aria-label',t('Close','关闭'));
+    closeBtn.addEventListener('click',hideAiPopup);
+    head.append(closeBtn);aiPopup.append(head);
+
+    const body=el('div','study-ai-body');
+    const messagesEl=el('div','study-ai-messages');
+    const statusEl=el('div','study-ai-status','');
+    const actionsEl=el('div','study-ai-actions');
+    const form=el('form','study-ai-form');
+    const input=el('input','study-ai-input');
+    input.type='text';input.maxLength=1000;input.placeholder=t('Ask a follow-up question…','输入追问内容…');
+    input.setAttribute('aria-label',t('Follow-up question','追问内容'));
+    const sendBtn=button('Send','发送',()=>{},'btn study-ai-send');sendBtn.type='submit';
+    form.append(input,sendBtn);
+    form.addEventListener('submit',e=>{
+      e.preventDefault();const q=input.value.trim();if(!q||sendBtn.disabled)return;input.value='';openAiAsk(snapshot,q);
+    });
+    body.append(messagesEl,statusEl,actionsEl,form);aiPopup.append(body);
+
+    const question=customQuestion||t('Please explain this chemistry content and key concepts.','请解释这段化学内容及相关知识点。');
+    [...askHistory,{role:'user',content:question}].forEach(item=>{
+      const m=el('div','study-ai-msg study-ai-msg-'+item.role);
+      m.textContent=item.content;
+      messagesEl.append(m);
+    });
+
+    positionPopup(aiPopup,snapshot.anchor,snapshot.modal);
+
+    const token=accountToken();
+    if(!token){
+      statusEl.textContent=t('Please sign in first.','请先登录账号后再使用 AI 问答。');
+      statusEl.className='study-ai-status error';
+      return;
+    }
+
+    const assistantMsgEl=el('div','study-ai-msg study-ai-msg-assistant');
+    messagesEl.append(assistantMsgEl);
+
+    const reqId=++currentRequestId;
+    const controller=new AbortController();currentAbortController=controller;
+    statusEl.textContent=t('AI is thinking…','AI 正在解答…');
+    sendBtn.disabled=true;input.disabled=true;
+    actionsEl.append(button('Cancel','取消',()=>controller.abort()));
+
+    const historyPayload=askHistory.slice(-8).map(x=>({
+      role:x.role,content:String(x.content).slice(0,6000)
+    }));
+
+    fetch('/api/ai/ask',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body:JSON.stringify({
+        text:snapshot.text.slice(0,6000),
+        context:snapshot.context.slice(0,2000),
+        question:question.slice(0,1000),
+        history:historyPayload
+      }),
+      signal:controller.signal
+    }).then(async resp=>{
+      if(reqId!==currentRequestId)return;
+      if(!resp.ok){
+        let msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+        if(resp.status===401)msg=t('Session expired. Please sign in again.','登录已失效，请重新登录。');
+        else if(resp.status===429)msg=t('Too many requests. Please try again later.','请求过于频繁，请稍后再试。');
+        else if(resp.status===503)msg=t('Service temporarily unavailable. Please try again later.','服务暂时不可用，请稍后重试。');
+        else{try{const d=await resp.json();if(d.error)msg=d.error;}catch{}}
+        if(reqId!==currentRequestId)return;
+        assistantMsgEl.remove();sendBtn.disabled=false;input.disabled=false;
+        statusEl.textContent=msg;statusEl.className='study-ai-status error';
+        actionsEl.replaceChildren(button('Retry','重试',()=>openAiAsk(snapshot,customQuestion)));
+        return;
+      }
+      const reader=resp.body.getReader();
+      const decoder=new TextDecoder('utf-8');
+      let buffer='',accumulated='',completed=false;
+      function consume(line){
+        if(!line.trim())return;
+        const item=JSON.parse(line);
+        if(item.error)throw Error(String(item.error));
+        if(typeof item.delta==='string'){
+          accumulated+=item.delta;assistantMsgEl.textContent=accumulated;messagesEl.scrollTop=messagesEl.scrollHeight;
+        }
+        if(item.done===true)completed=true;
+      }
+      while(true){
+        const {done,value}=await reader.read();
+        if(done)break;
+        if(reqId!==currentRequestId)return;
+        buffer+=decoder.decode(value,{stream:true});
+        const lines=buffer.split('\n');
+        buffer=lines.pop();
+        for(const line of lines)consume(line);
+      }
+      consume(buffer+decoder.decode());
+      if(reqId!==currentRequestId)return;
+      if(!completed||!accumulated.trim())throw Error(t('Answer interrupted. Please retry.','回答连接中断，请重试。'));
+      statusEl.textContent='';actionsEl.replaceChildren();
+      sendBtn.disabled=false;input.disabled=false;
+      askHistory.push({role:'user',content:question},{role:'assistant',content:accumulated.slice(0,6000)});
+      if(askHistory.length>8)askHistory=askHistory.slice(-8);
+    }).catch(err=>{
+      if(reqId!==currentRequestId)return;
+      controller.abort();sendBtn.disabled=false;input.disabled=false;
+      if(!assistantMsgEl.textContent)assistantMsgEl.remove();
+      if(err.name==='AbortError'){
+        statusEl.textContent=t('Request cancelled.','请求已取消。');statusEl.className='study-ai-status';
+      }else{
+        statusEl.textContent=t('Answer incomplete. Please retry.','回答未完成，请重试。');
+        statusEl.className='study-ai-status error';
+      }
+      actionsEl.replaceChildren(button('Retry','重试',()=>openAiAsk(snapshot,customQuestion)));
+    });
+  }
+
   function inspectSelection(){
     const selection=window.getSelection();if(!selection||selection.isCollapsed||selection.rangeCount!==1)return;
-    const raw=selection.toString().trim();if(!/^[A-Za-z]+(?:['’\-][A-Za-z]+)*(?:\s+[A-Za-z]+(?:['’\-][A-Za-z]+)*){0,4}$/.test(raw)||raw.length>70)return;
     const range=selection.getRangeAt(0),node=range.commonAncestorContainer;
     const parent=node.nodeType===1?node:node.parentElement;
-    const scope=parent?.closest('.study-card');if(!scope||parent.closest('.katex,button,input,textarea,.study-word-popup'))return;
+    if(!parent||parent.closest('button,input,textarea,select,.study-word-popup,.study-ai-popup'))return;
+    const scope=findStudyScope(parent);if(!scope)return;
     if(!scope.contains(range.startContainer)||!scope.contains(range.endContainer))return;
-    showWord(raw,range.getBoundingClientRect(),scope);
+
+    const cleanText=extractCleanText(range);if(!cleanText||cleanText.length<1)return;
+
+    const isSingleWord=/^[A-Za-z]+(?:['’\-][A-Za-z]+)*(?:\s+[A-Za-z]+(?:['’\-][A-Za-z]+)*){0,3}$/.test(cleanText)&&cleanText.length<=60;
+    if(isSingleWord){
+      const localResult=lookupWord(cleanText);
+      if(localResult){
+        hideAiPopup();showWord(cleanText,range.getBoundingClientRect(),scope,extractContext(range,scope));return;
+      }
+    }
+
+    hideWord();
+    const context=extractContext(range,scope);
+    if(aiPopup&&activeSnapshot?.text===cleanText&&activeSnapshot?.context===context)return;
+    const anchor=range.getBoundingClientRect();
+    const modal=scope.closest('dialog[open]');
+    let title=cleanText.split('\n')[0].trim();
+    if(title.length>36)title=title.slice(0,36)+'…';
+
+    if(!activeSnapshot||activeSnapshot.text!==cleanText||activeSnapshot.context!==context){
+      askHistory=[];
+    }
+    activeSnapshot={text:cleanText,context:context,anchor:anchor,scope:scope,modal:modal,title:title};
+    showAiToolbar(activeSnapshot);
   }
+
   let selectTimer;
-  document.addEventListener('selectionchange',()=>{
-    clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,250);
+  document.addEventListener('selectionchange',()=>{clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,250);});
+  document.addEventListener('pointerup',event=>{
+    if(!event.target.closest('.study-word-popup,.study-ai-popup')){clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,30);}
   });
-  document.addEventListener('pointerup',event=>{if(!event.target.closest('.study-word-popup')){clearTimeout(selectTimer);selectTimer=setTimeout(inspectSelection,30);}});
-  document.addEventListener('pointerdown',event=>{if(!event.target.closest('.study-word-popup'))hideWord();});
-  document.addEventListener('click',event=>{const term=event.target.closest('.study-term');if(term&&window.getSelection()?.isCollapsed)showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card'));});
+  document.addEventListener('pointerdown',event=>{
+    if(event.target.closest('.study-ai-popup button,.study-word-popup button')){event.preventDefault();return;}
+    if(!event.target.closest('.study-word-popup,.study-ai-popup'))hideAllPopups();
+  });
+  document.addEventListener('click',event=>{
+    const sel=window.getSelection();
+    if(sel&&!sel.isCollapsed&&sel.toString().trim().length>0){
+      if(event.target.closest('.w'))event.stopPropagation();
+    }
+    const term=event.target.closest('.study-term');
+    if(term&&window.getSelection()?.isCollapsed)showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card, .reader-content, #studyGuide, .study-page')||term.parentElement);
+  },true);
   document.addEventListener('keydown',event=>{
     const term=event.target.closest('.study-term');
-    if(term&&['Enter',' '].includes(event.key)){event.preventDefault();showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card'));}
-    if(event.key==='Escape'&&wordPopup){event.preventDefault();event.stopPropagation();hideWord();}
+    if(term&&['Enter',' '].includes(event.key)){event.preventDefault();showWord(term.dataset.term,term.getBoundingClientRect(),term.closest('.study-card, .reader-content, #studyGuide, .study-page')||term.parentElement);}
+    if(event.key==='Escape'){
+      if(aiPopup||wordPopup){event.preventDefault();event.stopPropagation();hideAllPopups();}
+    }
   },true);
-  document.addEventListener('scroll',event=>{if(wordPopup&&!wordPopup.contains(event.target))hideWord();},true);
-  window.addEventListener('resize',hideWord);
-  function readingHint(){return el('p','study-lookup-hint',t('Bold terms are key concepts. Select an English word or short term to see its Chinese meaning; click a bold term or focus it and press Enter.','粗体标出英文重点词。选中英文单词或短语可查中文；也可点击重点词，或用 Tab 聚焦后按 Enter。'));}
+  document.addEventListener('scroll',event=>{
+    if(wordPopup&&!wordPopup.contains(event.target))hideWord();
+    if(aiPopup&&!aiPopup.contains(event.target)&&aiPopup.classList.contains('study-ai-toolbar'))hideAiPopup();
+  },true);
+  window.addEventListener('resize',hideAllPopups);
+  window.addEventListener('hashchange',hideAllPopups);
+
+  function readingHint(){if(isMaterial())return null;return el('p','study-lookup-hint',t('Bold terms are key concepts. Select an English word or short term to see its Chinese meaning; click a bold term or focus it and press Enter.','粗体标出英文重点词。选中英文单词或短语可查中文；也可点击重点词，或用 Tab 聚焦后按 Enter。'));}
   const UI = new Map(Object.entries({
     'AP Chemistry 学习工具':'AP Chemistry Learning Tool',
     '首页':'Home','学习':'Learn','题库':'Question bank','错题本':'Review','生词本':'Vocabulary','设置':'Settings',
-    '进入 →':'Open →','公式表':'Formula sheet','查缺补漏':'Knowledge check','大纲':'Outline','翻译':'Dictionary','刷新':'Reload',
+    '个单词':'words','暂无生词':'No saved words','查过的单词会保存在这里。':'Words you look up appear here.','查词':'Look up a word','清空生词本':'Clear vocabulary',
+    '进入 →':'Open →','公式表':'Formula sheet','查缺补漏':'Knowledge check','大纲':'Outline','翻译':'Translation','刷新':'Reload',
     '← 返回首页':'← Home','登录 / 注册':'Sign in / Register','← 返回单元列表':'← All units',
     '9 个单元':'9 units','按小节归类':'Organised by topic','一键练习':'Quick practice','按范围选':'Choose topics','自选题量':'Choose question count',
     '中英双语解析':'Bilingual explanations','自动记录':'Automatic history','三态分类':'Track progress','一键订正':'Retry mistakes','单词列表':'Word list','背诵模式':'Recall practice','自动收录':'Save new words',
@@ -153,7 +569,7 @@
       if (node.nodeValue !== value) node.nodeValue = value;
     }
   }
-  function renderMath(root) {
+  function renderMath(root, singleDollar = false) {
     if (!window.katex) return;
     root.querySelectorAll('[data-tex]').forEach(n => {
       if (n.dataset.rendered === n.dataset.tex) return;
@@ -163,7 +579,7 @@
       } catch { n.textContent = n.dataset.tex; }
     });
     if (window.renderMathInElement) renderMathInElement(root,{
-      delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false},...(singleDollar?[{left:'$',right:'$',display:false}]:[])],
       throwOnError:false,trust:false,ignoredClasses:['katex','no-math'],
       ignoredTags:['script','noscript','style','textarea','pre','code','option']
     });
@@ -176,7 +592,7 @@
     card.append(el('div','study-eyebrow',t('CHAPTER','第')+' '+c.id+(language === 'zh' ? ' 章' : '')),
       el('h2','',text(c.title)),el('p','study-core',text(c.core)));
     const block = (en,zh,value) => { const n=el('section','study-block'); n.append(el('h3','',t(en,zh)),el('p','',text(value))); return n; };
-    card.append(readingHint());
+    const hint = readingHint(); if (hint) card.append(hint);
     const lesson=lessons[c.id];
     if(lesson){
       const roadmap=el('section','study-roadmap');
@@ -228,14 +644,29 @@
   languageLabel.append(languageSelect); controls.append(languageLabel);
   const guideButton = button('Study guide','双语讲解',()=>openGuide());
   const bookButton = button('Book practice','书本题库',()=>openBook());
-  controls.append(guideButton,bookButton); top.append(controls);
+  controls.append(guideButton,bookButton);
+  if (!isMaterial() && top) top.append(controls);
   const homeCard = el('div','study-home study-owned');
-  $('home').insertBefore(homeCard,$('home').querySelector('.modules'));
+  if (!isMaterial() && $('home')) {
+    const modules = $('home').querySelector('.modules');
+    if (modules) $('home').insertBefore(homeCard, modules);
+  }
   const bankLink = el('div','study-bank-link study-owned');
-  $('bankSelView').prepend(bankLink);
+  if ($('bankSelView')) $('bankSelView').prepend(bankLink);
   let activeChapter = 1;
-  const guide = el('dialog','study-dialog study-owned'); guide.id='studyGuide';
-  const book = el('dialog','study-dialog study-owned'); book.id='bookPractice';
+  let guideTab = 'reading';
+  const guide = isMaterial()
+    ? el('section','study-page study-owned')
+    : el('dialog','study-dialog study-owned');
+  guide.id = 'studyGuide';
+  if (isMaterial()) guide.hidden = true;
+
+  const book = isMaterial()
+    ? el('section','study-page study-owned')
+    : el('dialog','study-dialog study-owned');
+  book.id = 'bookPractice';
+  if (isMaterial()) book.hidden = true;
+
   document.body.append(guide,book);
   function header(dialog,title) {
     const h=el('header','study-dialog-head'); h.append(el('h2','',title));
@@ -243,9 +674,27 @@
     actions.append(button('中文','English',()=>{language=language==='en'?'zh':'en';save('apchem.language',language);renderLanguage();}));
     const close=button('Close','关闭',()=>dialog.close()); close.setAttribute('aria-label',t('Close dialog','关闭对话框'));actions.append(close);h.append(actions);return h;
   }
-  function showDialog(d) { if (!d.open) d.showModal(); }
+  function showDialog(d) { if (d.tagName?.toLowerCase()==='dialog' && !d.open) d.showModal(); }
+  function isGuideVisible() {
+    return isMaterial() ? (!guide.hidden && guide.style.display !== 'none') : Boolean(guide.open);
+  }
+  function isBookVisible() {
+    return isMaterial() ? (!book.hidden && book.style.display !== 'none') : Boolean(book.open);
+  }
+  function setReadingLanguage(val) {
+    if (!['zh','en','both'].includes(val)) return;
+    readingLanguage = val;
+    save('apchem.readingLanguage', readingLanguage);
+    if (isGuideVisible()) {
+      const scrollY = window.scrollY;
+      const scrollTop = guide.scrollTop;
+      showGuide(activeChapter, guideTab);
+      if (isMaterial()) window.scrollTo(0, scrollY);
+      else guide.scrollTop = scrollTop;
+    }
+  }
   function renderGuide() {
-    hideWord();
+    hideAllPopups();
     guide.replaceChildren(header(guide,t('Bilingual chemistry guide','化学双语学习讲解')));
     const layout=el('div','study-layout'); const nav=el('nav','study-chapter-nav'); nav.setAttribute('aria-label',t('Chapters','章节'));
     content.chapters.forEach(c=>{const b=button(`${c.id}. ${c.title.en}`,`${c.id}. ${c.title.zh}`,()=>{activeChapter=c.id;renderGuide();guide.scrollTop=0;},'study-chapter-button');
@@ -255,8 +704,174 @@
       chapterCard(content.chapters.find(c=>c.id===activeChapter)));
     layout.append(nav,body);guide.append(layout);renderMath(body);emphasise(body);
   }
-  function openGuide(id) { if (id) activeChapter=id; renderGuide(); showDialog(guide);guide.scrollTop=0; }
-  guide.addEventListener('close',hideWord);
+  function openGuide(id, tab = 'reading') {
+    const targetChapter = Number(id) || activeChapter || 1;
+    const targetTab = ['reading','examples','checks'].includes(tab) ? tab : 'reading';
+    if (isMaterial()) {
+      document.dispatchEvent(new CustomEvent('apchem:navigate', {
+        detail: { view: 'guide', chapter: targetChapter, tab: targetTab }
+      }));
+    } else {
+      activeChapter = targetChapter;
+      guideTab = targetTab;
+      renderGuide();
+      showDialog(guide);
+      guide.scrollTop = 0;
+    }
+  }
+  function showGuide(id, tab = 'reading') {
+    hideAllPopups();
+    currentBookRequestId++;
+    if (id !== undefined && id !== null) {
+      const parsed = Number(id);
+      if (parsed >= 1 && parsed <= 14) activeChapter = parsed;
+    }
+    if (tab && ['reading','examples','checks'].includes(tab)) {
+      guideTab = tab;
+    } else {
+      guideTab = 'reading';
+    }
+    const c = content.chapters.find(item => item.id === activeChapter) || content.chapters[0];
+    const lesson = lessons[c.id];
+
+    guide.replaceChildren();
+
+    const heading = el('div', 'reader-heading lesson-heading');
+    const titleWrap = el('div');
+    titleWrap.append(el('h1', '', text(c.title)),el('p','subtext',t(`Chapter ${c.id}`,`第 ${c.id} 章`)));
+    heading.append(titleWrap);
+    guide.append(heading);
+
+    const nav = el('nav', 'reader-tabs lesson-tabs');
+    nav.setAttribute('aria-label', t('Chapter sections', '本节内容'));
+    const tabsList = [
+      ['reading', t('Guide', '讲义')],
+      ['examples', t('Worked Examples', '例题')],
+      ['checks', t('Practice Checks', '自测')]
+    ];
+    tabsList.forEach(([tKey, label]) => {
+      const a = el('a', tKey === guideTab ? 'reader-tab active' : 'reader-tab');
+      a.href = `#/learn/${c.id}/${tKey}`;
+      a.textContent = label;
+      if (tKey === guideTab) {
+        a.setAttribute('aria-current', 'page');
+      }
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        openGuide(c.id, tKey);
+      });
+      nav.append(a);
+    });
+    guide.append(nav);
+
+    const contentEl = el('article', 'reader-content study-reading study-card');
+    contentEl.lang = readingLanguage === 'en' ? 'en' : 'zh-CN';
+
+    if (guideTab === 'reading') {
+      if (lesson && lesson.sections) {
+        lesson.sections.forEach((section, sIdx) => {
+          const secEl = el('section', 'study-teaching reading-section');
+          secEl.id = `reading-${c.id}-${sIdx}`;
+          renderBi(secEl, 'h3', section.title, 'section-title');
+          section.paragraphs.forEach(pBi => renderBi(secEl, 'p', pBi));
+          if (section.tex) secEl.append(formula(section.tex));
+          if (section.note) renderBi(secEl, 'p', section.note, 'study-symbol-note');
+          contentEl.append(secEl);
+        });
+      }
+      const review = el('details', 'study-recap');
+      review.append(
+        el('summary', '', t('Chapter summary', '章节小结')),
+        blockBi('Core concept', '核心概念', c.core),
+        blockBi('Prerequisites', '先备知识', lesson.before),
+        blockBi('Learning goals', '学习目标', lesson.goals),
+        blockBi('Why it works', '为什么', c.why),
+        formula(c.formula),
+        blockBi('Symbols, units, and conditions', '符号、单位与适用条件', c.symbols)
+      );
+      contentEl.append(review);
+      contentEl.append(blockBi('Common mistake', '常见错误', c.trap, 'study-block study-trap'));
+
+      const footer = el('footer', 'lesson-footer study-actions');
+      footer.append(button('Worked examples →', '查看例题 →', () => openGuide(c.id, 'examples'), 'filled btn'));
+      contentEl.append(footer);
+    } else if (guideTab === 'examples') {
+      const ex1 = el('section', 'study-example');
+      ex1.append(el('h3', 'example-title', t('Worked example 1 · follow the reasoning', '例题 1 · 跟着思路做')));
+      renderBi(ex1, 'p', c.example);
+      const ol1 = el('ol', 'steps');
+      c.steps.forEach(s => {
+        const li = el('li');
+        const d = el('div');
+        renderBi(d, 'p', s);
+        li.append(d);
+        ol1.append(li);
+      });
+      ex1.append(ol1);
+      contentEl.append(ex1);
+
+      if (lesson && lesson.extra) {
+        const ex2 = el('section', 'study-example');
+        ex2.append(el('h3', 'example-title', t('Worked example 2 · apply the concept', '例题 2 · 应用概念')));
+        renderBi(ex2, 'p', lesson.extra.prompt);
+        const ol2 = el('ol', 'steps');
+        lesson.extra.steps.forEach(s => {
+          const li = el('li');
+          const d = el('div');
+          renderBi(d, 'p', s);
+          li.append(d);
+          ol2.append(li);
+        });
+        ex2.append(ol2);
+        if (lesson.extra.tex) ex2.append(formula(lesson.extra.tex));
+        contentEl.append(ex2);
+      }
+
+      const footer = el('footer', 'lesson-footer study-actions');
+      footer.append(
+        button('Practice checks →', '章节自测 →', () => openGuide(c.id, 'checks'), 'filled btn'),
+        button('← Back to guide', '← 返回讲义', () => openGuide(c.id, 'reading'), 'btn textbutton')
+      );
+      contentEl.append(footer);
+    } else if (guideTab === 'checks') {
+      if (lesson && lesson.checks) {
+        const checksSec = el('section', 'study-checks');
+        checksSec.append(el('h3', '', t('Try it yourself before revealing the answer', '先独立尝试，再展开答案')));
+        lesson.checks.forEach((chk, i) => {
+          const item = el('div', 'study-check');
+          const qWrap = el('div', 'study-check-question');
+          renderBi(qWrap, 'p', chk.question, '', `${i + 1}. `);
+          item.append(qWrap);
+
+          const ans = el('details', 'study-check-answer');
+          ans.append(el('summary', '', t('Show answer and reasoning', '查看答案与理由')));
+          const aWrap = el('div', 'study-check-answer-body');
+          renderBi(aWrap, 'p', chk.answer);
+          ans.append(aWrap);
+          item.append(ans);
+          checksSec.append(item);
+        });
+        contentEl.append(checksSec);
+      }
+
+      const footer = el('footer', 'lesson-footer study-actions');
+      footer.append(
+        button('Practise book questions', '练习本书题目', () => openBook('chapter' + String(c.id).padStart(2, '0')), 'filled btn'),
+        button('← Back to examples', '← 查看例题', () => openGuide(c.id, 'examples'), 'btn textbutton')
+      );
+      contentEl.append(footer);
+    }
+
+    guide.append(contentEl);
+    renderMath(contentEl);
+    emphasise(contentEl);
+
+    document.dispatchEvent(new CustomEvent('apchem:reader', {
+      detail: { chapter: activeChapter, tab: guideTab }
+    }));
+  }
+  guide.addEventListener('close',hideAllPopups);
+  book.addEventListener('close',hideAllPopups);
   // Book data is optional, local and loaded only when requested.
   let bookLoad;
   function loadBook() {
@@ -265,6 +880,7 @@
       s.onload=()=>resolve(window.AP_BOOK_DATA || null);s.onerror=()=>resolve(null);document.head.append(s);});
     return bookLoad;
   }
+  let currentBookRequestId=0;
   let bookData, groupId='all', questionType='all', search='', wrongOnly=false, questionIndex=0;
   let history=read('apchem.bookHistory.v1',{});
   if (!history || typeof history !== 'object' || Array.isArray(history)) history={};
@@ -294,10 +910,23 @@
   }
   function record(q, correct, choice=null) { history[q.id]={correct,choice,at:Date.now()};save('apchem.bookHistory.v1',history); }
   function renderBookShell() {
-    book.replaceChildren(header(book,t('Book practice · AP Chemistry Premium 2025','书本题库 · AP Chemistry Premium 2025')));
+    hideAllPopups();
+    book.replaceChildren();
+    if (!isMaterial()) {
+      book.append(header(book, t('Book practice · AP Chemistry Premium 2025', '书本题库 · AP Chemistry Premium 2025')));
+    } else {
+      const heading = el('div', 'reader-heading lesson-heading');
+      const titleWrap = el('div');
+      titleWrap.append(
+        el('h1', '', t('Book practice', '书本题库')),
+        el('p', 'subtext', 'AP Chemistry Premium 2025')
+      );
+      heading.append(titleWrap);
+      book.append(heading);
+    }
     const body=el('div','study-book-body'); book.append(body);
     if (!bookData) {
-      body.append(el('p','',t('No book has been imported on this device. Import your EPUB using the local import tool described in the project README.','本机尚未导入书籍。请按项目说明使用本地导入工具导入 EPUB。')));return;
+      body.append(el('p','study-source',t('Book practice is currently unavailable.','书本题库暂不可用。')));return;
     }
     body.append(el('p','study-source',t('Original English questions and explanations. Image-only options are preserved for manual review.','保留原书英文题目与解析；图片形式选项保留原样，供手动核对。')));
     const filters=el('div','book-filters');
@@ -355,26 +984,74 @@
     const source=el('details','book-source-sheet');source.append(el('summary','',t('Open original question section to verify context','打开原书题目区核对上下文')),bookHtml(q.group.sheets[q.type]));article.append(source);
     host.append(article);renderMath(article);
   }
-  async function openBook(id) {
-    if(id)groupId=id;
-    questionIndex=0;resetAnswer();book.replaceChildren(header(book,t('Book practice','书本题库')),el('p','study-loading',t('Loading local book…','正在加载本地题库…')));showDialog(book);
-    bookData=await loadBook();renderBookShell();
+  function openBook(section = 'all') {
+    const targetSection = section || 'all';
+    if (isMaterial()) {
+      document.dispatchEvent(new CustomEvent('apchem:navigate', {
+        detail: { view: 'book', section: targetSection }
+      }));
+    } else {
+      groupId = targetSection;
+      questionIndex = 0; resetAnswer();
+      book.replaceChildren(header(book, t('Book practice', '书本题库')), el('p', 'study-loading', t('Loading local book…', '正在加载本地题库…')));
+      showDialog(book);
+      loadBook().then(data => {
+        bookData = data;
+        renderBookShell();
+      });
+    }
+  }
+  async function showBook(section = 'all', isWrongOnly = false) {
+    const reqId = ++currentBookRequestId;
+    hideAllPopups();
+    if (section) groupId = section;
+    wrongOnly = Boolean(isWrongOnly);
+    questionIndex = 0;
+    resetAnswer();
+    book.replaceChildren();
+    if (!isMaterial()) {
+      book.append(header(book, t('Book practice · AP Chemistry Premium 2025', '书本题库 · AP Chemistry Premium 2025')));
+    } else {
+      const heading = el('div', 'reader-heading lesson-heading');
+      const titleWrap = el('div');
+      titleWrap.append(
+        el('h1', '', t('Book practice', '书本题库')),
+        el('p', 'subtext', 'AP Chemistry Premium 2025')
+      );
+      heading.append(titleWrap);
+      book.append(heading);
+    }
+    const loadingEl = el('p', 'study-loading', t('Loading local book…', '正在加载本地题库…'));
+    book.append(loadingEl);
+    const data = await loadBook();
+    if (reqId !== currentBookRequestId) return;
+    bookData = data;
+    renderBookShell();
+  }
+  function closePopups() {
+    hideAllPopups();
+    currentBookRequestId++;
   }
   function renderLanguage() {
-    hideWord();
-    document.documentElement.lang=language==='en'?'en':'zh-CN';languageSelect.value=language;
+    hideAllPopups();
+    document.documentElement.lang=language==='en'?'en':'zh-CN';
+    if (languageSelect.parentElement) languageSelect.value=language;
     document.title=t('AP Chemistry · Bilingual Learning','AP Chemistry · 双语学习工具');
     translate(document.body);
     document.querySelectorAll('a[data-pane]').forEach(a=>{const topic=window.AP_TOPICS?.[a.dataset.pane];if(topic)a.textContent=t(topic[0],topic[1]);});
     guideButton.textContent=t('Study guide','双语讲解');bookButton.textContent=t('Book practice','书本题库');
-    homeCard.replaceChildren(el('div','study-eyebrow',t('UNDERSTAND · APPLY · REVIEW','理解 · 推导 · 练习')),
-      el('h2','',t('Understand the chemistry behind the answer.','把原理讲清楚，再把题做明白。')),
-      el('p','',t('Learn step by step across 14 bilingual chapters: foundations, explanations, two worked examples per chapter, and self-checks. Select English words for Chinese meanings.','从基础学起：14 章中英讲义，循序解释、每章两道分步例题与自测。英文重点词加粗，支持划词查中文。')),
-      button('Explore the study guide','查看双语讲解',()=>openGuide()),button('Open book practice','进入书本题库',()=>openBook()));
-    bankLink.replaceChildren(el('span','',t('Practice from your imported book:','练习已导入的书本题目：')),button('Book practice','书本题库',()=>openBook()));
+    if (!isMaterial() && homeCard.parentElement) {
+      homeCard.replaceChildren(el('div','study-eyebrow',t('UNDERSTAND · APPLY · REVIEW','理解 · 推导 · 练习')),
+        el('h2','',t('Understand the chemistry behind the answer.','把原理讲清楚，再把题做明白。')),
+        el('p','',t('Learn step by step across 14 bilingual chapters: foundations, explanations, two worked examples per chapter, and self-checks. Select English words for Chinese meanings.','从基础学起：14 章中英讲义，循序解释、每章两道分步例题与自测。英文重点词加粗，支持划词查中文。')),
+        button('Explore the study guide','查看双语讲解',()=>openGuide()),button('Open book practice','进入书本题库',()=>openBook()));
+    }
+    if (bankLink.parentElement) {
+      bankLink.replaceChildren(el('span','',t('Practice from your imported book:','练习已导入的书本题目：')),button('Book practice','书本题库',()=>openBook()));
+    }
     paneHosts.forEach(({host,legacy,summary})=>{
       host.replaceChildren();delete host.dataset.language;
-      legacy.open=language==='zh';summary.textContent=t('Original interactive lab and detailed notes (Chinese labels)','原有互动实验与详细笔记');
+      legacy.open=isMaterial()||language==='zh';summary.textContent=t('Original interactive lab and detailed notes (Chinese labels)','原有互动实验与详细笔记');
     });
     renderActivePanes();
     // The formula sheet gains typeset equations with explicit units in both languages.
@@ -382,7 +1059,14 @@
     if(sheet){let h=sheet.querySelector('.study-formulas');if(!h){h=el('div','study-formulas study-owned');sheet.prepend(h);}
       h.replaceChildren(el('h3','',t('Typeset formulas · symbols and units','LaTeX 公式 · 符号与单位')));
       content.chapters.forEach(c=>{const row=el('section','study-formula-row');row.append(el('h4','',text(c.title)),formula(c.formula),el('p','',text(c.symbols)));h.append(row);});renderMath(h);}
-    if(guide.open)renderGuide();if(book.open&&bookData)renderBookShell();
+    if(isGuideVisible()){
+      if(isMaterial())showGuide(activeChapter,guideTab);
+      else renderGuide();
+    }
+    if(isBookVisible()){
+      if(isMaterial())showBook(groupId,wrongOnly);
+      else if(bookData)renderBookShell();
+    }
   }
   function renderActivePanes(){
     paneHosts.forEach(({pane,host,ids,id})=>{
@@ -393,7 +1077,7 @@
   }
   languageSelect.addEventListener('change',()=>{language=languageSelect.value;save('apchem.language',language);renderLanguage();});
   renderLanguage();
-  const paneObserver=new MutationObserver(()=>{hideWord();renderActivePanes();});
+  const paneObserver=new MutationObserver(()=>{hideAllPopups();renderActivePanes();});
   paneHosts.forEach(({pane})=>paneObserver.observe(pane,{attributes:true,attributeFilter:['class']}));
   // Translate newly generated navigation text without observing the animation loops.
   const uiObserver=new MutationObserver(records=>{
@@ -401,5 +1085,26 @@
   });
   ['learnDirectory','bankRanges','bankSession','crumb','lsTitle','lsMeta'].forEach(id=>{const n=$(id);if(n)uiObserver.observe(n,{childList:true,subtree:true});});
   if(window.__q?.renderQ){const render=window.__q.renderQ;window.__q.renderQ=function(container,...args){const out=render.call(this,container,...args);renderMath(container);return out;};}
-  window.AP_LEARNING={openGuide,openBook,setLanguage(value){if(['zh','en'].includes(value)){language=value;save('apchem.language',value);renderLanguage();}},get language(){return language;}};
+  window.AP_LEARNING={
+    translateTool,
+    resetTranslationTool,
+    openGuide,
+    openBook,
+    showGuide,
+    showBook,
+    closePopups,
+    setLanguage(value){
+      if(['zh','en'].includes(value)){
+        language=value;
+        save('apchem.language',value);
+        renderLanguage();
+        document.dispatchEvent(new CustomEvent('apchem:language'));
+      }
+    },
+    setReadingLanguage,
+    get activeChapter(){return activeChapter;},
+    get guideTab(){return guideTab;},
+    get readingLanguage(){return readingLanguage;},
+    get language(){return language;}
+  };
 })();

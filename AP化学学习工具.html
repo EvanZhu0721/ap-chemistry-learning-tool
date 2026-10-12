@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="material-app">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -2081,13 +2081,30 @@ input[type=color]{width:36px;height:27px;border:1px solid var(--line);border-rad
 </style></noscript>
 <link rel="stylesheet" href="ap-chem-site/assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="ap-chem-site/assets/study.css">
+<link rel="stylesheet" href="ap-chem-site/assets/material-theme.css">
+<link rel="stylesheet" href="ap-chem-site/assets/material-app.css">
+<script src="ap-chem-site/assets/material-theme.js"></script>
 </head>
 <body>
 <script>
-try{var _t=localStorage.getItem("apchem.theme");if(_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
+document.documentElement.classList.add('material-loading');
+window.addEventListener('load',function(){
+  if(document.documentElement.classList.contains('material-ready'))return;
+  var startup=document.getElementById('material-startup');
+  startup.querySelector('progress').hidden=true;
+  startup.querySelector('p').hidden=false;
+  var retry=startup.querySelector('button');retry.hidden=false;retry.onclick=function(){location.reload();};
+});
+try{var _t=localStorage.getItem("apchem.theme");if(!document.documentElement.classList.contains("material-app")&&_t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}
 try{var _fs=localStorage.getItem("apchem.fontScale");if(_fs&&_fs!=="1"){document.body.style.zoom=_fs}}catch(e){}
 try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentElement.style.setProperty("--wm-size",_wm+"px")}}catch(e){}
 </script>
+<div id="material-startup" class="m-startup" role="status">
+  <div class="m-brand" aria-label="AP Chem"><span class="m-wordmark-ap">AP</span><span class="m-wordmark-chem">Chem</span></div>
+  <progress aria-label="加载中"></progress>
+  <p hidden>加载失败</p>
+  <button type="button" hidden>重新加载</button>
+</div>
 <noscript>
   <div class="nojs">
     <b>当前阅读器没有运行 JavaScript —— 已切换为「无脚本阅读模式」</b>
@@ -4279,7 +4296,7 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   <!-- ===== ★ [新增] 生词本（与 Unit 1 / Unit 2 并列的独立 UI） ===== -->
   <div class="module vocab" id="mod-vocab">
     <noscript><div class="nojs-need"><b>生词本需要浏览器</b>生词本由「翻译」查词后自动收录，依赖 JavaScript 与本地存储，禁用脚本时无法显示。<br>请在 Safari 中打开本文件，或使用在线链接。</div></noscript>
-    <div class="module-head"><h2>生词本 · Vocabulary</h2><p>翻译查过的单词会自动收录到这里：集中复习中文释义与对应知识点，并可进入背诵模式自测。</p></div>
+    <div class="module-head"><h2>生词本</h2></div>
     <nav class="tabs" data-tabs>
       <a class="tab on" href="#v-list" data-pane="v-list">单词列表</a>
       <a class="tab" href="#v-recite" data-pane="v-recite">背诵模式</a>
@@ -4287,8 +4304,8 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
     <section class="pane on" id="v-list">
       <div class="card">
-        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h3 style="margin:0">已收录单词：<span id="vCount">0</span> 个</h3>
+        <div class="row v-list-head">
+          <h3><span id="vCount">0</span> <span>个单词</span></h3>
           <button class="btn" id="vClear">清空生词本</button>
         </div>
         <div id="vList"></div>
@@ -4301,7 +4318,6 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
           <h3 style="margin:0">背诵模式</h3>
           <div class="rec-prog">已掌握 <b id="recOk">0</b> / <span id="recTotal">0</span></div>
         </div>
-        <p class="lead" style="text-align:center">根据下面显示的英文单词，写出它的中文释义。</p>
         <div class="rec-word" id="recWord">&mdash;</div>
         <div class="rec-pos" id="recPos"></div>
         <div class="rec-row">
@@ -4323,11 +4339,10 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
 
 <div class="modal hide" id="modalTr">
   <div class="modal-box">
-    <div class="modal-head"><h3>翻译 · 单词翻译</h3><button class="btn modal-close">关闭</button></div>
+    <div class="modal-head"><h3>翻译</h3><button class="btn modal-close">关闭</button></div>
     <div class="modal-body">
-      <p class="pn-lead">翻译<b>只翻译一个英文单词</b>（不翻译句子或公式）。翻译完成后，该单词会<b>自动收录进生词本</b>。</p>
       <div class="tr-row">
-        <input id="trInput" type="text" placeholder="输入一个英文单词，例如 isotope" autocomplete="off" spellcheck="false">
+        <textarea id="trInput" rows="4" maxlength="6000" aria-label="翻译原文" placeholder="输入英文单词或段落" autocomplete="off" spellcheck="false"></textarea>
         <button class="btn tr-go" id="trGo">翻译</button>
       </div>
       <div class="tr-out" id="trOut"></div>
@@ -4435,12 +4450,12 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
       <div class="set-row">
         <div class="set-info"><b>区老师颜色</b><span>毛毛虫身体圆圈的颜色</span></div>
         <div class="set-colors">
-          <span class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></span>
-          <span class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></span>
-          <span class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></span>
-          <span class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></span>
-          <span class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></span>
-          <input type="color" id="setPetColor" value="#5cb85c" aria-label="自定义区老师颜色">
+          <button type="button" class="swatch" data-c="#5cb85c" style="background:#5cb85c" role="button" aria-label="绿色"></button>
+          <button type="button" class="swatch" data-c="#e05656" style="background:#e05656" role="button" aria-label="红色"></button>
+          <button type="button" class="swatch" data-c="#f0a04b" style="background:#f0a04b" role="button" aria-label="橙色"></button>
+          <button type="button" class="swatch" data-c="#4a7de0" style="background:#4a7de0" role="button" aria-label="蓝色"></button>
+          <button type="button" class="swatch" data-c="#9b59d0" style="background:#9b59d0" role="button" aria-label="紫色"></button>
+          <input type="text" id="setPetColor" value="#5cb85c" maxlength="7" pattern="#[0-9a-fA-F]{6}" spellcheck="false" autocomplete="off" aria-label="自定义区老师颜色 HEX">
         </div>
       </div>
       <div class="set-row set-row-last">
@@ -15980,59 +15995,19 @@ drawQuantum();
   /* ============ C. 翻译 ============ */
   var trInput = $("trInput"), trOut = $("trOut"), trHint = $("trHint");
 
-  function countWords(s){
-    var parts = String(s).trim().split(/[^A-Za-z\-']+/).filter(function(x){ return x.length > 0; });
-    return parts.length;
-  }
-
   function doTranslate(raw){
-    var w = String(raw == null ? "" : raw).trim();
-    trOut.className = "tr-out";
-    trOut.innerHTML = "";
-    trHint.innerHTML = "";
-    if (!w){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "请输入一个英文单词。";
-      return;
-    }
-    var n = countWords(w);
-    if (n === 0){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "没有检测到英文单词。<b>翻译只用于翻译单个单词</b>，不翻译句子或公式。";
-      return;
-    }
-    if (n > 1){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "检测到 <b>" + n + "</b> 个单词。翻译<b>仅用于翻译单个单词</b>，请只输入一个词，例如 <b>isotope</b>。";
-      return;
-    }
-    var r = lookup(w);
-    if (!r){
-      trOut.className = "tr-out show warn";
-      trOut.innerHTML = "词典中暂时没有 <b>" + w + "</b>。<br><span class=\"tr-tip\">可以换一个形式试试（如复数写成单数），或直接在题目里点击其它不认识的单词。</span>";
-      return;
-    }
-    var e = r.e, isNew = true;
-    for (var i = 0; i < VOCAB.length; i++) if (VOCAB[i].w === r.key) isNew = false;
-    addWord(w);
-    trOut.className = "tr-out show ok";
-    trOut.innerHTML =
-      '<div class="tr-word">' + r.key + '<span class="tr-pos">' + e[0] + "</span></div>" +
-      '<div class="tr-cn">' + e[1] + "</div>" +
-      '<div class="tr-kp"><span class="kp">' + e[2] + "</span></div>";
-    trHint.innerHTML = isNew
-      ? "✓ 已自动加入生词本（当前共 " + VOCAB.length + " 个单词）"
-      : "这个词已在生词本中（当前共 " + VOCAB.length + " 个单词）";
+    window.AP_LEARNING.translateTool(raw);
   }
 
   var trGo = $("trGo");
   if (trGo) trGo.addEventListener("click", function(){ doTranslate(trInput ? trInput.value : ""); });
   if (trInput){
-    trInput.addEventListener("keydown", function(e){ if (e.key === "Enter") doTranslate(trInput.value); });
+    trInput.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault();doTranslate(trInput.value); } });
   }
 
   function openTranslate(word){
     closeAll();
+    window.AP_LEARNING.resetTranslationTool();
     var m = $("modalTr");
     if (m) m.classList.remove("hide");
     if (trInput) trInput.value = word || "";
@@ -16055,16 +16030,14 @@ drawQuantum();
   function renderVocab(){
     if (!vList) return;
     if (vCount) vCount.textContent = VOCAB.length;
+    $("mod-vocab").classList.toggle("vocab-empty", !VOCAB.length);
+    $("vClear").disabled = !VOCAB.length;
     if (!VOCAB.length){
       vList.innerHTML =
         '<div class="v-empty">' +
-          '<div class="v-empty-t">生词本还是空的</div>' +
-          '<p>在题目的英文里<b>点击任意一个不认识的单词</b>，或者用顶部的<b>翻译</b>查词，查过的词会自动收录到这里。</p>' +
-          '<div class="v-sug">先试试这几个：' +
-            ["isotope", "orbital", "electronegativity", "resonance", "octet", "limiting"].map(function(w){
-              return '<button class="btn v-sug-b" data-w="' + w + '">' + w + "</button>";
-            }).join("") +
-          "</div>" +
+          '<div class="v-empty-t">暂无生词</div>' +
+          '<p>查过的单词会保存在这里。</p>' +
+          '<button class="btn v-lookup">查词</button>' +
         "</div>";
       return;
     }
@@ -16091,8 +16064,7 @@ drawQuantum();
         persist(); renderVocab(); renderRecite();
         return;
       }
-      var sug = e.target.closest && e.target.closest(".v-sug-b");
-      if (sug) openTranslate(sug.dataset.w);
+      if (e.target.closest && e.target.closest(".v-lookup")) openTranslate();
     });
   }
 
@@ -16129,7 +16101,7 @@ drawQuantum();
       recWord.textContent = "—";
       if (recPos) recPos.textContent = "";
       if (recFb){ recFb.className = "rec-fb"; recFb.innerHTML = ""; }
-      if (recState) recState.innerHTML = "生词本为空，先去收录几个单词吧。";
+      if (recState) recState.textContent = "暂无生词";
       return;
     }
     if (recIdx >= VOCAB.length) recIdx = 0;
@@ -16152,7 +16124,7 @@ drawQuantum();
     }
     var ok = checkMeaning(typed, v.cn);
     if (ok) v.ok = 1;
-    persist();
+    persist(); renderVocab();
     recFb.className = "rec-fb show " + (ok ? "ok" : "no");
     recFb.innerHTML =
       '<div class="rec-verdict">' + (ok ? "✓ 答对了" : "✗ 再想想") + "</div>" +
@@ -16178,7 +16150,7 @@ drawQuantum();
   if (recNext) recNext.addEventListener("click", function(){ if (VOCAB.length){ recIdx = (recIdx + 1) % VOCAB.length; renderRecite(); } });
   if (recMark) recMark.addEventListener("click", function(){
     if (!VOCAB.length) return;
-    VOCAB[recIdx].ok = 1; persist();
+    VOCAB[recIdx].ok = 1; persist(); renderVocab();
     if (recOkEl) recOkEl.textContent = VOCAB.filter(function(x){ return x.ok; }).length;
     recFb.className = "rec-fb show ok";
     recFb.innerHTML = "已标记为掌握：<b>" + VOCAB[recIdx].w + "</b>";
@@ -16334,8 +16306,8 @@ drawQuantum();
           '<button class="btn" id="bkNext"' + (bankState.idx >= n - 1 ? " disabled" : "") + ">下一道 →</button>" +
         "</div>"
       : "";
-    return '<div class="card bk-review"><div class="bk-rv-head"><h3>本次练习 · Review</h3>' +
-      '<span class="bk-scope">范围：' + bankState.ids.join("、") + "</span></div>" +
+    return '<div class="card bk-review"><div class="bk-rv-head"><h3>进度</h3>' +
+      '<span class="bk-scope">' + bankState.ids.length + " 个知识点</span></div>" +
       '<div class="bk-stats">' +
         '<span class="bk-stat"><b>' + n + "</b><small>题目总数</small></span>" +
         '<span class="bk-stat"><b id="bkDone">' + d + "</b><small>已完成</small></span>" +
@@ -16784,12 +16756,12 @@ drawQuantum();
   /* ================= 1. 设置中心 ================= */
   var modal = document.getElementById("modalSettings");
   var btnOpen = document.getElementById("btnSettings");
-  var bodyEl = document.body;
 
   function segSync(seg, v){
     if (!seg) return;
     Array.prototype.forEach.call(seg.querySelectorAll("button"), function(b){
       b.classList.toggle("on", b.dataset.v === String(v));
+      b.setAttribute("aria-pressed", b.dataset.v === String(v) ? "true" : "false");
     });
   }
   function wireSeg(seg, onPick){
@@ -16812,7 +16784,8 @@ drawQuantum();
   /* —— 字体大小（整体界面缩放） —— */
   function applyFont(v, save){
     v = parseFloat(v); if (!v || v < 0.8 || v > 1.5) v = 1;
-    if (Math.abs(v - 1) < 0.001) bodyEl.style.zoom = ""; else bodyEl.style.zoom = v;
+    root.style.setProperty("--ui-scale", v);
+    if (Math.abs(v - 1) < 0.001) document.body.style.zoom = ""; else document.body.style.zoom = v;
     if (save !== false) LS.set("apchem.fontScale", v);
     segSync(document.getElementById("setFont"), v);
   }
@@ -16885,12 +16858,21 @@ drawQuantum();
     c = c.toUpperCase();
     if (segEls) for (var i = 0; i < segEls.length; i++) segEls[i].style.background = c;
     if (save !== false) LS.set("apchem.petColor", c);
-    if (petColorInput) petColorInput.value = c;
+    if (petColorInput) { petColorInput.value = c; petColorInput.removeAttribute("aria-invalid"); }
     Array.prototype.forEach.call(document.querySelectorAll("#modalSettings .swatch"), function(sw){
       sw.classList.toggle("on", (sw.dataset.c || "").toUpperCase() === c);
+      sw.setAttribute("aria-pressed", sw.classList.contains("on") ? "true" : "false");
     });
   }
-  if (petColorInput) petColorInput.addEventListener("input", function(){ applyPetColor(petColorInput.value, true); });
+  if (petColorInput) {
+    petColorInput.addEventListener("input", function(){
+      petColorInput.removeAttribute("aria-invalid");
+      if (/^#[0-9a-fA-F]{6}$/.test(petColorInput.value)) applyPetColor(petColorInput.value, true);
+    });
+    petColorInput.addEventListener("change", function(){
+      petColorInput.setAttribute("aria-invalid", /^#[0-9a-fA-F]{6}$/.test(petColorInput.value) ? "false" : "true");
+    });
+  }
   Array.prototype.forEach.call(document.querySelectorAll("#modalSettings .swatch"), function(sw){
     sw.addEventListener("click", function(){ applyPetColor(sw.dataset.c, true); });
   });
@@ -17064,8 +17046,8 @@ drawQuantum();
     if (sn) sn.textContent = squashUses;
     if (bn) bn.textContent = boilUses;
     var sb = document.getElementById("itemSquash"), bb = document.getElementById("itemBoil");
-    if (sb) sb.classList.toggle("disabled", squashUses <= 0);
-    if (bb) bb.classList.toggle("disabled", boilUses <= 0);
+    if (sb) { sb.classList.toggle("disabled", squashUses <= 0); sb.disabled = squashUses <= 0; }
+    if (bb) { bb.classList.toggle("disabled", boilUses <= 0); bb.disabled = boilUses <= 0; }
   }
 
   function useSquash(){
@@ -17271,7 +17253,7 @@ drawQuantum();
   };
 
   /* —— 恢复上次设置（全部初始化完成后再执行；主题已在页头脚本恢复，这里只同步按钮状态） —— */
-  applyTheme(isDark(), false);
+  segSync(document.getElementById("setTheme"), isDark() ? "dark" : "light");
   applyFont(LS.get("apchem.fontScale", "1"), false);
   applyWm(LS.get("apchem.wmSize", "12"), false);
   applyBankMode(LS.get("apchem.bankView", "single"), false);
@@ -18630,5 +18612,6 @@ drawQuantum();
 <script src="ap-chem-site/assets/lesson-details.js"></script>
 <script src="ap-chem-site/assets/lecture-glossary.js"></script>
 <script src="ap-chem-site/assets/study-enhancements.js"></script>
+<script src="ap-chem-site/assets/material-app.js"></script>
 </body>
 </html>
