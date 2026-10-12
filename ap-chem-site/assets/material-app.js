@@ -33,7 +33,8 @@
     palette:'M12 3a9 9 0 1 0 0 18 2 2 0 0 0 0-4h-1a2 2 0 0 1 0-4h4a6 6 0 0 0 6-5c-1-3-5-5-9-5zM7 8h.01M11 6h.01M16 7h.01M5 12h.01',
     user:'M8 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M4 21v-2a8 8 0 0 1 16 0v2',
     translate:'m4 5 12 0M10 3v2M6 5c0 5 4 9 8 10M14 5c0 5-4 9-10 10M14 21l4-10 4 10M15.5 17h5',
-    search:'M10 3a7 7 0 1 0 0 14 7 7 0 1 0 0-14m5 12 6 6'
+    search:'M10 3a7 7 0 1 0 0 14 7 7 0 1 0 0-14m5 12 6 6',
+    formula:'M18 5H8l5 7-5 7h10'
   };
   const icon = name => `<svg class="m-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name]}"/></svg>`;
   const node = (tag, cls, text) => { const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n; };
@@ -54,6 +55,9 @@
   shell.querySelector('.m-skip').onclick=e=>{e.preventDefault();main.focus();main.scrollIntoView();};
   const readingLanguage=node('button','m-language-button');readingLanguage.id='reading-language';readingLanguage.type='button';readingLanguage.setAttribute('popovertarget','reading-language-menu');readingLanguage.setAttribute('aria-label','讲义语言');readingLanguage.innerHTML=icon('translate')+'<span class="m-language-value">中英对照</span><svg class="m-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>';
   $('appearance').before(readingLanguage);
+  const formulaButton=node('button','m-icon-button');formulaButton.id='m-formula';formulaButton.type='button';formulaButton.setAttribute('aria-label','公式表');formulaButton.title='公式表';formulaButton.innerHTML=icon('formula');
+  formulaButton.onclick=()=>{const target=document.getElementById('btnFormula');if(target)target.click();};
+  $('appearance').before(formulaButton);
   const languageMenu=node('div','m-language-menu');languageMenu.id='reading-language-menu';languageMenu.setAttribute('popover','auto');languageMenu.innerHTML='<fieldset><legend>讲义语言</legend>'+[['both','中英对照'],['zh','中文'],['en','English']].map(([value,label])=>`<label><input type="radio" name="reading-language" value="${value}"><span>${label}</span></label>`).join('')+'</fieldset>';document.body.append(languageMenu);
   function syncReadingLanguage(){const value=window.AP_LEARNING.readingLanguage||'both';languageMenu.querySelector(`input[value="${value}"]`).checked=true;readingLanguage.querySelector('.m-language-value').textContent={both:isEnglish()?'Bilingual':'中英对照',zh:'中文',en:'English'}[value];}
   languageMenu.addEventListener('beforetoggle',e=>{if(e.newState==='open'){syncReadingLanguage();const r=readingLanguage.getBoundingClientRect();languageMenu.style.top=(r.bottom+8)+'px';languageMenu.style.right=Math.max(12,innerWidth-r.right)+'px';}});
