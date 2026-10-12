@@ -391,7 +391,8 @@ select{
 .ft-sec>h4{margin:0 0 8px;font-size:13.5px;color:var(--phy);padding-bottom:6px;border-bottom:1px solid var(--line);letter-spacing:.3px}
 .ft-row{display:flex;flex-wrap:wrap;gap:3px 14px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line)}
 .ft-row:last-child{border-bottom:none}
-.ft-fx{flex:0 0 auto;min-width:200px;font-weight:600;color:var(--ink);font-size:13.5px}
+.ft-fx{flex:0 0 auto;min-width:200px;color:var(--ink);font-size:13.5px}
+.ft-fx .katex{font-size:1.06em}
 .ft-note{flex:1;min-width:150px;font-size:12.5px;color:var(--muted);line-height:1.65}
 .ft-lead{margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.7}
 @media (max-width:640px){.ft-fx{min-width:0;flex-basis:100%}}
@@ -18273,87 +18274,92 @@ drawQuantum();
   // [分类, [[公式, 说明], ...]]
   var SECTIONS = [
     ["原子结构与光", [
-      ["E = hν = hc/λ", "光子能量（h 普朗克常数，c 光速，ν 频率，λ 波长）"],
-      ["c = λν", "光速 = 波长 × 频率"],
-      ["λ = h / (mv)", "德布罗意波长（m 质量，v 速度）"],
-      ["Eₙ = −R_H / n²", "氢原子能级（R_H = 2.18×10⁻¹⁸ J，n 主量子数）"],
-      ["ΔE = hν", "电子跃迁吸收或放出的能量"],
+      [String.raw`E=h\nu=hc/\lambda`, "光子能量（h 普朗克常数，c 光速，ν 频率，λ 波长）"],
+      [String.raw`c=\lambda\nu`, "光速 = 波长 × 频率"],
+      [String.raw`\lambda=h/(mv)`, "德布罗意波长（m 质量，v 速度）"],
+      [String.raw`E_n=-R_H/n^2`, "氢原子能级（R_H = 2.18×10⁻¹⁸ J，n 主量子数）"],
+      [String.raw`\Delta E=h\nu`, "电子跃迁吸收或放出的能量"],
     ]],
     ["化学计量与气体", [
-      ["n = m / M", "物质的量 = 质量 ÷ 摩尔质量"],
-      ["N = n × N_A", "粒子数 = 物质的量 × 阿伏加德罗常数"],
-      ["PV = nRT", "理想气体定律（nRT：R = 0.08206 L·atm/(mol·K)）"],
-      ["d = PM / (RT)", "由气体密度求摩尔质量"],
-      ["P₁V₁/T₁ = P₂V₂/T₂", "联合气体定律（含查理/波义耳/盖-吕萨克）"],
-      ["P_total = ΣPᵢ，Pᵢ = Xᵢ·P_total", "道尔顿分压定律（Xᵢ 摩尔分数）"],
-      ["M = n / V，M₁V₁ = M₂V₂", "摩尔浓度与稀释公式"],
-      ["A = abc", "比尔定律（A 吸光度，a 摩尔吸光系数，b 光程，c 浓度）"],
+      [String.raw`n=m/M`, "物质的量 = 质量 ÷ 摩尔质量"],
+      [String.raw`N=nN_A`, "粒子数 = 物质的量 × 阿伏加德罗常数"],
+      [String.raw`PV=nRT`, "理想气体定律（nRT：R = 0.08206 L·atm/(mol·K)）"],
+      [String.raw`d=PM/(RT)`, "由气体密度求摩尔质量"],
+      [String.raw`P_1V_1/T_1=P_2V_2/T_2`, "联合气体定律（含查理/波义耳/盖-吕萨克）"],
+      [String.raw`P_{\text{total}}=\sum P_i,\quad P_i=X_iP_{\text{total}}`, "道尔顿分压定律（Xᵢ 摩尔分数）"],
+      [String.raw`M=n/V,\quad M_1V_1=M_2V_2`, "摩尔浓度与稀释公式"],
+      [String.raw`A=abc`, "比尔定律（A 吸光度，a 摩尔吸光系数，b 光程，c 浓度）"],
     ]],
     ["热化学与热力学", [
-      ["q = mcΔT", "热量 = 质量 × 比热容 × 温度变化"],
-      ["ΔH°rxn = ΣΔH°f(产物) − ΣΔH°f(反应物)", "由标准生成焓求反应焓"],
-      ["ΔS°rxn = ΣS°(产物) − ΣS°(反应物)", "标准反应熵变"],
-      ["ΔG = ΔH − TΔS", "吉布斯自由能（T 绝对温度）"],
-      ["ΔG° = −RT ln K", "标准自由能与平衡常数"],
-      ["ΔG = ΔG° + RT ln Q", "任意状态自由能（Q 反应商）"],
-      ["ΔG° = −nFE°", "自由能与电池标准电动势"],
+      [String.raw`q=mc\Delta T`, "热量 = 质量 × 比热容 × 温度变化"],
+      [String.raw`\Delta H^\circ_{\text{rxn}}=\sum\Delta H^\circ_f(\text{prod})-\sum\Delta H^\circ_f(\text{react})`, "由标准生成焓求反应焓"],
+      [String.raw`\Delta S^\circ_{\text{rxn}}=\sum S^\circ(\text{prod})-\sum S^\circ(\text{react})`, "标准反应熵变"],
+      [String.raw`\Delta G=\Delta H-T\Delta S`, "吉布斯自由能（T 绝对温度）"],
+      [String.raw`\Delta G^\circ=-RT\ln K`, "标准自由能与平衡常数"],
+      [String.raw`\Delta G=\Delta G^\circ+RT\ln Q`, "任意状态自由能（Q 反应商）"],
+      [String.raw`\Delta G^\circ=-nFE^\circ`, "自由能与电池标准电动势"],
     ]],
     ["化学平衡", [
-      ["K = [产物]^系数 / [反应物]^系数", "平衡常数（浓度表示）"],
-      ["Kp = Kc(RT)^Δn", "分压与浓度平衡常数换算（Δn 气相摩尔数差）"],
-      ["Q vs K", "Q<K 正向进行；Q>K 逆向进行；Q=K 已达平衡"],
-      ["Ksp", "难溶电解质的溶度积常数"],
-      ["Ka × Kb = Kw", "共轭酸碱对的常数关系"],
+      [String.raw`K=\dfrac{[\text{prod}]^{c}}{[\text{react}]^{c}}`, "平衡常数（浓度表示）"],
+      [String.raw`K_p=K_c(RT)^{\Delta n}`, "分压与浓度平衡常数换算（Δn 气相摩尔数差）"],
+      [String.raw`Q\ \text{vs.}\ K`, "Q<K 正向进行；Q>K 逆向进行；Q=K 已达平衡"],
+      [String.raw`K_{sp}`, "难溶电解质的溶度积常数"],
+      [String.raw`K_a\times K_b=K_w`, "共轭酸碱对的常数关系"],
     ]],
     ["酸碱平衡", [
-      ["pH = −log[H⁺]，pOH = −log[OH⁻]", "pH 与 pOH 的定义"],
-      ["pH + pOH = 14（25°C）", "酸碱度之和"],
-      ["Kw = [H⁺][OH⁻] = 1.0×10⁻¹⁴", "25°C 水的离子积"],
-      ["pKa = −log Ka", "酸常数 Ka 的负对数"],
-      ["pH = pKa + log([A⁻]/[HA])", "Henderson–Hasselbalch（缓冲溶液）"],
+      [String.raw`\text{pH}=-\log[\mathrm{H^+}],\quad \text{pOH}=-\log[\mathrm{OH^-}]`, "pH 与 pOH 的定义"],
+      [String.raw`\text{pH}+\text{pOH}=14\ (25^\circ\text{C})`, "酸碱度之和"],
+      [String.raw`K_w=[\mathrm{H^+}][\mathrm{OH^-}]=1.0\times10^{-14}`, "25°C 水的离子积"],
+      [String.raw`\text{p}K_a=-\log K_a`, "酸常数 Ka 的负对数"],
+      [String.raw`\text{pH}=\text{p}K_a+\log([\mathrm{A^-}]/[\mathrm{HA}])`, "Henderson–Hasselbalch（缓冲溶液）"],
     ]],
     ["化学动力学", [
-      ["rate = k[A]^m[B]^n", "速率方程（k 速率常数，m、n 反应级数）"],
-      ["零级：[A] = −kt + [A]₀，t½ = [A]₀ / 2k", "零级积分速率式与半衰期"],
-      ["一级：ln[A] = −kt + ln[A]₀，t½ = 0.693 / k", "一级积分速率式与半衰期"],
-      ["二级：1/[A] = kt + 1/[A]₀，t½ = 1 / (k[A]₀)", "二级积分速率式与半衰期"],
-      ["k = A·e^(−Ea/RT)", "Arrhenius 方程（Ea 活化能，A 频率因子）"],
-      ["ln(k₂/k₁) = −(Ea/R)(1/T₂ − 1/T₁)", "两点式 Arrhenius"],
+      [String.raw`\text{rate}=k[\mathrm{A}]^m[\mathrm{B}]^n`, "速率方程（k 速率常数，m、n 反应级数）"],
+      [String.raw`[\mathrm{A}]=-kt+[\mathrm{A}]_0,\quad t_{1/2}=[\mathrm{A}]_0/2k`, "零级积分速率式与半衰期"],
+      [String.raw`\ln[\mathrm{A}]=-kt+\ln[\mathrm{A}]_0,\quad t_{1/2}=0.693/k`, "一级积分速率式与半衰期"],
+      [String.raw`1/[\mathrm{A}]=kt+1/[\mathrm{A}]_0,\quad t_{1/2}=1/(k[\mathrm{A}]_0)`, "二级积分速率式与半衰期"],
+      [String.raw`k=Ae^{-E_a/RT}`, "Arrhenius 方程（Ea 活化能，A 频率因子）"],
+      [String.raw`\ln(k_2/k_1)=-\dfrac{E_a}{R}\left(\dfrac{1}{T_2}-\dfrac{1}{T_1}\right)`, "两点式 Arrhenius"],
     ]],
     ["电化学", [
-      ["E°cell = E°cathode − E°anode", "标准电池电动势（用标准还原电位）"],
-      ["ΔG° = −nFE°", "自由能与电动势（n 电子数，F 法拉第常数）"],
-      ["E = E° − (0.0592 / n)·log Q", "Nernst 方程（25°C）"],
-      ["E° = (0.0592 / n)·log K", "标准电动势与平衡常数"],
-      ["mol e⁻ = It / F", "法拉第电解定律（I 电流，t 时间）"],
+      [String.raw`E^\circ_{\text{cell}}=E^\circ_{\text{cathode}}-E^\circ_{\text{anode}}`, "标准电池电动势（用标准还原电位）"],
+      [String.raw`\Delta G^\circ=-nFE^\circ`, "自由能与电动势（n 电子数，F 法拉第常数）"],
+      [String.raw`E=E^\circ-\dfrac{0.0592}{n}\log Q`, "Nernst 方程（25°C）"],
+      [String.raw`E^\circ=\dfrac{0.0592}{n}\log K`, "标准电动势与平衡常数"],
+      [String.raw`\text{mol e}^-=\dfrac{It}{F}`, "法拉第电解定律（I 电流，t 时间）"],
     ]],
     ["常用常数", [
-      ["R = 8.314 J/(mol·K)", "理想气体常数（能量形式）"],
-      ["R = 0.08206 L·atm/(mol·K)", "理想气体常数（压力–体积形式）"],
-      ["F = 96485 C/mol", "法拉第常数"],
-      ["N_A = 6.022×10²³ /mol", "阿伏加德罗常数"],
-      ["h = 6.626×10⁻³⁴ J·s", "普朗克常数"],
-      ["c = 3.00×10⁸ m/s", "真空光速"],
-      ["k_B = 1.38×10⁻²³ J/K", "玻尔兹曼常数"],
-      ["Kw = 1.0×10⁻¹⁴（25°C）", "水的离子积"],
-      ["0°C = 273.15 K", "摄氏–开尔文换算"],
+      [String.raw`R=8.314\ \mathrm{J\,mol^{-1}K^{-1}}`, "理想气体常数（能量形式）"],
+      [String.raw`R=0.08206\ \mathrm{L\,atm\,mol^{-1}K^{-1}}`, "理想气体常数（压力–体积形式）"],
+      [String.raw`F=96485\ \mathrm{C\,mol^{-1}}`, "法拉第常数"],
+      [String.raw`N_A=6.022\times10^{23}\ \mathrm{mol^{-1}}`, "阿伏加德罗常数"],
+      [String.raw`h=6.626\times10^{-34}\ \mathrm{J\,s}`, "普朗克常数"],
+      [String.raw`c=3.00\times10^{8}\ \mathrm{m\,s^{-1}}`, "真空光速"],
+      [String.raw`k_B=1.38\times10^{-23}\ \mathrm{J\,K^{-1}}`, "玻尔兹曼常数"],
+      [String.raw`K_w=1.0\times10^{-14}\ (25^\circ\mathrm{C})`, "水的离子积"],
+      [String.raw`0^\circ\mathrm{C}=273.15\ \mathrm{K}`, "摄氏–开尔文换算"],
     ]],
   ];
 
   function renderFormula(){
     var el = document.getElementById("ftPaneFormula");
+    if (!el) return;
+    var wrap = el.querySelector(".ft-legacy");
+    if (!wrap){ wrap = document.createElement("div"); wrap.className = "ft-legacy"; el.appendChild(wrap); }
     var h = '<p class="ft-lead">AP 化学常用公式与常数速查，按主题分类；元素周期表见上方标签页。</p>';
     for (var s = 0; s < SECTIONS.length; s++){
       h += '<div class="ft-sec"><h4>' + SECTIONS[s][0] + "</h4>";
       var rows = SECTIONS[s][1];
       for (var r = 0; r < rows.length; r++){
-        h += '<div class="ft-row"><span class="ft-fx">' + rows[r][0] + '</span><span class="ft-note">' + rows[r][1] + "</span></div>";
+        h += '<div class="ft-row"><span class="ft-fx">\\(' + rows[r][0] + '\\)</span><span class="ft-note">' + rows[r][1] + "</span></div>";
       }
       h += "</div>";
     }
-    el.innerHTML = h;
+    wrap.innerHTML = h;
+    if (window.renderMathInElement){ try{ renderMathInElement(wrap, { delimiters:[{left:"\\(",right:"\\)",display:false}], throwOnError:false }); }catch(e){} }
   }
   renderFormula();
+  window.addEventListener("load", function(){ try{ renderFormula(); }catch(e){} });
 
   // ===== 首页公式表区块（含变量说明与单位）=====
   var FORMULAS = [

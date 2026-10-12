@@ -58,6 +58,9 @@
   const formulaButton=node('button','m-icon-button');formulaButton.id='m-formula';formulaButton.type='button';formulaButton.setAttribute('aria-label','公式表');formulaButton.title='公式表';formulaButton.innerHTML=icon('formula');
   formulaButton.onclick=()=>{const target=document.getElementById('btnFormula');if(target)target.click();};
   $('appearance').before(formulaButton);
+  const translateButton=node('button','m-icon-button');translateButton.id='m-translate';translateButton.type='button';translateButton.setAttribute('aria-label','翻译');translateButton.title='翻译';translateButton.innerHTML=icon('translate');
+  translateButton.onclick=()=>{const target=document.getElementById('btnTrans');if(target)target.click();};
+  $('m-formula').before(translateButton);
   const languageMenu=node('div','m-language-menu');languageMenu.id='reading-language-menu';languageMenu.setAttribute('popover','auto');languageMenu.innerHTML='<fieldset><legend>讲义语言</legend>'+[['both','中英对照'],['zh','中文'],['en','English']].map(([value,label])=>`<label><input type="radio" name="reading-language" value="${value}"><span>${label}</span></label>`).join('')+'</fieldset>';document.body.append(languageMenu);
   function syncReadingLanguage(){const value=window.AP_LEARNING.readingLanguage||'both';languageMenu.querySelector(`input[value="${value}"]`).checked=true;readingLanguage.querySelector('.m-language-value').textContent={both:isEnglish()?'Bilingual':'中英对照',zh:'中文',en:'English'}[value];}
   languageMenu.addEventListener('beforetoggle',e=>{if(e.newState==='open'){syncReadingLanguage();const r=readingLanguage.getBoundingClientRect();languageMenu.style.top=(r.bottom+8)+'px';languageMenu.style.right=Math.max(12,innerWidth-r.right)+'px';}});
