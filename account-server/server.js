@@ -92,6 +92,22 @@ function tokenOf(req) {
   return String(req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
 }
 
+/* ==================== 学习统计（在线时长 / 做题数量 / 正确数） ==================== */
+// 只保留合法的非负整数，避免脏数据进入排行榜
+function sanitizeStats(s) {
+  const out = { answered: 0, correct: 0, onlineSeconds: 0 };
+  if (isObject(s)) {
+    for (const k of ['answered', 'correct', 'onlineSeconds']) {
+      const n = Number(s[k]);
+      out[k] = (Number.isFinite(n) && n > 0) ? Math.floor(n) : 0;
+    }
+  }
+  return out;
+}
+
+// 排行榜准入门槛：做题数量达到该值才上榜（“超过 10”按 ≥10 理解）
+const LEADERBOARD_MIN = 10;
+
 /* ==================== 统一响应工具 ==================== */
 function send(res, code, obj) {
   const body = JSON.stringify(obj);
@@ -207,6 +223,7 @@ function handleSyncPush(res, body, req) {
   if (!u.data) u.data = {};
   if (body.vocab !== undefined) u.data.vocab = body.vocab;
   if (body.wrong !== undefined) u.data.wrong = body.wrong;
+  if (body.stats !== undefined) u.data.stats = sanitizeStats(body.stats);
   u.data.updatedAt = new Date().toISOString();
   saveDB(db);
   return ok(res, { message: '数据已上传到云端' });
@@ -219,7 +236,25 @@ function handleSyncPull(res, req) {
   const db = loadDB();
   const u = db.users[username];
   if (!u) return fail(res, 404, 'USER_NOT_FOUND', '账号不存在');
-  return ok(res, { data: u.data || { vocab: [], wrong: {} } });
+  return ok(res, { data: u.data || { vocab: [], wrong: {}, stats: { answered: 0, correct: 0, onlineSeconds: 0 } } });
+}
+
+// 排行榜：做题数量达到门槛的用户，按数量降序（正确数作为次要排序）
+function handleLeaderboard(res) {
+  const db = loadDB();
+  const rows = [];
+  for (const name of Object.keys(db.users)) {
+    const u = db.users[name];
+    const stats = (u.data && u.data.stats) ? sanitizeStats(u.data.stats) : sanitizeStats(null);
+    if (stats.answered < LEADERBOARD_MIN) continue;
+    rows.push({ username: name, answered: stats.answered, correct: stats.correct });
+  }
+  rows.sort(function (a, b) {
+    if (b.answered !== a.answered) return b.answered - a.answered;
+    if (b.correct !== a.correct) return b.correct - a.correct;
+    return a.username < b.username ? -1 : (a.username > b.username ? 1 : 0);
+  });
+  return ok(res, { leaderboard: rows, min: LEADERBOARD_MIN });
 }
 
 /* ==================== 静态文件（托管测试页） ==================== */
@@ -247,6 +282,7 @@ const server = http.createServer(function (req, res) {
 
   if (p.indexOf('/api/') === 0) {
     if (req.method === 'GET' && p === '/api/me') return handleMe(res, req);
+    if (req.method === 'GET' && p === '/api/leaderboard') return handleLeaderboard(res);
     if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED', '该接口仅支持 POST');
     readBody(req).then(function (body) {
       if (!isObject(body)) return fail(res, 400, 'BAD_JSON', '请求体必须是 JSON 对象');

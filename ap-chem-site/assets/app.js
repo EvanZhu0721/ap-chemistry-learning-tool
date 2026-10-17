@@ -96,10 +96,11 @@ function esc(s){ return String(s); }
    导航：首页 / 模块 / tab
    ===================================================== */
 const home = $("home"), modLearn = $("mod-learn"), modBank = $("mod-bank"),
-      modWrong = $("mod-wrong"), modVocab = $("mod-vocab");
+      modWrong = $("mod-wrong"), modVocab = $("mod-vocab"),
+      modStats = $("mod-stats"), modRank = $("mod-rank");
 const btnBack = $("btnBack"), crumb = $("crumb");
-const MOD_NAMES = { learn: "学习", bank: "题库", wrong: "错题本", vocab: "生词本" };
-const MOD_ELS = { learn: modLearn, bank: modBank, wrong: modWrong, vocab: modVocab };
+const MOD_NAMES = { learn: "学习", bank: "题库", wrong: "错题本", vocab: "生词本", stats: "学习统计", rank: "排行榜" };
+const MOD_ELS = { learn: modLearn, bank: modBank, wrong: modWrong, vocab: modVocab, stats: modStats, rank: modRank };
 
 function showModule(m){
   home.style.display = m === "home" ? "" : "none";
@@ -109,6 +110,8 @@ function showModule(m){
   btnBack.style.display = m === "home" ? "none" : "inline-flex";
   crumb.innerHTML = m === "home" ? "首页" : "首页 / <b>" + (MOD_NAMES[m] || m) + "</b>";
   if (m === "learn" && window.__learnReset) window.__learnReset();
+  if (m === "stats" && window.__statsShow) window.__statsShow();
+  if (m === "rank" && window.__rankShow) window.__rankShow();
   if (window.__petPage) window.__petPage(m);
   window.scrollTo(0, 0);
 }
@@ -9819,6 +9822,7 @@ drawQuantum();
 
   function recordAnswer(qid, correct){
     if (window.__petHook) { try { window.__petHook("answer", qid, correct); } catch(e){} }
+    if (window.__answerStats) { try { window.__answerStats(correct); } catch(e){} }
     if (correct){
       if (QSTAT[qid]){ QSTAT[qid].ok = 1; persistQ(); if (window.__qbankRefresh) window.__qbankRefresh(); }
     } else {
@@ -14091,4 +14095,158 @@ drawQuantum();
 
   setMode("login");
   renderState();
+})();
+/* ==================== 学习统计 + 排行榜 ==================== */
+(function(){
+  var STATS_KEY = "apchem.stats.v1";
+  var TOKEN_KEY = "acct_token", NAME_KEY = "acct_name";
+  var PUSH_DELAY = 3000;        // 作答后 debounce 上传（毫秒）
+  var ONLINE_STEP = 30;         // 每 30 秒累计一次在线时长
+
+  function acct(){
+    try {
+      return { token: localStorage.getItem(TOKEN_KEY) || "", name: localStorage.getItem(NAME_KEY) || "" };
+    } catch(e){ return { token:"", name:"" }; }
+  }
+  function apiBase(){
+    if (window.ACCT_API != null) return window.ACCT_API;
+    return (location.hostname === "localhost" || location.hostname === "127.0.0.1") ? "http://localhost:8787" : "";
+  }
+  function loadStats(){
+    try {
+      var s = JSON.parse(localStorage.getItem(STATS_KEY) || "null") || {};
+      return { answered: s.answered|0, correct: s.correct|0, onlineSeconds: s.onlineSeconds|0 };
+    } catch(e){ return { answered:0, correct:0, onlineSeconds:0 }; }
+  }
+  function saveStats(s){
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch(e){}
+  }
+  function escHtml(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function fmtDur(sec){
+    sec = Math.max(0, Math.round(sec|0));
+    var h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+    if (h) return h + " 小时 " + m + " 分";
+    if (m) return m + " 分 " + s + " 秒";
+    return s + " 秒";
+  }
+  function accuracy(st){ return st.answered ? (Math.round(st.correct/st.answered*1000)/10) + "%" : "—"; }
+
+  /* —— 作答埋点：recordAnswer 每次作答都会调用 —— */
+  window.__answerStats = function(correct){
+    var s = loadStats();
+    s.answered += 1;
+    if (correct) s.correct += 1;
+    saveStats(s);
+    schedulePush();
+    renderStats();
+  };
+
+  var pushTimer = null;
+  function schedulePush(){
+    if (pushTimer) return;
+    pushTimer = setTimeout(function(){ pushTimer = null; pushStats(); }, PUSH_DELAY);
+  }
+  function pushStats(){
+    if (!acct().token) return Promise.resolve();
+    return post("/api/sync/push", { stats: loadStats() });
+  }
+  function pullStats(){
+    if (!acct().token) return Promise.resolve();
+    return post("/api/sync/pull", {}).then(function(d){
+      if (d && d.ok && d.data && d.data.stats){
+        var srv = d.data.stats, s = loadStats();
+        // 取最大合并，避免多设备互相覆盖
+        s.answered = Math.max(s.answered, srv.answered|0);
+        s.correct = Math.max(s.correct, srv.correct|0);
+        s.onlineSeconds = Math.max(s.onlineSeconds, srv.onlineSeconds|0);
+        saveStats(s);
+      }
+    });
+  }
+
+  async function post(path, body){
+    var a = acct();
+    var headers = { "Content-Type": "application/json" };
+    if (a.token) headers["Authorization"] = "Bearer " + a.token;
+    try {
+      var res = await fetch(apiBase() + path, { method: "POST", headers: headers, body: JSON.stringify(body || {}) });
+      return await res.json();
+    } catch(e){ return { ok:false }; }
+  }
+  async function get(path){
+    try {
+      var res = await fetch(apiBase() + path, { method: "GET" });
+      return await res.json();
+    } catch(e){ return { ok:false }; }
+  }
+
+  /* —— 在线时长：登录 + 页面可见时才累计 —— */
+  setInterval(function(){
+    if (!acct().token) return;
+    if (document.hidden) return;
+    var s = loadStats();
+    s.onlineSeconds += ONLINE_STEP;
+    saveStats(s);
+    schedulePush();
+    renderStats();
+  }, ONLINE_STEP * 1000);
+  document.addEventListener("visibilitychange", function(){ if (document.hidden) pushStats(); });
+  window.addEventListener("beforeunload", function(){ pushStats(); });
+
+  /* —— 学习统计面板 —— */
+  function renderStats(){
+    var box = document.getElementById("statsBox");
+    if (!box) return;
+    var s = loadStats(), a = acct();
+    var tip = a.token
+      ? '<p class="stats-tip">已登录：<b>' + escHtml(a.name) + '</b>（统计已同步到云端）</p>'
+      : '<p class="stats-tip">尚未登录：做题数据仅保存在本机，登录后可同步到云端并参与排行榜。</p>';
+    box.innerHTML =
+      '<div class="stats-row">' +
+        '<div class="stat-card"><div class="stat-num">' + fmtDur(s.onlineSeconds) + '</div><div class="stat-label">在线时长</div></div>' +
+        '<div class="stat-card"><div class="stat-num">' + s.answered + '</div><div class="stat-label">做题数量</div></div>' +
+        '<div class="stat-card"><div class="stat-num">' + accuracy(s) + '</div><div class="stat-label">正确率</div></div>' +
+      '</div>' + tip;
+  }
+
+  /* —— 排行榜面板 —— */
+  async function renderLeaderboard(){
+    var box = document.getElementById("rankBox");
+    if (!box) return;
+    box.innerHTML = '<p class="rank-loading">加载中…</p>';
+    var d = await get("/api/leaderboard");
+    var rows = (d && d.ok && Array.isArray(d.leaderboard)) ? d.leaderboard : null;
+    if (!rows){
+      box.innerHTML = '<p class="rank-loading">无法连接排行榜服务，请确认后端已启动。</p>';
+      return;
+    }
+    if (!rows.length){
+      box.innerHTML = '<p class="rank-loading">还没有人上榜（做题数量需达到 10 题及以上）。</p>';
+      return;
+    }
+    var h = '<table class="rank-table"><thead><tr><th>排名</th><th>用户名</th><th>做题数量</th><th>正确率</th></tr></thead><tbody>';
+    rows.forEach(function(r, i){
+      var cls = (i < 3) ? ' class="top' + (i+1) + '"' : '';
+      h += '<tr' + cls + '><td>' + (i+1) + '</td><td>' + escHtml(r.username) + '</td><td>' + r.answered + '</td><td>' + accuracy(r) + '</td></tr>';
+    });
+    h += '</tbody></table><p class="rank-note">本排行只对在此系统做题数量排名</p>';
+    box.innerHTML = h;
+  }
+
+  /* —— 模块展示钩子 —— */
+  window.__statsShow = function(){ renderStats(); pullStats().then(renderStats); };
+  window.__rankShow = function(){ renderLeaderboard(); };
+
+  /* —— 登录后拉取一次云端统计（账号模块写 localStorage 后由本计时器发现） —— */
+  var lastToken = acct().token;
+  setInterval(function(){
+    var t = acct().token;
+    if (t && t !== lastToken){
+      lastToken = t;
+      pullStats().then(renderStats);
+    } else if (!t && lastToken){
+      lastToken = t;
+      renderStats();
+    }
+  }, 3000);
 })();

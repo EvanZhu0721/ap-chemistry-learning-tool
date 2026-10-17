@@ -176,6 +176,8 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
   <input type="radio" name="nojsmod" id="nm-bank" class="nojs-radio">
   <input type="radio" name="nojsmod" id="nm-wrong" class="nojs-radio">
   <input type="radio" name="nojsmod" id="nm-vocab" class="nojs-radio">
+  <input type="radio" name="nojsmod" id="nm-stats" class="nojs-radio">
+  <input type="radio" name="nojsmod" id="nm-rank" class="nojs-radio">
   <div id="home">
     <div class="home-head">
       <h1>AP Chemistry</h1>
@@ -215,6 +217,24 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
         <p class="desc">Vocabulary Book —— 用「翻译」查过的单词会自动收录，集中查看中文释义与知识点，还能进入背诵模式自测。</p>
         <div class="chips">
           <span class="chip">单词列表</span><span class="chip">背诵模式</span><span class="chip">自动收录</span>
+        </div>
+      </label>
+      <label class="mod-card stats" data-mod="stats" for="nm-stats">
+        <span class="go">进入 →</span>
+        <div class="ic">📊</div>
+        <h2>学习统计</h2>
+        <p class="desc">Study Stats —— 查看你的在线时长、做题数量与正确率，登录后自动同步到云端。</p>
+        <div class="chips">
+          <span class="chip">在线时长</span><span class="chip">做题数量</span><span class="chip">正确率</span>
+        </div>
+      </label>
+      <label class="mod-card rank" data-mod="rank" for="nm-rank">
+        <span class="go">进入 →</span>
+        <div class="ic">🏆</div>
+        <h2>排行榜</h2>
+        <p class="desc">Leaderboard —— 做题数量超过 10 题即可上榜，按做题数量排名，并附每位用户的正确率。</p>
+        <div class="chips">
+          <span class="chip">全站排名</span><span class="chip">做题数量</span><span class="chip">正确率</span>
         </div>
       </label>
     </div>
@@ -2368,6 +2388,18 @@ try{var _wm=localStorage.getItem("apchem.wmSize");if(_wm){document.documentEleme
         <div class="rec-state" id="recState"></div>
       </div>
     </section>
+  </div>
+
+  <!-- ===== ★ [新增] 学习统计 ===== -->
+  <div class="module stats" id="mod-stats">
+    <div class="module-head"><h2>学习统计 · Study Stats</h2><p>你的在线时长、做题数量与正确率。登录后自动同步到云端，并计入全站排行榜。</p></div>
+    <div class="stats-wrap" id="statsBox"></div>
+  </div>
+
+  <!-- ===== ★ [新增] 排行榜 ===== -->
+  <div class="module rank" id="mod-rank">
+    <div class="module-head"><h2>排行榜 · Leaderboard</h2><p>做题数量达到 10 题及以上的用户可上榜，按做题数量从高到低排列，并附正确率。</p></div>
+    <div class="stats-wrap" id="rankBox"></div>
   </div>
 
 </div>
