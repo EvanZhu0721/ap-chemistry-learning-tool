@@ -93,16 +93,45 @@ function tokenOf(req) {
 }
 
 /* ==================== 学习统计（在线时长 / 做题数量 / 正确数） ==================== */
-// 只保留合法的非负整数，避免脏数据进入排行榜
+// 硬上限只用于拦截明显荒谬的数值，正常学习数据远低于此。
+const STAT_LIMIT = { answered: 200000, correct: 200000, onlineSeconds: 100000000 };
+// 两次上传之间允许的最大增量：按经过的挂钟时间折算，并留出离线补传的余量。
+// 统计量完全由客户端上报，服务端无法验证其真实性；护栏的作用是阻止"一次请求跳到榜首"。
+const ANSWER_RATE_PER_MIN = 120;   // 每分钟最多 120 题（远高于正常作答速度）
+const ANSWER_SLACK = 200;          // 单次上传的容错余量
+const ONLINE_SLACK = 900;          // 在线时长单次上传的容错余量（秒）
+
+function clampInt(value, max) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(Math.floor(n), max);
+}
+
+// 只保留合法的非负整数，并保证 correct ≤ answered（否则正确率会超过 100%）
 function sanitizeStats(s) {
   const out = { answered: 0, correct: 0, onlineSeconds: 0 };
   if (isObject(s)) {
-    for (const k of ['answered', 'correct', 'onlineSeconds']) {
-      const n = Number(s[k]);
-      out[k] = (Number.isFinite(n) && n > 0) ? Math.floor(n) : 0;
-    }
+    out.answered = clampInt(s.answered, STAT_LIMIT.answered);
+    out.correct = Math.min(clampInt(s.correct, STAT_LIMIT.correct), out.answered);
+    out.onlineSeconds = clampInt(s.onlineSeconds, STAT_LIMIT.onlineSeconds);
   }
   return out;
+}
+
+// 合并一次上传：统计量是累计值，因此只增不减；相对上次接受值，
+// 增幅不得超过经过时间所能支撑的速度（首次上传直接采信，避免误伤离线积累的数据）。
+function mergeStats(previous, incoming, elapsedMs) {
+  const prev = sanitizeStats(previous);
+  const next = sanitizeStats(incoming);
+  const minutes = Math.max(0, elapsedMs) / 60000;
+  const seconds = Math.max(0, elapsedMs) / 1000;
+  const maxAnswered = prev.answered + Math.ceil(minutes * ANSWER_RATE_PER_MIN) + ANSWER_SLACK;
+  const maxOnline = prev.onlineSeconds + Math.ceil(seconds) + ONLINE_SLACK;
+  next.answered = Math.max(prev.answered, Math.min(next.answered, maxAnswered));
+  next.onlineSeconds = Math.max(prev.onlineSeconds, Math.min(next.onlineSeconds, maxOnline));
+  // prev.correct ≤ prev.answered ≤ next.answered，因此夹紧后仍满足正确率 ≤ 100%
+  next.correct = Math.max(prev.correct, Math.min(next.correct, next.answered));
+  return { answered: next.answered, correct: next.correct, onlineSeconds: next.onlineSeconds };
 }
 
 // 排行榜准入门槛：做题数量达到该值才上榜（“超过 10”按 ≥10 理解）
@@ -223,10 +252,21 @@ function handleSyncPush(res, body, req) {
   if (!u.data) u.data = {};
   if (body.vocab !== undefined) u.data.vocab = body.vocab;
   if (body.wrong !== undefined) u.data.wrong = body.wrong;
-  if (body.stats !== undefined) u.data.stats = sanitizeStats(body.stats);
+  if (body.stats !== undefined) {
+    const previous = isObject(u.data.stats) ? u.data.stats : null;
+    const now = Date.now();
+    if (previous) {
+      const elapsed = now - (Number(u.data.statsAt) || 0);
+      u.data.stats = mergeStats(previous, body.stats, elapsed);
+    } else {
+      // 首次上传：直接采信净化后的值（可能是长期离线积累的真实数据）
+      u.data.stats = sanitizeStats(body.stats);
+    }
+    u.data.statsAt = now;
+  }
   u.data.updatedAt = new Date().toISOString();
   saveDB(db);
-  return ok(res, { message: '数据已上传到云端' });
+  return ok(res, { message: '数据已上传到云端', stats: u.data.stats });
 }
 
 // 下载学习数据（错题本 + 生词本）

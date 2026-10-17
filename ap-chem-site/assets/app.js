@@ -13967,8 +13967,9 @@ drawQuantum();
   if (!btnUser || !modal) return;
 
   // 后端地址：同源用相对路径；本地开发默认指向 8787 端口；可用 window.ACCT_API 覆盖
-  var API = (window.ACCT_API != null) ? window.ACCT_API :
-            ((location.hostname === "localhost" || location.hostname === "127.0.0.1") ? "http://localhost:8787" : "");
+  // 统一去掉结尾斜杠，避免与 "/api/..." 拼成双斜杠。
+  var API = String((window.ACCT_API != null) ? window.ACCT_API :
+            ((location.hostname === "localhost" || location.hostname === "127.0.0.1") ? "http://localhost:8787" : "")).replace(/\/+$/, "");
   var TOKEN_KEY = "acct_token", NAME_KEY = "acct_name";
   var token = "", username = "";
   try { token = localStorage.getItem(TOKEN_KEY) || ""; username = localStorage.getItem(NAME_KEY) || ""; } catch(e){}
@@ -14109,8 +14110,9 @@ drawQuantum();
     } catch(e){ return { token:"", name:"" }; }
   }
   function apiBase(){
-    if (window.ACCT_API != null) return window.ACCT_API;
-    return (location.hostname === "localhost" || location.hostname === "127.0.0.1") ? "http://localhost:8787" : "";
+    var base = (window.ACCT_API != null) ? window.ACCT_API
+             : ((location.hostname === "localhost" || location.hostname === "127.0.0.1") ? "http://localhost:8787" : "");
+    return String(base).replace(/\/+$/, "");   // 去掉结尾斜杠，避免拼成 "//api/..."
   }
   function loadStats(){
     try {
@@ -14155,11 +14157,19 @@ drawQuantum();
     return post("/api/sync/pull", {}).then(function(d){
       if (d && d.ok && d.data && d.data.stats){
         var srv = d.data.stats, s = loadStats();
-        // 取最大合并，避免多设备互相覆盖
-        s.answered = Math.max(s.answered, srv.answered|0);
-        s.correct = Math.max(s.correct, srv.correct|0);
-        s.onlineSeconds = Math.max(s.onlineSeconds, srv.onlineSeconds|0);
-        saveStats(s);
+        // 做题数与正确数整体采信更多的一方，避免逐字段取最大值把正确率抬高；
+        // 在线时长与答题数相互独立，两端口径一致，直接取较大值。
+        var merged = {
+          answered: s.answered,
+          correct: s.correct,
+          onlineSeconds: Math.max(s.onlineSeconds, srv.onlineSeconds|0)
+        };
+        if ((srv.answered|0) > merged.answered){
+          merged.answered = srv.answered|0;
+          merged.correct = srv.correct|0;
+        }
+        merged.correct = Math.min(merged.correct, merged.answered);   // 正确率不超过 100%
+        saveStats(merged);
       }
     });
   }
@@ -14221,7 +14231,9 @@ drawQuantum();
       return;
     }
     if (!rows.length){
-      box.innerHTML = '<p class="rank-loading">还没有人上榜（做题数量需达到 10 题及以上）。</p>';
+      // 门槛由服务端下发，避免文案与后端常量各自维护
+      var min = (d && d.min) || 10;
+      box.innerHTML = '<p class="rank-loading">还没有人上榜（做题数量需达到 ' + min + ' 题及以上）。</p>';
       return;
     }
     var h = '<table class="rank-table"><thead><tr><th>排名</th><th>用户名</th><th>做题数量</th><th>正确率</th></tr></thead><tbody>';
