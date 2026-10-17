@@ -861,8 +861,8 @@
   let bookData, groupId='all', questionType='all', search='', wrongOnly=false, questionIndex=0;
   let history=read('apchem.bookHistory.v1',{});
   if (!history || typeof history !== 'object' || Array.isArray(history)) history={};
-  let selected=null, revealed=false, written='';
-  function resetAnswer() { selected=null;revealed=false;written=''; }
+  let selected=null, revealed=false, written='', recorded=false;
+  function resetAnswer() { selected=null;revealed=false;written='';recorded=false; }
   function filtered() {
     if (!bookData) return [];
     const unit=content.chapters.find(c=>'unit'+c.id===groupId);
@@ -886,7 +886,12 @@
     });
     div.append(...parsed.body.childNodes);return div;
   }
-  function record(q, correct, choice=null) { history[q.id]={correct,choice,at:Date.now()};save('apchem.bookHistory.v1',history); }
+  function record(q, correct, choice=null) {
+    if (recorded) return;
+    recorded=true;
+    history[q.id]={correct,choice,at:Date.now()};save('apchem.bookHistory.v1',history);
+    if (window.__answerStats) window.__answerStats(correct);
+  }
   function renderBookShell() {
     hideAllPopups();
     book.replaceChildren();
@@ -956,7 +961,12 @@
       if(q.answer!==null)feedback.append(el('h3',selected===q.answer?'book-correct':'book-incorrect',selected===q.answer?t('Correct','回答正确'):t(`Correct answer: ${String.fromCharCode(65+q.answer)}`,`正确选项：${String.fromCharCode(65+q.answer)}`)));
       else feedback.append(el('p','',t('Compare with the source explanation and assess your work. This question is not auto-graded.','请对照原书解析自行判断；本题不自动判分。')));
       feedback.append(bookHtml(q.explanation || t('No source explanation was found.','没有找到对应的原书解析。')));
-      if(q.answer===null)feedback.append(button('I got it right','我答对了',()=>{record(q,true);progress.textContent=t('Recorded as correct','已记录为答对');}),button('Review later','加入错题',()=>{record(q,false);progress.textContent=t('Saved for review','已加入书本错题');}));
+      if(q.answer===null) {
+        const right=button('I got it right','我答对了',()=>{record(q,true);if(wrongOnly)resetAnswer();renderBookQuestion();progress.textContent=t('Recorded as correct','已记录为答对');});
+        const review=button('Review later','加入错题',()=>{record(q,false);renderBookQuestion();progress.textContent=t('Saved for review','已加入书本错题');});
+        right.disabled=review.disabled=recorded;
+        feedback.append(right,review);
+      }
       article.append(feedback);
     }
     const source=el('details','book-source-sheet');source.append(el('summary','',t('Open original question section to verify context','打开原书题目区核对上下文')),bookHtml(q.group.sheets[q.type]));article.append(source);
